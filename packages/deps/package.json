@@ -1,0 +1,50 @@
+{
+  "name": "@damatjs/deps",
+  "version": "0.0.1",
+  "description": "Dependencies for damat",
+  "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/damatjs/damat",
+    "directory": "packages/deps"
+  },
+  "engines": {
+    "bun": ">=1.1.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./dist/index.js",
+    "./mikro-orm/cli": "./dist/mikro-orm-cli.js",
+    "./mikro-orm/core": "./dist/mikro-orm-core.js",
+    "./mikro-orm/knex": "./dist/mikro-orm-knex.js",
+    "./mikro-orm/migrations": "./dist/mikro-orm-migrations.js",
+    "./mikro-orm/postgresql": "./dist/mikro-orm-postgresql.js",
+    "./awilix": "./dist/awilix.js",
+    "./pg": "./dist/pg.js",
+    "./zod": "./dist/zod.js"
+  },
+  "author": "Abel Lamesgen",
+  "license": "MIT",
+  "scripts": {
+    "build": "bun run rm -rf dist && bun tsc --build"
+  },
+  "dependencies": {
+    "@mikro-orm/cli": "6.6.7",
+    "@mikro-orm/core": "6.6.7",
+    "@mikro-orm/knex": "6.6.7",
+    "@mikro-orm/migrations": "6.6.7",
+    "@mikro-orm/postgresql": "6.6.7",
+    "awilix": "^13.0.0",
+    "pg": "^8.18.0",
+    "zod": "4.3.6"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.16.0"
+  },
+  "gitHead": "88279c89e019c471d226216f4bc5be9f9a0c2a4a"
+}
