@@ -6,7 +6,7 @@
 
 import type { BaseModuleService } from "@/microOrm";
 import type { ModuleDefinition, ModuleInstance } from "./types";
-import { EntityManager } from '@damatjs/orm';
+import { EntityManager } from '@damatjs/orm-model';
 import { z } from "@damatjs/deps/zod";
 
 /**

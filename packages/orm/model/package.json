@@ -1,5 +1,5 @@
 {
-  "name": "@damatjs/orm",
+  "name": "@damatjs/orm-model",
   "description": "Damatjs orm utils definition",
   "version": "0.0.1",
   "type": "module",

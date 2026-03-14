@@ -24,7 +24,8 @@
   "dependencies": {
     "@damatjs/deps": "*",
     "@damatjs/utils": "*",
-    "@damatjs/orm": "*",
+    "@damatjs/orm-migration": "*",
+    "@damatjs/orm-model": "*",
     "@damatjs/types": "*"
   },
   "devDependencies": {

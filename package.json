@@ -22,6 +22,7 @@
     "backend/*",
     "packages/*",
     "packages/cli/*",
-    "packages/core/*"
+    "packages/core/*",
+    "packages/orm/*"
   ]
 }
