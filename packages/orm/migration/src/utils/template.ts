@@ -1,4 +1,4 @@
-import type { GeneratedMigration } from "../types";
+import { GeneratedMigration } from '@/types';
 
 /**
  * Get the base migration template (empty)

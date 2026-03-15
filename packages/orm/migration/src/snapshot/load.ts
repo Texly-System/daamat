@@ -4,6 +4,27 @@ import type { ModuleSnapshot } from "../types/snapshot";
 import { EMPTY_SNAPSHOT } from "../types/snapshot";
 import { getSnapshotPath } from "./path";
 
+
+/**
+ * Load the persisted snapshot for a module.
+ *
+ * Always returns a valid `ModuleSnapshot` — never throws, never returns
+ * undefined. Falls back to the empty baseline when the file is missing or
+ * cannot be parsed.
+ *
+ * @param migrationsDir  Absolute path to the module's migrations directory
+ */
+export function snapshotExist(migrationsDir: string): boolean {
+  const filePath = getSnapshotPath(migrationsDir);
+
+  if (!fs.existsSync(filePath)) {
+    return false;
+  }
+
+  return true;
+}
+
+
 /**
  * Load the persisted snapshot for a module.
  *
