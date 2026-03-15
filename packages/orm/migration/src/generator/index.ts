@@ -25,5 +25,4 @@ export * from "./initialMigration";
 
 export * from "./utils";
 export * from "./introspection";
-export * from "./sqlGenerator";
 export * from "./types";
