@@ -10,6 +10,7 @@ import { runMigrations } from "../../executor";
 import { log, successBanner, errorBanner } from "../../logger";
 import { DEFAULT_MODULES_DIR } from "../../generator";
 import type { CommandResult } from "./types";
+import { requireDatabaseUrl } from "./types";
 
 /**
  * Run all pending migrations (up command).
@@ -21,7 +22,7 @@ export async function commandUp(options: CliOptions): Promise<CommandResult> {
   log("info", "Running module migrations...");
   console.log("");
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString: requireDatabaseUrl() });
   try {
     const results = await runMigrations(
       pool,

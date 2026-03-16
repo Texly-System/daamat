@@ -10,6 +10,7 @@ import { getMigrationStatus, getModuleMigrationStatus } from "../../executor";
 import { log } from "../../logger";
 import { DEFAULT_MODULES_DIR } from "../../generator";
 import type { CommandResult } from "./types";
+import { requireDatabaseUrl } from "./types";
 
 /**
  * Show migration status.
@@ -29,7 +30,7 @@ export async function commandStatus(
   }
   console.log("");
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString: requireDatabaseUrl() });
   try {
     let hasModules = false;
 

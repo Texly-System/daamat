@@ -51,7 +51,7 @@ export function discoverModuleMigrations(
       return {
         name: file.replace(".ts", ""),
         module: moduleName,
-        path: path.join(migrationsDir, file),
+        path: path.resolve(migrationsDir, file),
         timestamp,
         applied: false, // updated when cross-referenced with the DB tracker
       };

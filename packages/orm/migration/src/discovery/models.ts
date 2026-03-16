@@ -54,9 +54,15 @@ export async function discoverModels(
 
   const files = fs
     .readdirSync(modelsDir)
-    .filter((f) => /\.(ts|js)$/.test(f) && !f.endsWith(".d.ts"))
+    .filter(
+      (f) =>
+        /\.(ts|js)$/.test(f) &&
+        !f.endsWith(".d.ts") &&
+        f !== "index.ts" &&
+        f !== "index.js",
+    )
     .sort()
-    .map((f) => path.join(modelsDir, f));
+    .map((f) => path.resolve(modelsDir, f));
 
   if (files.length === 0) {
     throw new Error(

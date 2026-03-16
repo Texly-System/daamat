@@ -1,30 +1,21 @@
 /**
- * Verification Entity
- * 
+ * Verification Model
+ *
  * Email verification tokens (Better Auth compatible)
  */
 
-import { Entity, Property, PrimaryKey, Index, Opt } from '@damatjs/deps/mikro-orm/core'
-import { v4 as uuid } from '@damatjs/deps/uuid';
+import { model } from "@damatjs/orm-model/transform";
 
-@Entity({ tableName: 'verifications' })
-export class Verification {
-    @PrimaryKey()
-    id: string = uuid();
+export const Verification = model
+  .define("verifications", {
+    id: model.id({ prefix: "ver" }).primaryKey(),
 
-    @Property()
-    @Index()
-    identifier!: string; // email or phone
+    identifier: model.text(), // email or phone
+    value: model.text(), // token or code
 
-    @Property()
-    value!: string; // token or code
+    expiresAt: model.timestamp({ withTimezone: true }),
 
-    @Property()
-    expiresAt!: Date;
-
-    @Property()
-    createdAt: Date & Opt = new Date();
-
-    @Property({ onUpdate: () => new Date() })
-    updatedAt: Date & Opt = new Date();
-}
+    createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+    updatedAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+  })
+  .indexes([{ on: ["identifier"], name: "idx_verifications_identifier" }]);

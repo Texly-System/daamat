@@ -15,6 +15,8 @@
       "version": "0.0.0",
       "dependencies": {
         "@damatjs/deps": "*",
+        "@damatjs/orm-migration": "*",
+        "@damatjs/orm-model": "*",
         "@damatjs/services": "*",
         "@damatjs/types": "*",
         "@damatjs/utils": "*",
@@ -120,6 +122,9 @@
     "packages/orm/migration": {
       "name": "@damatjs/orm-migration",
       "version": "0.0.1",
+      "bin": {
+        "damat-migrate": "./dist/cli/bin.js",
+      },
       "dependencies": {
         "@damatjs/deps": "*",
         "@damatjs/orm-model": "*",
@@ -1405,6 +1410,8 @@
     "zod": ["zod@4.3.6", "", {}, "sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg=="],
 
     "@better-auth/core/jose": ["jose@6.2.1", "", {}, "sha512-jUaKr1yrbfaImV7R2TN/b3IcZzsw38/chqMpo2XJ7i2F8AfM/lA4G1goC3JVEwg0H7UldTmSt3P68nt31W7/mw=="],
+
+    "@damatjs/default/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@damatjs/deps/nanoid": ["nanoid@5.1.6", "", { "bin": { "nanoid": "bin/nanoid.js" } }, "sha512-c7+7RQ+dMB5dPwwCp4ee1/iV/q2P6aK1mTZcfr1BTuVlyW9hJYiMPybJCcnBlQtuSmTIWNeazm/zqNoZSSElBg=="],
 

@@ -11,6 +11,7 @@ import { resolveModules } from "../../discovery";
 import { log, successBanner, errorBanner } from "../../logger";
 import { DEFAULT_MODULES_DIR } from "../../generator";
 import type { CommandResult } from "./types";
+import { requireDatabaseUrl } from "./types";
 
 /**
  * Revert migrations for a module.
@@ -28,7 +29,7 @@ export async function commandRevert(
   if (!moduleName) {
     log("error", "Module name is required");
     console.error("");
-    console.error("Usage: npm run db:migrate:revert <module> [count] [--all]");
+    console.error("Usage: damat-migrate revert <module> [count] [--all]");
     console.error("");
     console.error("Modules with migrations:");
 
@@ -48,7 +49,7 @@ export async function commandRevert(
   log("info", `Reverting migrations for module '${moduleName}'...`);
   console.log("");
 
-  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  const pool = new Pool({ connectionString: requireDatabaseUrl() });
   try {
     const count = allFlag ? 9999 : countArg ? parseInt(countArg, 10) : 1;
     const result = await revertMigrations(pool, modulesDir, moduleName, count);

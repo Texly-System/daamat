@@ -1,38 +1,22 @@
 /**
- * User Entity
- * 
+ * User Model
+ *
  * Core user identity for authentication (Better Auth compatible)
  */
 
-import { Entity, Property, PrimaryKey, Index, Opt } from '@damatjs/deps/mikro-orm/core'
-import { v4 as uuid } from '@damatjs/deps/uuid';
+import { model } from "@damatjs/orm-model/transform";
 
-@Entity({ tableName: 'users' })
-export class User {
-    @PrimaryKey()
-    id: string = uuid();
+export const User = model
+  .define("users", {
+    id: model.id({ prefix: "usr" }).primaryKey(),
 
-    @Property()
-    @Index()
-    email!: string;
+    email: model.text(),
+    emailVerified: model.boolean().default(false),
+    name: model.text().nullable(),
+    image: model.text().nullable(),
 
-    @Property({ default: false })
-    emailVerified: boolean & Opt = false;
-
-    @Property({ nullable: true })
-    name?: string;
-
-    @Property({ nullable: true, type: 'text' })
-    image?: string;
-
-    @Property()
-    createdAt: Date & Opt = new Date();
-
-    @Property({ onUpdate: () => new Date() })
-    updatedAt: Date & Opt = new Date();
-
-    @Property({ nullable: true })
-    deletedAt?: Date;
-
-    // Relations will be added via links
-}
+    createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+    updatedAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+    deletedAt: model.timestamp({ withTimezone: true }).nullable(),
+  })
+  .indexes([{ on: ["email"], unique: true, name: "uniq_users_email" }]);
