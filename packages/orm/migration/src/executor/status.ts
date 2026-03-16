@@ -6,10 +6,7 @@
 
 import type { Pool } from "@damatjs/deps/pg";
 import type { MigrationStatus, ModuleMigrationStatus } from "../types";
-import {
-  discoverModuleMigrations,
-  listModulesWithMigrations,
-} from "../discovery";
+import { discoverModuleMigrations, resolveModules } from "../discovery";
 import { MigrationTracker } from "../tracker";
 
 /**
@@ -18,15 +15,15 @@ import { MigrationTracker } from "../tracker";
 export async function getMigrationStatus(
   pool: Pool,
   modulesDir: string,
-  modules?: string[],
+  activeModules?: string[],
 ): Promise<MigrationStatus> {
   const tracker = new MigrationTracker(pool);
   await tracker.ensureTable();
 
-  const modulesData = listModulesWithMigrations(modulesDir, modules);
+  const modules = resolveModules(modulesDir, activeModules);
   const result: ModuleMigrationStatus[] = [];
 
-  for (const moduleName of modulesData) {
+  for (const moduleName of modules) {
     const migrations = discoverModuleMigrations(modulesDir, moduleName);
     const applied = await tracker.getApplied(moduleName);
     const appliedNames = new Set(applied.map((a) => a.name));
@@ -57,14 +54,14 @@ export async function getModuleMigrationStatus(
   const tracker = new MigrationTracker(pool);
   await tracker.ensureTable();
 
-  const modules = listModulesWithMigrations(modulesDir, [moduleName]);
+  const migrations = discoverModuleMigrations(modulesDir, moduleName);
 
-  if (modules.length === 0) {
-    throw new Error(`Module '${moduleName}' not found at ${modulesDir}`);
+  if (migrations.length === 0) {
+    throw new Error(
+      `Module '${moduleName}' not found or has no migrations at ${modulesDir}`,
+    );
   }
 
-  const mod = modules[0]!;
-  const migrations = discoverModuleMigrations(modulesDir, mod);
   const applied = await tracker.getApplied(moduleName);
   const appliedNames = new Set(applied.map((a) => a.name));
 

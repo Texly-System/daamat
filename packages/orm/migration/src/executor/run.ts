@@ -7,38 +7,34 @@
 import type { Pool } from "@damatjs/deps/pg";
 import type { ModuleMigrationResult } from "../types";
 import { log } from "../logger";
-import {
-  discoverModuleMigrations,
-  listModulesWithMigrations,
-} from "../discovery";
+import { discoverModuleMigrations, resolveModules } from "../discovery";
 import { MigrationTracker } from "../tracker";
 import { executeMigration } from "./migration";
 
 /**
- * Run pending migrations for a module or all modules.
+ * Run pending migrations for all or specific modules.
  *
- * @param pool         - pg connection pool
- * @param modulesDir   - Path to the modules directory
- * @param activeModules - List of active module names
- * @param moduleName   - Optional specific module to run migrations for
+ * @param pool          - pg connection pool
+ * @param modulesDir    - Path to the modules directory
+ * @param activeModules - Optional allowlist of module names (empty/omitted = all discovered)
+ * @param moduleName    - Optional single module to target
  */
 export async function runMigrations(
   pool: Pool,
   modulesDir: string,
-  modules?: string[],
+  activeModules?: string[],
   moduleName?: string,
 ): Promise<ModuleMigrationResult[]> {
   const tracker = new MigrationTracker(pool);
   await tracker.ensureTable();
 
-  const results: ModuleMigrationResult[] = [];
-  const modulesData = moduleName
+  const modules = moduleName
     ? [moduleName]
-    : listModulesWithMigrations(modulesDir, modules);
+    : resolveModules(modulesDir, activeModules);
 
-  for (const mod of modulesData) {
-    const result = await runModuleMigrations(pool, modulesDir, mod, tracker);
-    results.push(result);
+  const results: ModuleMigrationResult[] = [];
+  for (const mod of modules) {
+    results.push(await runModuleMigrations(pool, modulesDir, mod, tracker));
   }
 
   return results;

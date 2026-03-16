@@ -2,6 +2,7 @@
  * Migration CLI
  *
  * Main entry point for the migration command-line interface.
+ * Reads DATABASE_URL from environment via dotenv.
  */
 
 import "dotenv/config";
@@ -28,9 +29,8 @@ import type { CliOptions } from "../types";
  * import { runCli } from '@damatjs/orm-migration';
  *
  * runCli({
- *   database: { url: process.env.DATABASE_URL! },
- *   modulesDir: 'src/modules',           // optional, defaults to "src/modules"
- *   activeModules: ['user', 'billing'],
+ *   modulesDir: 'src/modules',     // optional, defaults to "src/modules"
+ *   modules: ['user', 'billing'],
  *   command: process.env.MIGRATION_CMD ?? 'up',
  * });
  * ```
@@ -42,48 +42,36 @@ export async function runCli(options: CliOptions): Promise<void> {
     let result;
 
     switch (options.command) {
-      // Run pending migrations
       case undefined:
       case "migrate":
       case "up":
         result = await commandUp(options);
         break;
 
-      // Show migration status
       case "status":
         result = await commandStatus(options, args);
         break;
 
-      // Create a new migration
       case "create":
         result = await commandCreate(options, args);
         break;
 
-      // Revert migrations
       case "revert":
         result = await commandRevert(options, args);
         break;
 
-      // List modules
       case "list":
         result = await commandList(options);
         break;
 
-      // Help
       case "help":
       case "--help":
       case "-h":
         result = commandHelp();
         break;
 
-      // Unknown command
       default:
         result = commandUnknown(options.command);
-    }
-
-    // Close pool if opened
-    if (result.pool) {
-      await result.pool.end();
     }
 
     process.exit(result.exitCode);
