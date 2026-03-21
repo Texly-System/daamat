@@ -4,7 +4,7 @@
  * Email verification tokens (Better Auth compatible)
  */
 
-import { model } from "@damatjs/orm-model/transform";
+import { model } from "@damatjs/orm-model";
 
 export const Verification = model
   .define("verifications", {

@@ -1,9 +1,5 @@
-import {
-  BelongsToBuilder,
-  ColumnBuilder,
-  HasManyBuilder,
-  HasOneBuilder,
-} from "@/transform";
+
+import { BelongsToBuilder, ColumnBuilder, HasManyBuilder, HasOneBuilder } from '@/properties';
 import { IndexDefinition, TableSchema } from ".";
 
 /**

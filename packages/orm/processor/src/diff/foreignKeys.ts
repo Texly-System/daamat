@@ -1,4 +1,4 @@
-import type { ForeignKeySchema } from "@damatjs/orm-model/types";
+import type { ForeignKeySchema } from "@damatjs/orm-model";
 import type {
   AddForeignKeyChange,
   DropForeignKeyChange,

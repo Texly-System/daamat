@@ -4,7 +4,7 @@
  * User sessions for authentication (Better Auth compatible)
  */
 
-import { model } from "@damatjs/orm-model/transform";
+import { model } from "@damatjs/orm-model";
 import { User } from "./user";
 
 export const Session = model

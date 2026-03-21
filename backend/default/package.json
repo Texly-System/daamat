@@ -31,6 +31,7 @@
     "@damatjs/utils": "*",
     "@damatjs/workflow-engine": "*",
     "@damatjs/orm-migration": "*",
+    "@damatjs/orm-connector": "*",
     "@damatjs/orm-model": "*",
     "@hono/node-server": "^1.13.7",
     "bcryptjs": "^2.4.3",

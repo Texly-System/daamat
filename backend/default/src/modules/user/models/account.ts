@@ -4,7 +4,7 @@
  * OAuth/Auth provider accounts linked to users (Better Auth compatible)
  */
 
-import { model } from "@damatjs/orm-model/transform";
+import { model } from "@damatjs/orm-model";
 import { User } from "./user";
 
 export const Account = model

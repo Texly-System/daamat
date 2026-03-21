@@ -2,7 +2,7 @@ import type {
   ColumnSchema,
   ForeignKeySchema,
   IndexSchema,
-} from "@damatjs/orm-model/types";
+} from "@damatjs/orm-model";
 import type { NativeEnum } from "../types/snapshot";
 
 /**
@@ -68,6 +68,6 @@ export function nativeEnumsEqual(a: NativeEnum, b: NativeEnum): boolean {
   return (
     a.schema === b.schema &&
     JSON.stringify(a.values.slice().sort()) ===
-      JSON.stringify(b.values.slice().sort())
+    JSON.stringify(b.values.slice().sort())
   );
 }

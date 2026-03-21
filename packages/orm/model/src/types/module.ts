@@ -1,26 +1,13 @@
-import type {
-  EntityClass,
-} from "@damatjs/deps/mikro-orm/postgresql";
-
-// =============================================================================
-// MODULE DEFINITION
-// =============================================================================
+import { EnumSchema, TableSchema } from "./";
 
 /**
- * Database module definition.
- * Each feature module registers its entities and migrations path here.
+ * Schema for an entire module (collection of tables)
  */
-export interface DatabaseModule {
-  /** Unique module name */
-  name: string;
-  /** Entity classes owned by this module */
-  entities: EntityClass<any>[];
-  /** Path to migrations directory (relative to module) */
-  migrationsPath?: string;
+export interface ModuleSchema {
+    /** Module name */
+    moduleName: string;
+    /** Tables in the module */
+    tables: TableSchema[];
+    /** Enum types defined in the module */
+    enums: EnumSchema[];
 }
-
-/**
- * Database module registry.
- * Maps module names to their definitions.
- */
-export type DatabaseModuleRegistry = Record<string, DatabaseModule>;

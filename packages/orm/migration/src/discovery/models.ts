@@ -14,7 +14,7 @@ import path from "node:path";
 import type {
   ModelDefinition,
   ModelProperties,
-} from "@damatjs/orm-model/types";
+} from "@damatjs/orm-model";
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -48,7 +48,7 @@ export async function discoverModels(
   if (!fs.existsSync(modelsDir)) {
     throw new Error(
       `Models directory not found: ${modelsDir}\n` +
-        `Expected convention: {modulesDir}/{moduleName}/models/`,
+      `Expected convention: {modulesDir}/{moduleName}/models/`,
     );
   }
 
@@ -67,7 +67,7 @@ export async function discoverModels(
   if (files.length === 0) {
     throw new Error(
       `No model files found in ${modelsDir}.\n` +
-        `Create at least one .ts file that exports a createModelDefinition() value.`,
+      `Create at least one .ts file that exports a createModelDefinition() value.`,
     );
   }
 
@@ -85,7 +85,7 @@ export async function discoverModels(
   if (models.length === 0) {
     throw new Error(
       `No ModelDefinition exports found in ${modelsDir}.\n` +
-        `Make sure each model file exports a value created with createModelDefinition().`,
+      `Make sure each model file exports a value created with createModelDefinition().`,
     );
   }
 
@@ -108,8 +108,8 @@ function isModelDefinition(
     value !== null &&
     typeof value === "object" &&
     typeof (value as ModelDefinition<ModelProperties>)._tableName ===
-      "string" &&
+    "string" &&
     typeof (value as ModelDefinition<ModelProperties>).toTableSchema ===
-      "function"
+    "function"
   );
 }

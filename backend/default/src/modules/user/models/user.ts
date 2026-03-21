@@ -4,7 +4,7 @@
  * Core user identity for authentication (Better Auth compatible)
  */
 
-import { model } from "@damatjs/orm-model/transform";
+import { model } from "@damatjs/orm-model";
 
 export const User = model
   .define("users", {
