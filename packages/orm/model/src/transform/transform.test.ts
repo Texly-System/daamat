@@ -1,6 +1,11 @@
 import { describe, it, expect } from "bun:test";
 import { model } from "./schema/model";
 import {
+  validateRelations,
+  assertValidRelations,
+  RelationValidationError,
+} from "./schema/validateRelations";
+import {
   Category,
   User,
   Product,
@@ -301,6 +306,282 @@ describe("transform", () => {
       const colNames = User.toTableSchema().columns.map((c) => c.name);
       expect(colNames).not.toContain("orders");
       expect(colNames).not.toContain("orders_id");
+    });
+  });
+
+  // ── hasMany / hasOne relations ────────────────────────────────────────────
+
+  describe("hasMany / hasOne relations", () => {
+    it("User has a hasMany relation to orders in schema", () => {
+      const schema = User.toTableSchema();
+      expect(schema.relations).toHaveLength(1);
+      expect(schema.relations[0]!.name).toBe("orders");
+      expect(schema.relations[0]!.type).toBe("hasMany");
+      expect(schema.relations[0]!.targetTable).toBe("orders");
+      expect(schema.relations[0]!.mappedBy).toBe("user");
+    });
+
+    it("belongsTo does not create relation entries (it creates FK columns)", () => {
+      const schema = Order.toTableSchema();
+      // Order has belongsTo User, but that creates an FK column, not a relation entry
+      expect(schema.relations).toHaveLength(0);
+      // But it does have the FK column
+      const fkColumn = schema.columns.find((c) => c.name === "user_id");
+      expect(fkColumn).toBeDefined();
+    });
+
+    it("hasMany mappedBy is optional", () => {
+      const Parent = model.define("parents", {
+        id: model.id().primaryKey(),
+        // hasMany without mappedBy
+        children: model.hasMany(() => ({ _tableName: "children" })),
+      });
+
+      const schema = Parent.toTableSchema();
+      expect(schema.relations).toHaveLength(1);
+      expect(schema.relations[0]!.name).toBe("children");
+      expect(schema.relations[0]!.mappedBy).toBeUndefined();
+    });
+
+    it("hasOne is captured in relations array", () => {
+      const Profile = model.define("profiles", {
+        id: model.id().primaryKey(),
+      });
+
+      const Account = model.define("accounts", {
+        id: model.id().primaryKey(),
+        profile: model.hasOne(Profile, { mappedBy: "account" }),
+      });
+
+      const schema = Account.toTableSchema();
+      expect(schema.relations).toHaveLength(1);
+      expect(schema.relations[0]!.type).toBe("hasOne");
+      expect(schema.relations[0]!.targetTable).toBe("profiles");
+      expect(schema.relations[0]!.mappedBy).toBe("account");
+    });
+  });
+
+  // ── belongsTo FK naming ───────────────────────────────────────────────────
+
+  describe("belongsTo FK naming", () => {
+    it("FK column name defaults to property name + _id", () => {
+      const Author = model.define("authors", {
+        id: model.id().primaryKey(),
+      });
+
+      const Book = model.define("books", {
+        id: model.id().primaryKey(),
+        // Property name is "author", so FK should be "author_id"
+        author: model.belongsTo(Author),
+      });
+
+      const schema = Book.toTableSchema();
+      const fkColumn = schema.columns.find((c) => c.name === "author_id");
+      expect(fkColumn).toBeDefined();
+      expect(fkColumn!.type).toBe("text");
+    });
+
+    it("FK column name can be overridden via foreignKey option", () => {
+      const Publisher = model.define("publishers", {
+        id: model.id().primaryKey(),
+      });
+
+      const Magazine = model.define("magazines", {
+        id: model.id().primaryKey(),
+        // Property name is "publisher", but we override FK to "pub_ref"
+        publisher: model.belongsTo(Publisher, { foreignKey: "pub_ref" }),
+      });
+
+      const schema = Magazine.toTableSchema();
+      const fkColumn = schema.columns.find((c) => c.name === "pub_ref");
+      expect(fkColumn).toBeDefined();
+      // Default name should NOT exist
+      const defaultFk = schema.columns.find((c) => c.name === "publisher_id");
+      expect(defaultFk).toBeUndefined();
+    });
+
+    it("Order FK column is user_id (property name based)", () => {
+      // Verify the existing fixture uses property-based naming
+      const orderSchema = Order.toTableSchema();
+      const fkColumn = orderSchema.columns.find((c) => c.name === "user_id");
+      expect(fkColumn).toBeDefined();
+    });
+  });
+
+  // ── relation validation ───────────────────────────────────────────────────
+
+  describe("relation validation", () => {
+    it("validates correct bidirectional relations (no errors)", () => {
+      // Define Child first, then Parent references it
+      const Child = model.define("children", {
+        id: model.id().primaryKey(),
+      });
+
+      const Parent = model.define("parents", {
+        id: model.id().primaryKey(),
+        children: model.hasMany(Child, { mappedBy: "parent" }),
+      });
+
+      // Add belongsTo to Child after Parent is defined
+      const ChildWithRelation = model.define("children_v2", {
+        id: model.id().primaryKey(),
+        parent: model.belongsTo(Parent),
+      });
+
+      // Use Parent with hasMany pointing to ChildWithRelation
+      const ParentFinal = model.define("parents_final", {
+        id: model.id().primaryKey(),
+        children: model.hasMany(ChildWithRelation, { mappedBy: "parent" }),
+      });
+
+      const result = validateRelations([ParentFinal, ChildWithRelation]);
+      expect(result.valid).toBe(true);
+      expect(result.errors).toHaveLength(0);
+    });
+
+    it("detects missing belongsTo for hasMany", () => {
+      const Book = model.define("books_test", {
+        id: model.id().primaryKey(),
+        title: model.text(),
+        // Missing: author: model.belongsTo(Author)
+      });
+
+      const Author = model.define("authors_test", {
+        id: model.id().primaryKey(),
+        books: model.hasMany(Book, { mappedBy: "author" }),
+      });
+
+      const result = validateRelations([Author, Book]);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]!.errorType).toBe("missing_belongsTo");
+      expect(result.errors[0]!.message).toContain(
+        'does not have a property named "author"',
+      );
+    });
+
+    it("detects missing belongsTo for hasOne", () => {
+      const Passport = model.define("passports_test", {
+        id: model.id().primaryKey(),
+        number: model.text(),
+        // Missing: owner: model.belongsTo(Person)
+      });
+
+      const Person = model.define("persons_test", {
+        id: model.id().primaryKey(),
+        passport: model.hasOne(Passport, { mappedBy: "owner" }),
+      });
+
+      const result = validateRelations([Person, Passport]);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]!.errorType).toBe("missing_belongsTo");
+    });
+
+    it("detects mappedBy pointing to non-belongsTo property", () => {
+      const Member = model.define("members_test", {
+        id: model.id().primaryKey(),
+        // "group" exists but is not a belongsTo - it's a text column
+        group: model.text(),
+      });
+
+      const Group = model.define("groups_test", {
+        id: model.id().primaryKey(),
+        members: model.hasMany(Member, { mappedBy: "group" }),
+      });
+
+      const result = validateRelations([Group, Member]);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]!.errorType).toBe("mappedBy_mismatch");
+      expect(result.errors[0]!.message).toContain(
+        "is not a belongsTo relation",
+      );
+    });
+
+    it("detects missing hasMany for belongsTo with mappedBy", () => {
+      const Department = model.define("departments_test", {
+        id: model.id().primaryKey(),
+        name: model.text(),
+        // Missing: employees: model.hasMany(Employee, { mappedBy: "department" })
+      });
+
+      const Employee = model.define("employees_test", {
+        id: model.id().primaryKey(),
+        department: model.belongsTo(Department, { mappedBy: "employees" }),
+      });
+
+      const result = validateRelations([Department, Employee]);
+      expect(result.valid).toBe(false);
+      expect(result.errors).toHaveLength(1);
+      expect(result.errors[0]!.errorType).toBe("missing_hasMany");
+      expect(result.errors[0]!.message).toContain(
+        'does not have a property named "employees"',
+      );
+    });
+
+    it("skips validation for models not in the provided list", () => {
+      // Only provide Author, not Book - validation should pass (nothing to check)
+      const Author = model.define("authors_skip", {
+        id: model.id().primaryKey(),
+        books: model.hasMany(() => ({ _tableName: "books_skip" }), {
+          mappedBy: "author",
+        }),
+      });
+
+      const result = validateRelations([Author]);
+      expect(result.valid).toBe(true);
+    });
+
+    it("hasMany without mappedBy skips inverse validation", () => {
+      const Folder = model.define("folders_test", {
+        id: model.id().primaryKey(),
+        // hasMany without mappedBy - no inverse validation needed
+        files: model.hasMany(() => ({ _tableName: "files_test" })),
+      });
+
+      const result = validateRelations([Folder]);
+      expect(result.valid).toBe(true);
+    });
+
+    it("assertValidRelations throws on first error", () => {
+      const B = model.define("table_b_test", {
+        id: model.id().primaryKey(),
+        // Missing belongsTo
+      });
+
+      const A = model.define("table_a_test", {
+        id: model.id().primaryKey(),
+        bs: model.hasMany(B, { mappedBy: "a" }),
+      });
+
+      expect(() => assertValidRelations([A, B])).toThrow(
+        RelationValidationError,
+      );
+    });
+
+    it("assertValidRelations passes for valid relations", () => {
+      const Y = model.define("table_y_test", {
+        id: model.id().primaryKey(),
+      });
+
+      const X = model.define("table_x_test", {
+        id: model.id().primaryKey(),
+        ys: model.hasMany(Y, { mappedBy: "x" }),
+      });
+
+      // Create Y with belongsTo
+      const YWithRelation = model.define("table_y_final", {
+        id: model.id().primaryKey(),
+        x: model.belongsTo(X),
+      });
+
+      const XFinal = model.define("table_x_final", {
+        id: model.id().primaryKey(),
+        ys: model.hasMany(YWithRelation, { mappedBy: "x" }),
+      });
+
+      expect(() => assertValidRelations([XFinal, YWithRelation])).not.toThrow();
     });
   });
 });

@@ -1,15 +1,19 @@
 import {
   TableSchema,
   PrimaryKeySchema,
-  ColumnSchema, IndexSchema,
+  ColumnSchema,
+  IndexSchema,
   ForeignKeySchema,
+  RelationSchema,
   ModelDefinition,
-  ModelProperties
+  ModelProperties,
 } from "@/types";
 import {
   ColumnBuilder,
   BelongsToBuilder,
-  convertIndexDefinition
+  HasManyBuilder,
+  HasOneBuilder,
+  convertIndexDefinition,
 } from "../properties";
 
 /**
@@ -21,6 +25,7 @@ export function convertModelToTableSchema<T extends ModelProperties>(
   const columns: ColumnSchema[] = [];
   const foreignKeys: ForeignKeySchema[] = [];
   const indexSchemas: IndexSchema[] = [];
+  const relations: RelationSchema[] = [];
   let primaryKeyColumns: string[] = [];
   let primaryKeyName = `${model._tableName}_pkey`;
 
@@ -37,6 +42,9 @@ export function convertModelToTableSchema<T extends ModelProperties>(
         primaryKeyColumns.push(propName);
       }
     } else if (propValue instanceof BelongsToBuilder) {
+      // Set the property name so getForeignKeyColumn() can use it for default naming
+      propValue._setPropertyName(propName);
+
       // BelongsTo creates a foreign key column
       const fkColumnName = propValue.getForeignKeyColumn();
       const columnBuilder = propValue.toColumnBuilder();
@@ -52,8 +60,24 @@ export function convertModelToTableSchema<T extends ModelProperties>(
           targetTableName,
         ),
       );
+    } else if (
+      propValue instanceof HasManyBuilder ||
+      propValue instanceof HasOneBuilder
+    ) {
+      // HasMany and HasOne don't create columns - capture as relation metadata
+      const relationSchema: RelationSchema = {
+        name: propName,
+        type: propValue instanceof HasManyBuilder ? "hasMany" : "hasOne",
+        targetTable: propValue.getTargetTableName(),
+      };
+
+      const mappedBy = propValue.getMappedBy();
+      if (mappedBy !== undefined) {
+        relationSchema.mappedBy = mappedBy;
+      }
+
+      relations.push(relationSchema);
     }
-    // HasMany and HasOne don't create columns - they're just metadata
   }
 
   // Convert index definitions to IndexSchema
@@ -74,6 +98,7 @@ export function convertModelToTableSchema<T extends ModelProperties>(
     indexes: indexSchemas,
     foreignKeys,
     primaryKey,
+    relations,
   };
 
   if (model._schemaName !== undefined) {

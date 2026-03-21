@@ -1,11 +1,27 @@
-import { BelongsToOptions, ForeignKeySchema } from "@/types";
+import { BelongsToOptions, ForeignKeySchema, ModelProperties } from "@/types";
 import { ColumnBuilder, TextColumnBuilder } from "../column";
 import { RelationBuilder } from "./base";
 
 /**
- * BelongsTo relation builder - creates a foreign key column
+ * BelongsToBuilder relation builder - creates a foreign key column.
+ *
+ * The type parameter `T` carries the target model's property map so that
+ * `ModelDefinition._properties.someRelation` is typed as
+ * `BelongsToBuilder<TargetModel['_properties']>` rather than the erased
+ * `BelongsToBuilder<ModelProperties>`.
+ *
+ * The FK column name defaults to `<propertyName>_id` (e.g., `user` → `user_id`).
+ * This can be overridden via the `foreignKey` option.
  */
-export class BelongsToBuilder extends RelationBuilder {
+export class BelongsToBuilder<
+  T extends ModelProperties = ModelProperties,
+> extends RelationBuilder {
+  /** Phantom type — never accessed at runtime, only used for TS inference */
+  declare readonly _targetProperties: T;
+
+  /** The property name this relation is assigned to (set during schema conversion) */
+  private _propertyName?: string;
+
   constructor(target: () => string, options?: BelongsToOptions) {
     super("belongsTo", target);
     if (options?.foreignKey !== undefined) {
@@ -18,13 +34,35 @@ export class BelongsToBuilder extends RelationBuilder {
     this._onDelete = "SET NULL";
   }
 
+  /** Set the property name (called during schema conversion) */
+  _setPropertyName(name: string): void {
+    this._propertyName = name;
+  }
+
+  /** Get the property name */
+  getPropertyName(): string | undefined {
+    return this._propertyName;
+  }
+
   createsForeignKey(): boolean {
     return true;
   }
 
+  /**
+   * Get the foreign key column name.
+   * Defaults to `<propertyName>_id` if not explicitly set via options.
+   * Falls back to `<targetTableName>_id` if property name is not yet set.
+   */
   getForeignKeyColumn(): string {
-    // Default to target_id if not specified
-    return this._foreignKey ?? `${this._target()}_id`;
+    if (this._foreignKey !== undefined) {
+      return this._foreignKey;
+    }
+    // Use property name if available (e.g., user → user_id)
+    if (this._propertyName !== undefined) {
+      return `${this._propertyName}_id`;
+    }
+    // Fallback to target table name (shouldn't happen in normal flow)
+    return `${this._target()}_id`;
   }
 
   /** Generate the foreign key column builder */

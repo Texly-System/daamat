@@ -62,6 +62,7 @@ exports[`transform snapshots Category schema 1`] = `
     ],
     "name": "categories_pkey",
   },
+  "relations": [],
 }
 `;
 
@@ -173,6 +174,14 @@ exports[`transform snapshots User schema (with postgres schema name + indexes) 1
     ],
     "name": "users_pkey",
   },
+  "relations": [
+    {
+      "mappedBy": "user",
+      "name": "orders",
+      "targetTable": "orders",
+      "type": "hasMany",
+    },
+  ],
   "schema": "store",
 }
 `;
@@ -327,6 +336,7 @@ exports[`transform snapshots Product schema (decimal, enum, array, nullable FK) 
     ],
     "name": "products_pkey",
   },
+  "relations": [],
 }
 `;
 
@@ -421,6 +431,7 @@ exports[`transform snapshots Order schema (belongsTo User) 1`] = `
     ],
     "name": "orders_pkey",
   },
+  "relations": [],
 }
 `;
 
@@ -523,6 +534,7 @@ exports[`transform snapshots OrderItem schema (two belongsTo + composite unique 
     ],
     "name": "order_items_pkey",
   },
+  "relations": [],
 }
 `;
 
@@ -548,5 +560,6 @@ exports[`transform snapshots minimal model snapshot 1`] = `
     ],
     "name": "simple_pkey",
   },
+  "relations": [],
 }
 `;

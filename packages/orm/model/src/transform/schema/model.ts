@@ -16,11 +16,16 @@ import {
   HasManyBuilder,
   HasOneBuilder,
   ModelReference,
+  InferModelProperties,
   createLazyReference,
 } from "../properties";
-import { BelongsToOptions, HasManyOptions, ModelDefinition, ModelProperties } from '@/types';
-import { createModelDefinition } from './createModelDefinition';
-
+import {
+  BelongsToOptions,
+  HasManyOptions,
+  ModelDefinition,
+  ModelProperties,
+} from "@/types";
+import { createModelDefinition } from "./createModelDefinition";
 
 /**
  * The main model builder API - similar to @medusajs/framework/utils model
@@ -107,33 +112,63 @@ export const model = {
   // Relation builders
 
   /**
-   * Create a belongsTo relation (creates a foreign key column)
-   * @param target - A function returning the target model or the model itself
-   * @param options - Relation options
+   * Create a belongsTo relation (creates a foreign key column).
+   *
+   * Pass the target model directly or as a lazy arrow for circular references:
+   *   - `model.belongsTo(UserSchema)`            — direct
+   *   - `model.belongsTo(() => UserSchema)`       — lazy (no annotation needed)
+   *
+   * The returned builder is typed `BelongsToBuilder<T>` where `T` is the
+   * target model's property map, inferred automatically.
    */
-  belongsTo(
-    target: ModelReference,
+  belongsTo<R extends ModelReference>(
+    target: R,
     options?: BelongsToOptions,
-  ): BelongsToBuilder {
-    return new BelongsToBuilder(createLazyReference(target), options);
+  ): BelongsToBuilder<InferModelProperties<R>> {
+    return new BelongsToBuilder<InferModelProperties<R>>(
+      createLazyReference(target as ModelReference<ModelProperties>),
+      options,
+    );
   },
 
   /**
-   * Create a hasMany relation (no column created - inverse side)
-   * @param target - A function returning the target model or the model itself
-   * @param options - Relation options including mappedBy
+   * Create a hasMany relation (no column created - inverse side).
+   *
+   * Pass the target model directly or as a lazy arrow for circular references:
+   *   - `model.hasMany(OrderSchema, { mappedBy: 'user' })`
+   *   - `model.hasMany(() => OrderSchema, { mappedBy: 'user' })`  — lazy
+   *
+   * The returned builder is typed `HasManyBuilder<T>` where `T` is the
+   * target model's property map, inferred automatically.
    */
-  hasMany(target: ModelReference, options: HasManyOptions): HasManyBuilder {
-    return new HasManyBuilder(createLazyReference(target), options);
+  hasMany<R extends ModelReference>(
+    target: R,
+    options?: HasManyOptions,
+  ): HasManyBuilder<InferModelProperties<R>> {
+    return new HasManyBuilder<InferModelProperties<R>>(
+      createLazyReference(target as ModelReference<ModelProperties>),
+      options,
+    );
   },
 
   /**
-   * Create a hasOne relation (no column created - inverse side)
-   * @param target - A function returning the target model or the model itself
-   * @param options - Relation options including mappedBy
+   * Create a hasOne relation (no column created - inverse side).
+   *
+   * Pass the target model directly or as a lazy arrow for circular references:
+   *   - `model.hasOne(ProfileSchema, { mappedBy: 'account' })`
+   *   - `model.hasOne(() => ProfileSchema, { mappedBy: 'account' })`  — lazy
+   *
+   * The returned builder is typed `HasOneBuilder<T>` where `T` is the
+   * target model's property map, inferred automatically.
    */
-  hasOne(target: ModelReference, options: HasManyOptions): HasOneBuilder {
-    return new HasOneBuilder(createLazyReference(target), options);
+  hasOne<R extends ModelReference>(
+    target: R,
+    options?: HasManyOptions,
+  ): HasOneBuilder<InferModelProperties<R>> {
+    return new HasOneBuilder<InferModelProperties<R>>(
+      createLazyReference(target as ModelReference<ModelProperties>),
+      options,
+    );
   },
 };
 

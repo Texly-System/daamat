@@ -35,6 +35,16 @@ export abstract class RelationBuilder {
     return this;
   }
 
+  /** Get the target table name */
+  getTargetTableName(): string {
+    return this._target();
+  }
+
+  /** Get the mappedBy property name */
+  getMappedBy(): string | undefined {
+    return this._mappedBy;
+  }
+
   /** Get relation definition */
   toDefinition(): RelationDefinition {
     const def: RelationDefinition = {

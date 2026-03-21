@@ -1,13 +1,29 @@
-import { HasManyOptions } from "@/types";
+import { HasManyOptions, ModelProperties } from "@/types";
 import { RelationBuilder } from "./base";
 
 /**
- * HasMany relation builder - does not create a foreign key column
+ * HasMany relation builder - does not create a foreign key column.
+ *
+ * The type parameter `T` carries the target model's property map so that
+ * `ModelDefinition._properties.someRelation` is typed as
+ * `HasManyBuilder<TargetModel['_properties']>` rather than the erased
+ * `HasManyBuilder<ModelProperties>`.
+ *
+ * The `mappedBy` option names the property on the target model that holds
+ * the belongsTo pointing back to this model. Optional — when omitted the
+ * relation is still recorded in the schema but no inverse validation is run.
  */
-export class HasManyBuilder extends RelationBuilder {
-  constructor(target: () => string, options: HasManyOptions) {
+export class HasManyBuilder<
+  T extends ModelProperties = ModelProperties,
+> extends RelationBuilder {
+  /** Phantom type — never accessed at runtime, only used for TS inference */
+  declare readonly _targetProperties: T;
+
+  constructor(target: () => string, options?: HasManyOptions) {
     super("hasMany", target);
-    this._mappedBy = options.mappedBy;
+    if (options?.mappedBy !== undefined) {
+      this._mappedBy = options.mappedBy;
+    }
   }
 
   createsForeignKey(): boolean {
