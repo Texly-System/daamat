@@ -1,18 +1,18 @@
-import { IndexSchema, IndexDefinition } from "@/types";
+import { IndexColumn, IndexSchema, } from "@/types";
 
 /**
  * Convert user-friendly index definition to IndexSchema
  */
-export function convertIndexDefinition(
+export function cleanupIndexSchema(
   tableName: string,
-  index: IndexDefinition,
-  indexNumber: number,
+  index: IndexSchema,
+  indexNumber?: number,
 ): IndexSchema {
-  const columns = index.on.map((col) => {
+  const columns = index.columns.map((col) => {
     if (typeof col === "string") {
       return { name: col };
     }
-    const result: { name: string; order?: "ASC" | "DESC" } = { name: col.name };
+    const result: IndexColumn = { name: col.name };
     if (col.order !== undefined) {
       result.order = col.order;
     }
@@ -21,7 +21,8 @@ export function convertIndexDefinition(
 
   const columnNames = columns.map((c) => c.name).join("_");
   const uniquePrefix = index.unique ? "uniq_" : "idx_";
-  const generatedName = `${uniquePrefix}${tableName}_${columnNames}_${indexNumber}`;
+  let generatedName = `${uniquePrefix}${tableName}_${columnNames}`;
+  if (indexNumber) generatedName = `${generatedName}_${indexNumber}`;
 
   const schema: IndexSchema = {
     name: index.name ?? generatedName,

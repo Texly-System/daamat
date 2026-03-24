@@ -1,17 +1,18 @@
-import { convertIndexDefinition } from "./convertIndex";
-import { IndexSchema, IndexType, IndexColumnConfig, IndexDefinition } from "@/types";
+import { cleanupIndexSchema } from "../../utils/cleanupIndex";
+import { IndexSchema, IndexType, IndexColumn } from "@/types";
 
 /**
  * Index builder for fluent API
  */
 export class IndexBuilder {
-  private _columns: IndexColumnConfig[] = [];
-  private _unique: boolean = false;
-  private _type?: IndexType;
-  private _where?: string;
   private _name?: string;
+  private _columns: (string | IndexColumn)[] = [];
+  private _unique: boolean = false;
+  private _type: IndexType = "btree";
+  private _where?: string;
+  private _concurrently?: boolean;
 
-  constructor(columns: (string | IndexColumnConfig)[]) {
+  constructor(columns: (string | IndexColumn)[]) {
     this._columns = columns.map((col) =>
       typeof col === "string" ? { name: col } : col,
     );
@@ -41,28 +42,25 @@ export class IndexBuilder {
     return this;
   }
 
-  /** Convert to IndexDefinition */
-  toDefinition(): IndexDefinition {
-    const def: IndexDefinition = {
-      on: this._columns,
-      unique: this._unique,
-    };
-
-    if (this._type !== undefined) {
-      def.type = this._type;
-    }
-    if (this._where !== undefined) {
-      def.where = this._where;
-    }
-    if (this._name !== undefined) {
-      def.name = this._name;
-    }
-
-    return def;
+  /** Set concurrently */
+  concurrently(): this {
+    this._concurrently = true;
+    return this;
   }
 
   /** Convert to IndexSchema */
   toSchema(tableName: string, indexNumber: number): IndexSchema {
-    return convertIndexDefinition(tableName, this.toDefinition(), indexNumber);
+    return cleanupIndexSchema(
+      tableName,
+      {
+        name: this._name,
+        columns: this._columns,
+        unique: this._unique,
+        type: this._type,
+        where: this._where,
+        concurrently: this._concurrently,
+      },
+      indexNumber
+    );
   }
 }
