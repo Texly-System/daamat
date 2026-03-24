@@ -1,46 +1,77 @@
-import { ForeignKeyAction } from './foreignKey';
+import { ColumnType } from "./column";
+import { ForeignKeyAction, ForeignKeySchemaMatch } from "./foreignKey";
 
 /**
- * Relation type enumeration
+ * Relation types
  */
 export type RelationType = "belongsTo" | "hasMany" | "hasOne";
 
 /**
- * Options for belongsTo relation
+ * FK column configuration
  */
-export interface BelongsToOptions {
-  /** The foreign key column name */
-  foreignKey?: string;
-  /** The property name on the related model that maps back */
-  mappedBy?: string;
+export interface FieldsConfig {
+  /** Local FK column name(s) - defaults to `<propertyName>_id` */
+  fields?: string | string[];
+
+  /** Referenced column(s) on target - defaults to 'id' */
+  references?: string | string[];
+
+  /** Column type for FK column - defaults to 'text' */
+  type?: ColumnType;
+
+  /** Whether FK column allows NULL */
+  nullable?: boolean;
+
+  /** Whether FK column is unique (1:1 relation) */
+  unique?: boolean;
+
+  /** Create index on FK column */
+  indexed?: boolean;
 }
 
 /**
- * Options for hasMany/hasOne relation
+ * FK constraint configuration
  */
-export interface HasManyOptions {
-  /**
-   * The property name on the related model that maps back.
-   * If not provided, defaults to inferring from the owner table name.
-   */
-  mappedBy?: string;
-}
+export interface ConstraintConfig {
+  /** Custom constraint name */
+  constraintName?: string;
 
-/**
- * Relation definition stored in model
- */
-export interface RelationDefinition {
-  type: RelationType;
-  /** Function that returns the related model name (for lazy evaluation) */
-  target: () => string;
-  /** Foreign key column name (for belongsTo) */
-  foreignKey?: string;
-  /** Mapped by property name */
-  mappedBy?: string;
-  /** Whether the relation is nullable */
-  nullable: boolean;
-  /** On delete action */
+  /** ON DELETE action */
   onDelete?: ForeignKeyAction;
-  /** On update action */
+
+  /** ON UPDATE action */
   onUpdate?: ForeignKeyAction;
+
+  /** Deferrable constraint */
+  deferrable?: boolean;
+
+  /** Initially deferred */
+  initiallyDeferred?: boolean;
+
+  /** Match type for composite FKs */
+  match?: ForeignKeySchemaMatch;
+}
+
+/**
+ * BelongsTo options - the owning side that creates FK
+ */
+export interface BelongsToConfig extends FieldsConfig, ConstraintConfig {
+  /** Inverse property name on target model */
+  inverse?: string;
+}
+
+/**
+ * HasMany options - inverse side of 1:N
+ */
+export interface HasManyConfig {
+  /** Property on target that holds the belongsTo */
+  inverse?: string;
+}
+
+/**
+ * HasOne options - inverse side of 1:1
+ */
+export interface HasOneConfig {
+  /** Property on target that holds the belongsTo */
+  inverse?: string;
 }

@@ -1,36 +1,51 @@
-import { HasManyOptions, ModelProperties } from "@/types";
-import { RelationBuilder } from "./base";
+import type { HasOneConfig } from "@/types/relation";
+import { Relation, ModelLike, Target } from "./base";
 
 /**
- * HasOne relation builder - does not create a foreign key column.
+ * HasOne - Inverse side of a one-to-one relationship
  *
- * The type parameter `T` carries the target model's property map so that
- * `ModelDefinition._properties.someRelation` is typed as
- * `HasOneBuilder<TargetModel['_properties']>` rather than the erased
- * `HasOneBuilder<ModelProperties>`.
+ * Does NOT create any DB artifacts. This is metadata for the ORM.
+ * The FK lives on the other side (the model with belongsTo + unique).
  *
- * The `mappedBy` option names the property on the target model that holds
- * the belongsTo pointing back to this model. Optional — when omitted the
- * relation is still recorded in the schema but no inverse validation is run.
+ * Usage:
+ * ```ts
+ * const UserSchema = model('users', {
+ *   // User has one profile (FK is on profiles table, unique)
+ *   profile: hasOne(ProfileSchema, { inverse: 'user' })
+ * })
+ * ```
  */
-export class HasOneBuilder<
-  T extends ModelProperties = ModelProperties,
-> extends RelationBuilder {
-  /** Phantom type — never accessed at runtime, only used for TS inference */
-  declare readonly _targetProperties: T;
-
-  constructor(target: () => string, options?: HasManyOptions) {
+export class HasOne<
+  TModel extends ModelLike = ModelLike,
+> extends Relation<TModel> {
+  constructor(target: Target<TModel>, config?: HasOneConfig) {
     super("hasOne", target);
-    if (options?.mappedBy !== undefined) {
-      this._mappedBy = options.mappedBy;
+
+    if (config?.inverse) {
+      this._inverse = config.inverse;
     }
+  }
+
+  /** Set inverse property name */
+  inverse(propertyName: string): this {
+    this._inverse = propertyName;
+    return this;
   }
 
   createsForeignKey(): boolean {
     return false;
   }
-
-  getForeignKeyColumn(): undefined {
-    return undefined;
-  }
 }
+
+/**
+ * Create a hasOne relation
+ */
+export function hasOne<TModel extends ModelLike>(
+  target: Target<TModel>,
+  config?: HasOneConfig,
+): HasOne<TModel> {
+  return new HasOne(target, config);
+}
+
+// Keep old name for backwards compat
+export { HasOne as HasOneBuilder };

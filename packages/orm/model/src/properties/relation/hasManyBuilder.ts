@@ -1,36 +1,51 @@
-import { HasManyOptions, ModelProperties } from "@/types";
-import { RelationBuilder } from "./base";
+import type { HasManyConfig } from "@/types/relation";
+import { Relation, ModelLike, Target } from "./base";
 
 /**
- * HasMany relation builder - does not create a foreign key column.
+ * HasMany - Inverse side of a one-to-many relationship
  *
- * The type parameter `T` carries the target model's property map so that
- * `ModelDefinition._properties.someRelation` is typed as
- * `HasManyBuilder<TargetModel['_properties']>` rather than the erased
- * `HasManyBuilder<ModelProperties>`.
+ * Does NOT create any DB artifacts. This is metadata for the ORM.
+ * The FK lives on the "many" side (the model with belongsTo).
  *
- * The `mappedBy` option names the property on the target model that holds
- * the belongsTo pointing back to this model. Optional — when omitted the
- * relation is still recorded in the schema but no inverse validation is run.
+ * Usage:
+ * ```ts
+ * const UserSchema = model('users', {
+ *   // User has many posts (FK is on posts table)
+ *   posts: hasMany(PostSchema, { inverse: 'author' })
+ * })
+ * ```
  */
-export class HasManyBuilder<
-  T extends ModelProperties = ModelProperties,
-> extends RelationBuilder {
-  /** Phantom type — never accessed at runtime, only used for TS inference */
-  declare readonly _targetProperties: T;
-
-  constructor(target: () => string, options?: HasManyOptions) {
+export class HasMany<
+  TModel extends ModelLike = ModelLike,
+> extends Relation<TModel> {
+  constructor(target: Target<TModel>, config?: HasManyConfig) {
     super("hasMany", target);
-    if (options?.mappedBy !== undefined) {
-      this._mappedBy = options.mappedBy;
+
+    if (config?.inverse) {
+      this._inverse = config.inverse;
     }
+  }
+
+  /** Set inverse property name */
+  inverse(propertyName: string): this {
+    this._inverse = propertyName;
+    return this;
   }
 
   createsForeignKey(): boolean {
     return false;
   }
-
-  getForeignKeyColumn(): undefined {
-    return undefined;
-  }
 }
+
+/**
+ * Create a hasMany relation
+ */
+export function hasMany<TModel extends ModelLike>(
+  target: Target<TModel>,
+  config?: HasManyConfig,
+): HasMany<TModel> {
+  return new HasMany(target, config);
+}
+
+// Keep old name for backwards compat
+export { HasMany as HasManyBuilder };
