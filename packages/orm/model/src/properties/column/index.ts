@@ -1,6 +1,7 @@
 export * from "./base";
 export * from "./boolean";
 export * from "./bytea";
+export * from "./vector";
 export * from "./enum";
 export * from "./id";
 export * from "./json";
