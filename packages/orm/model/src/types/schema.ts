@@ -1,6 +1,9 @@
-
-import { BelongsToBuilder, ColumnBuilder, HasManyBuilder, HasOneBuilder } from '@/properties';
-import { IndexSchema, TableSchema } from ".";
+import {
+  BelongsToBuilder,
+  ColumnBuilder,
+  HasManyBuilder,
+  HasOneBuilder,
+} from "@/properties";
 
 /**
  * Property types that can be used in model definition
@@ -15,21 +18,3 @@ export type PropertyValue =
  * Model properties definition
  */
 export type ModelProperties = Record<string, PropertyValue>;
-
-/**
- * Model definition result
- */
-export interface ModelDefinition<T extends ModelProperties = ModelProperties> {
-  /** Internal table name */
-  _tableName: string;
-  /** Internal schema name */
-  _schemaName?: string;
-  /** Internal properties */
-  _properties: T;
-  /** Internal indexes */
-  _indexes: IndexSchema[];
-  /** Add indexes to the model */
-  indexes(indexes: IndexSchema[]): ModelDefinition<T>;
-  /** Convert to TableSchema */
-  toTableSchema(): TableSchema;
-}

@@ -1,4 +1,4 @@
-import { ModelDefinition, ModelProperties } from "@/types";
+import { ModelDefinition } from "./model";
 import { BelongsTo, HasMany, HasOne } from "../properties";
 
 /**
@@ -39,13 +39,11 @@ export interface ValidationResult {
  * @param models - Array of model definitions to validate
  * @returns ValidationResult with any errors found
  */
-export function validateRelations(
-  models: ModelDefinition<ModelProperties>[],
-): ValidationResult {
+export function validateRelations(models: ModelDefinition[]): ValidationResult {
   const errors: RelationValidationError[] = [];
 
   // Build a lookup map of models by table name
-  const modelMap = new Map<string, ModelDefinition<ModelProperties>>();
+  const modelMap = new Map<string, ModelDefinition>();
   for (const model of models) {
     modelMap.set(model._tableName, model);
   }
@@ -157,9 +155,7 @@ export function validateRelations(
  * @param models - Array of model definitions to validate
  * @throws RelationValidationError if validation fails (throws first error)
  */
-export function assertValidRelations(
-  models: ModelDefinition<ModelProperties>[],
-): void {
+export function assertValidRelations(models: ModelDefinition[]): void {
   const result = validateRelations(models);
   if (!result.valid) {
     throw result.errors[0];

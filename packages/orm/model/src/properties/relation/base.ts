@@ -1,4 +1,3 @@
-import type { ModelDefinition, ModelProperties } from "@/types/schema";
 import type { RelationType } from "@/types/relation";
 
 /**
@@ -78,13 +77,3 @@ export abstract class Relation<TModel extends ModelLike = ModelLike> {
   /** Whether this relation creates a FK on this table */
   abstract createsForeignKey(): boolean;
 }
-
-/**
- * Extract model properties type from a relation
- */
-export type InferTargetProperties<R> =
-  R extends Relation<infer M>
-  ? M extends ModelDefinition<infer P>
-  ? P
-  : ModelProperties
-  : never;

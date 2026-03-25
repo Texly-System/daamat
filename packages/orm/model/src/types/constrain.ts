@@ -1,16 +1,16 @@
+import type { IndexType } from "./indexType";
+
 /**
  * Constraint types
  */
 export type ConstraintType = "unique" | "primary_key" | "check" | "exclude";
 
-export type IndexType = "btree" | "hash" | "gin" | "gist" | "brin";
-
 /**
  * Base interface for all constraints
  */
 export interface Constraint {
-  /** Constraint name */
-  name: string;
+  /** Constraint name (auto-generated if omitted) */
+  name?: string;
   /** Type of constraint */
   type: ConstraintType;
   /** Partial index condition */
