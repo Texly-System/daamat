@@ -1,26 +1,28 @@
-// import { model } from "../schema/model";
-// import { OrderSchema } from "./order";
-// import { ProductSchema } from "./product";
+import { model } from "@/schema";
+import { columns } from "@/properties";
+import { OrderSchema } from "./order";
+import { ProductSchema } from "./product";
 
-// // ---------------------------------------------------------------------------
-// // OrderItem
-// // ---------------------------------------------------------------------------
-// export const OrderItemSchema = model
-//   .define("order_items", {
-//     id: model.id({ prefix: "oi" }).primaryKey(),
-//     quantity: model.number(),
-//     unitPrice: model.decimal(10, 2),
+// ---------------------------------------------------------------------------
+// OrderItem
+// ---------------------------------------------------------------------------
+export const OrderItemSchema = model("order_items", {
+  id: columns.id({ prefix: "oi" }).primaryKey(),
+  quantity: columns.integer(),
+  unitPrice: columns.numeric(10, 2),
 
-//     // belongsTo Order
-//     order: model.belongsTo(OrderSchema, { foreignKey: "order_id" }),
+  // belongsTo Order
+  order: columns.belongsTo(OrderSchema),
 
-//     // belongsTo Product
-//     product: model.belongsTo(ProductSchema, { foreignKey: "product_id" }),
-//   })
-//   .indexes([
-//     {
-//       on: ["order_id", "product_id"],
-//       unique: true,
-//       name: "uniq_order_items_order_product",
-//     },
-//   ]);
+  // belongsTo Product
+  product: columns.belongsTo(ProductSchema),
+}).indexes([
+  columns
+    .indexes("uniq_order_items_order_product")
+    .columns(["order_id", "product_id"])
+    .unique(),
+]);
+
+export function getOrderItemTableSchema() {
+  return OrderItemSchema.toTableSchema();
+}

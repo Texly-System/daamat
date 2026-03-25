@@ -1,0 +1,509 @@
+{
+  "moduleName": "ecommerce",
+  "schema": "public",
+  "tables": [
+    {
+      "name": "categories",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "generate_id('cat')"
+        },
+        {
+          "name": "name",
+          "type": "character varying",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "length": 128
+        },
+        {
+          "name": "slug",
+          "type": "character varying",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": true,
+          "array": false,
+          "autoincrement": false,
+          "length": 128
+        },
+        {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [],
+      "foreignKeys": [],
+      "constraints": [],
+      "relations": []
+    },
+    {
+      "name": "products",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "generate_id('prd')"
+        },
+        {
+          "name": "sku",
+          "type": "character varying",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": true,
+          "array": false,
+          "autoincrement": false,
+          "length": 64
+        },
+        {
+          "name": "title",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "price",
+          "type": "numeric",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "length": 10,
+          "scale": 2
+        },
+        {
+          "name": "stock",
+          "type": "integer",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "0"
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "enum": "product_status"
+        },
+        {
+          "name": "tags",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": true,
+          "autoincrement": false
+        },
+        {
+          "name": "specs",
+          "type": "json",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "now()"
+        },
+        {
+          "name": "category_id",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "products_sku",
+          "columns": [
+            {
+              "name": "sku"
+            }
+          ],
+          "unique": true,
+          "type": "btree"
+        },
+        {
+          "name": "products_status_createdAt",
+          "columns": [
+            {
+              "name": "status"
+            },
+            {
+              "name": "createdAt"
+            }
+          ],
+          "unique": false,
+          "type": "btree"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "name": "fk_products_category_id",
+          "columns": [
+            "category_id"
+          ],
+          "referencedTable": "categories",
+          "referencedColumns": [
+            "id"
+          ],
+          "onDelete": "SET NULL",
+          "nullable": true
+        }
+      ],
+      "constraints": [],
+      "relations": []
+    },
+    {
+      "name": "orders",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "generate_id('ord')"
+        },
+        {
+          "name": "total",
+          "type": "numeric",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "length": 12,
+          "scale": 2
+        },
+        {
+          "name": "status",
+          "type": "enum",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "enum": "orders"
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "placedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "orders_total",
+          "columns": [
+            {
+              "name": "total"
+            }
+          ],
+          "unique": false,
+          "type": "btree"
+        }
+      ],
+      "foreignKeys": [],
+      "constraints": [
+        {
+          "name": "check_total",
+          "type": "check",
+          "condition": "total > 0"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "name": "order_items",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "generate_id('oi')"
+        },
+        {
+          "name": "quantity",
+          "type": "integer",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "unitPrice",
+          "type": "numeric",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "length": 10,
+          "scale": 2
+        },
+        {
+          "name": "order_id",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "product_id",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        }
+      ],
+      "indexes": [
+        {
+          "name": "uniq_order_items_order_product",
+          "columns": [
+            {
+              "name": "order_id"
+            },
+            {
+              "name": "product_id"
+            }
+          ],
+          "unique": true,
+          "type": "btree"
+        }
+      ],
+      "foreignKeys": [
+        {
+          "name": "fk_order_items_order_id",
+          "columns": [
+            "order_id"
+          ],
+          "referencedTable": "orders",
+          "referencedColumns": [
+            "id"
+          ]
+        },
+        {
+          "name": "fk_order_items_product_id",
+          "columns": [
+            "product_id"
+          ],
+          "referencedTable": "products",
+          "referencedColumns": [
+            "id"
+          ]
+        }
+      ],
+      "constraints": [],
+      "relations": []
+    },
+    {
+      "name": "users",
+      "columns": [
+        {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "generate_id('usr')"
+        },
+        {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": true,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "age",
+          "type": "integer",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "verified",
+          "type": "boolean",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "false"
+        },
+        {
+          "name": "metadata",
+          "type": "jsonb",
+          "primaryKey": false,
+          "nullable": true,
+          "unique": false,
+          "array": false,
+          "autoincrement": false
+        },
+        {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "now()"
+        },
+        {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "nullable": false,
+          "unique": false,
+          "array": false,
+          "autoincrement": false,
+          "default": "now()"
+        }
+      ],
+      "indexes": [
+        {
+          "name": "uniq_users_email",
+          "columns": [
+            {
+              "name": "email"
+            }
+          ],
+          "unique": true,
+          "type": "btree"
+        },
+        {
+          "name": "idx_users_created_at",
+          "columns": [
+            {
+              "name": "createdAt"
+            }
+          ],
+          "unique": false,
+          "type": "btree"
+        }
+      ],
+      "foreignKeys": [],
+      "constraints": [],
+      "relations": [
+        {
+          "name": "orders",
+          "type": "hasMany",
+          "targetTable": "orders",
+          "mappedBy": "user"
+        }
+      ],
+      "schema": "store"
+    }
+  ],
+  "enums": [
+    {
+      "name": "product_status",
+      "values": [
+        "draft",
+        "active",
+        "archived"
+      ]
+    },
+    {
+      "name": "orders",
+      "values": [
+        "pending",
+        "confirmed",
+        "shipped",
+        "delivered",
+        "cancelled"
+      ]
+    }
+  ]
+}

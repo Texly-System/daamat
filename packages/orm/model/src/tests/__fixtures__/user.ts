@@ -1,30 +1,31 @@
-// import { model } from "../schema/model";
-// import { OrderSchema } from "./order";
+import { model } from "@/schema";
+import { columns } from "@/properties";
+import { OrderSchema } from "./order";
 
-// // ---------------------------------------------------------------------------
-// // User
-// // ---------------------------------------------------------------------------
-// export const UserSchema = model
-//   .define(
-//     "users",
-//     {
-//       id: model.id({ prefix: "usr" }).primaryKey(),
-//       email: model.text().unique(),
-//       name: model.text(),
-//       age: model.number().nullable(),
-//       verified: model.boolean().default(false),
-//       metadata: model.json({ binary: true }).nullable(),
-//       createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
-//       updatedAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+// ---------------------------------------------------------------------------
+// User
+// ---------------------------------------------------------------------------
+export const UserSchema = model(
+  "users",
+  {
+    id: columns.id({ prefix: "usr" }).primaryKey(),
+    email: columns.text().unique(),
+    name: columns.text(),
+    age: columns.integer().nullable(),
+    verified: columns.boolean().default(false),
+    metadata: columns.json({ binary: true }).nullable(),
+    createdAt: columns.timestamp({ withTimezone: true }).defaultNow(),
+    updatedAt: columns.timestamp({ withTimezone: true }).defaultNow(),
 
-//       // hasMany Orders — lazy arrow breaks the circular-init error at runtime.
-//       // No return-type annotation needed: TypeScript infers the target type from
-//       // the arrow's return value, giving HasManyBuilder<OrderSchema['_properties']>.
-//       orders: model.hasMany(() => OrderSchema, { mappedBy: "user" }),
-//     },
-//     { schema: "store" },
-//   )
-//   .indexes([
-//     { on: ["email"], unique: true, name: "uniq_users_email" },
-//     { on: ["createdAt"], name: "idx_users_created_at" },
-//   ]);
+    // hasMany Orders — lazy arrow breaks the circular-init error at runtime.
+    orders: columns.hasMany(() => OrderSchema).inverse("user"),
+  },
+  { schema: "store" },
+).indexes([
+  columns.indexes("uniq_users_email").columns(["email"]).unique(),
+  columns.indexes("idx_users_created_at").columns(["createdAt"]),
+]);
+
+export function getUserTableSchema() {
+  return UserSchema.toTableSchema();
+}

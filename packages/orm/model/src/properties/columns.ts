@@ -7,11 +7,13 @@ import { ByteaColumnBuilder } from "./column/bytea";
 import {
   TextColumnBuilder,
   CharacterVaryingColumnBuilder,
+  CharacterColumnBuilder,
 } from "./column/text";
 import {
   DateColumnBuilder,
   TimeColumnBuilder,
   TimestampColumnBuilder,
+  IntervalColumnBuilder,
 } from "./column/time";
 import { EnumColumnBuilder } from "./column/enum";
 import { IdColumnBuilder } from "./column/id";
@@ -19,16 +21,20 @@ import { JsonColumnBuilder } from "./column/json";
 import {
   IntegerColumnBuilder,
   NumericColumnBuilder,
+  RealColumnBuilder,
+  DoublePrecisionColumnBuilder,
+  MoneyColumnBuilder,
 } from "./column/number";
 import { UuidColumnBuilder } from "./column/uuid";
+import { VectorColumnBuilder } from "./column/vector";
 import { EnumBuilder } from "./enum/base";
 import {
   BelongsToConfig as BelongsToOptions,
   HasManyConfig as HasManyOptions,
   HasOneConfig as HasOneOptions,
 } from "@/types";
-import { IndexBuilder } from './indexes';
-import { ConstraintBuilder } from './constraints';
+import { IndexBuilder } from "./indexes";
+import { ConstraintBuilder } from "./constraints";
 
 function createLazyReference<T extends { _tableName: string }>(
   target: Target<T>,
@@ -73,9 +79,18 @@ export const columns = {
     return new TextColumnBuilder();
   },
 
-  /** Create character varying column */
-  varchar(): CharacterVaryingColumnBuilder {
-    return new CharacterVaryingColumnBuilder();
+  /** Create character varying column with optional max length */
+  varchar(length?: number): CharacterVaryingColumnBuilder {
+    const builder = new CharacterVaryingColumnBuilder();
+    if (length !== undefined) builder.length(length);
+    return builder;
+  },
+
+  /** Create a fixed-length character column */
+  char(length?: number): CharacterColumnBuilder {
+    const builder = new CharacterColumnBuilder();
+    if (length !== undefined) builder.length(length);
+    return builder;
   },
 
   /** Create an enum column */
@@ -98,9 +113,39 @@ export const columns = {
     return new IntegerColumnBuilder();
   },
 
-  /** Create a numeric column */
+  /** Create a numeric/decimal column with optional precision and scale */
   numeric(precision?: number, scale?: number): NumericColumnBuilder {
     return new NumericColumnBuilder(precision, scale);
+  },
+
+  /** Create a real (single-precision floating-point) column */
+  real(): RealColumnBuilder {
+    return new RealColumnBuilder();
+  },
+
+  /** Create a double precision (8-byte floating-point) column */
+  doublePrecision(): DoublePrecisionColumnBuilder {
+    return new DoublePrecisionColumnBuilder();
+  },
+
+  /** Create a money (currency amount) column */
+  money(): MoneyColumnBuilder {
+    return new MoneyColumnBuilder();
+  },
+
+  /** Create a JSON/JSONB column */
+  jsonb(): JsonColumnBuilder {
+    return new JsonColumnBuilder({ binary: true });
+  },
+
+  /** Create an interval (time span) column */
+  interval(): IntervalColumnBuilder {
+    return new IntervalColumnBuilder();
+  },
+
+  /** Create a vector column (real[] with fixed dimensions, for embeddings) */
+  vector(dimensions: number): VectorColumnBuilder {
+    return new VectorColumnBuilder(dimensions);
   },
 
   // Relation builders

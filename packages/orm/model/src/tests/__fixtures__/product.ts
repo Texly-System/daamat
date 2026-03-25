@@ -1,27 +1,36 @@
-// import { model } from "../schema/model";
-// import { CategorySchema } from "./category";
+import { model } from "@/schema";
+import { EnumBuilder } from "../../properties/enum/base";
+import { columns } from "@/properties";
+import { CategorySchema } from "./category";
 
-// // ---------------------------------------------------------------------------
-// // Product
-// // ---------------------------------------------------------------------------
-// export const ProductSchema = model
-//   .define("products", {
-//     id: model.id({ prefix: "prd" }).primaryKey(),
-//     sku: model.varchar(64).unique(),
-//     title: model.text(),
-//     price: model.decimal(10, 2),
-//     stock: model.number().default(0),
-//     status: model.enum(["draft", "active", "archived"]),
-//     tags: model.text().array().nullable(),
-//     specs: model.json().nullable(),
-//     createdAt: model.timestamp().defaultRaw("now()"),
+// ---------------------------------------------------------------------------
+// Product
+// ---------------------------------------------------------------------------
 
-//     // belongsTo Category (nullable - product might not have a category yet)
-//     category: model
-//       .belongsTo(CategorySchema, { foreignKey: "category_id" })
-//       .nullable(),
-//   })
-//   .indexes([
-//     { on: ["sku"], unique: true },
-//     { on: ["status", "createdAt"], type: "btree" },
-//   ]);
+export const ProductStatusEnum = new EnumBuilder([
+  "draft",
+  "active",
+  "archived",
+]).name("product_status");
+
+export const ProductSchema = model("products", {
+  id: columns.id({ prefix: "prd" }).primaryKey(),
+  sku: columns.varchar().length(64).unique(),
+  title: columns.text(),
+  price: columns.numeric(10, 2),
+  stock: columns.integer().default(0),
+  status: columns.enum(ProductStatusEnum),
+  tags: columns.text().array().nullable(),
+  specs: columns.json().nullable(),
+  createdAt: columns.timestamp({ withTimezone: true }).defaultNow(),
+
+  // belongsTo Category (nullable - product might not have a category yet)
+  category: columns.belongsTo(CategorySchema).nullable(),
+}).indexes([
+  columns.indexes().columns(["sku"]).unique(),
+  columns.indexes().columns(["status", "createdAt"]).type("btree"),
+]);
+
+export function getProductTableSchema() {
+  return ProductSchema.toTableSchema();
+}

@@ -47,10 +47,10 @@ export const OrderSchema = model("orders", {
       .constrains()
       .check("total > 0")
       .columns(["total"]),
-    columns
-      .constrains()
-      .exclude([{ column: "total", operator: "< 0" }])
-      .columns(["total"]).indexType("gist")
+    // columns
+    //   .constrains()
+    //   .exclude([{ column: "total", operator: "< 0" }])
+    //   .columns(["total"]).indexType("gist")
   ])
   .indexes([
     columns.indexes()

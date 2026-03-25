@@ -40,6 +40,7 @@
     "build": "rm -rf tsconfig.tsbuildinfo dist && tsc",
     "dev": "bun run build --watch",
     "watch": "tsc --watch",
-    "test": "bun test src/test/transform.test.ts"
+    "snapshot": "bun run scripts/generate-snapshots",
+    "test": "bun run snapshot && bun test ./src/tests/**.test.ts"
   }
 }

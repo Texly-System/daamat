@@ -1,12 +1,17 @@
-// import { model } from "../schema/model";
+import { model } from "@/schema";
+import { columns } from "@/properties";
 
-// // ---------------------------------------------------------------------------
-// // Category
-// // ---------------------------------------------------------------------------
-// export const CategorySchema = model.define("categories", {
-//   id: model.id({ prefix: "cat" }).primaryKey(),
-//   name: model.varchar(128),
-//   slug: model.varchar(128).unique(),
-//   description: model.text().nullable(),
-//   createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
-// });
+// ---------------------------------------------------------------------------
+// Category
+// ---------------------------------------------------------------------------
+export const CategorySchema = model("categories", {
+  id: columns.id({ prefix: "cat" }).primaryKey(),
+  name: columns.varchar().length(128),
+  slug: columns.varchar().length(128).unique(),
+  description: columns.text().nullable(),
+  createdAt: columns.timestamp({ withTimezone: true }).defaultNow(),
+});
+
+export function getCategoryTableSchema() {
+  return CategorySchema.toTableSchema();
+}
