@@ -1,4 +1,4 @@
-import type { TableSchema } from "@damatjs/orm-model/types";
+import type { TableSchema } from "@damatjs/orm-model";
 import type {
   CreateTableChange,
   DropTableChange,

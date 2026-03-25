@@ -58,7 +58,7 @@ export async function commandCreate(
       console.log("");
       console.log("Next steps:");
       console.log(`  1. Review the migration file: ${filePath}`);
-      console.log("  2. Run migrations: npm run db:migrate");
+      console.log("  2. Run migrations: damat-migrate up");
       console.log("");
     } else {
       console.log("");
@@ -79,7 +79,7 @@ export async function commandCreate(
       console.log("");
       console.log("Next steps:");
       console.log(`  1. Review the migration file: ${result.filePath}`);
-      console.log("  2. Run migrations: npm run db:migrate");
+      console.log("  2. Run migrations: damat-migrate up");
       console.log("");
 
       if (result.warnings.length > 0) {
@@ -103,13 +103,10 @@ export async function commandCreate(
 function printUsage(): void {
   log("error", "Module name is required");
   console.error("");
-  console.error("Usage: npm run db:migrate:create <module>");
-  console.error("");
-  console.error("Modules with migrations:");
-  console.error("  (no modules found)");
+  console.error("Usage: damat-migrate create <module>");
   console.error("");
   console.error("Examples:");
-  console.error("  npm run db:migrate:create user");
+  console.error("  damat-migrate create user");
   console.error("");
   console.error(
     "Models are auto-discovered from {modulesDir}/{module}/models/",

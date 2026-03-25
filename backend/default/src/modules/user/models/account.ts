@@ -1,56 +1,41 @@
 /**
- * Account Entity
- * 
+ * Account Model
+ *
  * OAuth/Auth provider accounts linked to users (Better Auth compatible)
  */
 
-import { Entity, Property, PrimaryKey, ManyToOne, Index, Unique, Opt } from '@damatjs/deps/mikro-orm/core'
-import { v4 as uuid } from '@damatjs/deps/uuid';
-import { User } from './user';
+import { model } from "@damatjs/orm-model";
+import { User } from "./user";
 
-@Entity({ tableName: 'accounts' })
-@Unique({ properties: ['providerId', 'accountId'] })
-export class Account {
-    @PrimaryKey()
-    id: string = uuid();
+export const Account = model
+  .define("accounts", {
+    id: model.id({ prefix: "acc" }).primaryKey(),
 
-    @ManyToOne(() => User, { deleteRule: 'cascade' })
-    user!: User;
+    user: model.belongsTo(User, { foreignKey: "user_id" }).onDelete("CASCADE"),
 
-    @Property()
-    @Index()
-    accountId!: string;
-
-    @Property()
-    @Index()
-    providerId!: string;
+    accountId: model.text(),
+    providerId: model.text(),
 
     // OAuth tokens
-    @Property({ nullable: true, type: 'text' })
-    accessToken?: string;
-
-    @Property({ nullable: true, type: 'text' })
-    refreshToken?: string;
-
-    @Property({ nullable: true })
-    accessTokenExpiresAt?: Date;
-
-    @Property({ nullable: true })
-    refreshTokenExpiresAt?: Date;
-
-    @Property({ nullable: true, type: 'text' })
-    scope?: string;
-
-    @Property({ nullable: true, type: 'text' })
-    idToken?: string;
+    accessToken: model.text().nullable(),
+    refreshToken: model.text().nullable(),
+    accessTokenExpiresAt: model.timestamp({ withTimezone: true }).nullable(),
+    refreshTokenExpiresAt: model.timestamp({ withTimezone: true }).nullable(),
+    scope: model.text().nullable(),
+    idToken: model.text().nullable(),
 
     // Password for credential auth
-    @Property({ nullable: true, type: 'text' })
-    password?: string;
+    password: model.text().nullable(),
 
-    @Property()
-    createdAt: Date & Opt = new Date();
-
-    @Property({ onUpdate: () => new Date() })
-    updatedAt: Date & Opt = new Date();
-}
+    createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+    updatedAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+  })
+  .indexes([
+    { on: ["accountId"], name: "idx_accounts_account_id" },
+    { on: ["providerId"], name: "idx_accounts_provider_id" },
+    {
+      on: ["providerId", "accountId"],
+      unique: true,
+      name: "uniq_accounts_provider_account",
+    },
+  ]);

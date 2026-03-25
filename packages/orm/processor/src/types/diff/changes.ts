@@ -4,7 +4,7 @@ import type {
   ForeignKeySchema,
   IndexSchema,
   TableSchema,
-} from "@damatjs/orm-model/types";
+} from "@damatjs/orm-model";
 import type { NativeEnum } from "../snapshot";
 
 // ─── tables ──────────────────────────────────────────────────────────────────

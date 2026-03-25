@@ -1,4 +1,4 @@
-import type { ColumnSchema } from "@damatjs/orm-model/types";
+import type { ColumnSchema } from "@damatjs/orm-model";
 import type {
   AddColumnChange,
   AlterColumnChange,

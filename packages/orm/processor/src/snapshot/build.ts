@@ -1,7 +1,7 @@
 import type {
   ModelDefinition,
   ModelProperties,
-} from "@damatjs/orm-model/types";
+} from "@damatjs/orm-model";
 import type { ModuleSnapshot, NativeEnum } from "../types/snapshot";
 
 /**

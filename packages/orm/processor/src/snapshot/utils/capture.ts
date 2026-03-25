@@ -1,7 +1,7 @@
 import type {
   ModelDefinition,
   ModelProperties,
-} from "@damatjs/orm-model/types";
+} from "@damatjs/orm-model";
 import type { ModuleSnapshot } from "../../types/snapshot";
 import { buildSnapshot } from "../build";
 import { loadSnapshot } from "../load";

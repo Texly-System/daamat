@@ -1,38 +1,28 @@
 /**
- * Session Entity
- * 
+ * Session Model
+ *
  * User sessions for authentication (Better Auth compatible)
  */
 
-import { Entity, Property, PrimaryKey, ManyToOne, Index, Opt } from '@damatjs/deps/mikro-orm/core'
-import { v4 as uuid } from '@damatjs/deps/uuid';
-import { User } from './user';
+import { model } from "@damatjs/orm-model";
+import { User } from "./user";
 
-@Entity({ tableName: 'sessions' })
-export class Session {
-    @PrimaryKey()
-    id: string = uuid();
+export const Session = model
+  .define("sessions", {
+    id: model.id({ prefix: "ses" }).primaryKey(),
 
-    @ManyToOne(() => User, { deleteRule: 'cascade' })
-    @Index()
-    user!: User;
+    user: model.belongsTo(User, { foreignKey: "user_id" }).onDelete("CASCADE"),
 
-    @Property()
-    @Index()
-    token!: string;
+    token: model.text(),
+    expiresAt: model.timestamp({ withTimezone: true }),
 
-    @Property()
-    expiresAt!: Date;
+    ipAddress: model.varchar(45).nullable(),
+    userAgent: model.text().nullable(),
 
-    @Property({ nullable: true, length: 45 })
-    ipAddress?: string;
-
-    @Property({ nullable: true, type: 'text' })
-    userAgent?: string;
-
-    @Property()
-    createdAt: Date & Opt = new Date();
-
-    @Property({ onUpdate: () => new Date() })
-    updatedAt: Date & Opt = new Date();
-}
+    createdAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+    updatedAt: model.timestamp({ withTimezone: true }).defaultRaw("now()"),
+  })
+  .indexes([
+    { on: ["user_id"], name: "idx_sessions_user_id" },
+    { on: ["token"], unique: true, name: "uniq_sessions_token" },
+  ]);

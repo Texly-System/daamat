@@ -1,6 +1,6 @@
 {
   "name": "@damatjs/orm-model",
-  "description": "Damatjs orm utils definition",
+  "description": "Damatjs orm model definition",
   "version": "0.0.1",
   "type": "module",
   "main": "dist/index.js",
@@ -9,10 +9,6 @@
     ".": {
       "types": "./dist/index.d.ts",
       "default": "./dist/index.js"
-    },
-    "./transform": {
-      "types": "./dist/transform/index.d.ts",
-      "default": "./dist/transform/index.js"
     },
     "./types": {
       "types": "./dist/types/index.d.ts",
@@ -24,6 +20,7 @@
   },
   "files": [
     "dist",
+    "!dist/tests",
     "!dist/**/__tests__",
     "!dist/**/__fixtures__",
     "!dist/**/__mocks__",
@@ -32,10 +29,7 @@
   "author": "Abel Lamesgen",
   "dependencies": {
     "@damatjs/deps": "*",
-    "@damatjs/types": "*",
-    "dotenv": "^17.3.1",
-    "reflect-metadata": "^0.2.2",
-    "ulid": "^3.0.2"
+    "@damatjs/types": "*"
   },
   "devDependencies": {
     "@damatjs/typescript-config": "*",
@@ -46,6 +40,7 @@
     "build": "rm -rf tsconfig.tsbuildinfo dist && tsc",
     "dev": "bun run build --watch",
     "watch": "tsc --watch",
-    "test": "bun test src/transform/transform.test.ts && bun test src/connection/connection.test.ts"
+    "snapshot": "bun run scripts/generate-snapshots",
+    "test": "bun run snapshot && bun test ./src/tests/**.test.ts"
   }
 }
