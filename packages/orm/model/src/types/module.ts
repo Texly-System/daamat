@@ -4,6 +4,8 @@ import { EnumSchema, TableSchema } from "./";
  * Schema for an entire module (collection of tables)
  */
 export interface ModuleSchema {
+    /** Schema name (default: public) */
+    schema?: string;
     /** Module name */
     moduleName: string;
     /** Tables in the module */

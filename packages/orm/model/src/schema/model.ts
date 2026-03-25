@@ -1,32 +1,40 @@
+import { BooleanColumnBuilder } from "../properties/column/boolean";
+import { ByteaColumnBuilder } from "../properties/column/bytea";
 import {
-  IdColumnBuilder,
   TextColumnBuilder,
-  VarcharColumnBuilder,
-  NumberColumnBuilder,
-  DecimalColumnBuilder,
-  BooleanColumnBuilder,
-  TimestampColumnBuilder,
+  CharacterVaryingColumnBuilder,
+} from "../properties/column/text";
+import {
   DateColumnBuilder,
   TimeColumnBuilder,
-  JsonColumnBuilder,
-  EnumColumnBuilder,
-  UuidColumnBuilder,
-  ByteaColumnBuilder,
-  BelongsToBuilder,
-  HasManyBuilder,
-  HasOneBuilder,
-  ModelReference,
-  InferModelProperties,
-  createLazyReference,
-} from "../properties";
-import { EnumBuilder } from "../properties/enum";
+  TimestampColumnBuilder,
+} from "../properties/column/time";
+import { EnumColumnBuilder } from "../properties/column/enum";
+import { IdColumnBuilder } from "../properties/column/id";
+import { JsonColumnBuilder } from "../properties/column/json";
 import {
-  BelongsToOptions,
-  HasManyOptions,
+  IntegerColumnBuilder,
+  NumericColumnBuilder,
+} from "../properties/column/number";
+import { UuidColumnBuilder } from "../properties/column/uuid";
+import { BelongsToBuilder } from "../properties/relation/belongsToBuilder";
+import { HasManyBuilder } from "../properties/relation/hasManyBuilder";
+import { HasOneBuilder } from "../properties/relation/hasOneBuilder";
+import { Target } from "../properties/relation/base";
+
+function createLazyReference<T extends { _tableName: string }>(
+  target: Target<T>,
+): Target<T> {
+  return target;
+}
+import { EnumBuilder } from "../properties/enum/base";
+import {
+  BelongsToConfig as BelongsToOptions,
+  HasManyConfig as HasManyOptions,
+  HasOneConfig as HasOneOptions,
   ModelDefinition,
   ModelProperties,
 } from "@/types";
-import { createModelDefinition } from "./createModelDefinition";
 
 /**
  * The main model builder API - similar to @medusajs/framework/utils model
@@ -40,7 +48,29 @@ export const model = {
     properties: T,
     options?: { schema?: string },
   ): ModelDefinition<T> {
-    return createModelDefinition(tableName, properties, options?.schema);
+    const definition: ModelDefinition<T> = {
+      _tableName: tableName,
+      _properties: properties,
+      _indexes: [],
+      indexes(indexes) {
+        this._indexes = indexes;
+        return this;
+      },
+      toTableSchema() {
+        return {
+          name: this._tableName,
+          columns: [],
+          indexes: [],
+          foreignKeys: [],
+          constraints: [],
+          relations: [],
+        };
+      },
+    };
+    if (options?.schema) {
+      definition._schemaName = options.schema;
+    }
+    return definition;
   },
 
   // Column type builders
@@ -48,26 +78,6 @@ export const model = {
   /** Create an ID column (text with optional prefix for ID generation) */
   id(options?: { prefix?: string }): IdColumnBuilder {
     return new IdColumnBuilder(options);
-  },
-
-  /** Create a text column */
-  text(): TextColumnBuilder {
-    return new TextColumnBuilder();
-  },
-
-  /** Create a varchar column with optional length */
-  varchar(length?: number): VarcharColumnBuilder {
-    return new VarcharColumnBuilder(length);
-  },
-
-  /** Create an integer number column */
-  number(): NumberColumnBuilder {
-    return new NumberColumnBuilder();
-  },
-
-  /** Create a decimal/numeric column */
-  decimal(precision?: number, scale?: number): DecimalColumnBuilder {
-    return new DecimalColumnBuilder(precision, scale);
   },
 
   /** Create a boolean column */
@@ -122,14 +132,11 @@ export const model = {
    * The returned builder is typed `BelongsToBuilder<T>` where `T` is the
    * target model's property map, inferred automatically.
    */
-  belongsTo<R extends ModelReference>(
+  belongsTo<R extends Target<{ _tableName: string }>>(
     target: R,
     options?: BelongsToOptions,
-  ): BelongsToBuilder<InferModelProperties<R>> {
-    return new BelongsToBuilder<InferModelProperties<R>>(
-      createLazyReference(target as ModelReference<ModelProperties>),
-      options,
-    );
+  ): BelongsToBuilder<any> {
+    return new BelongsToBuilder<any>(createLazyReference(target), options);
   },
 
   /**
@@ -142,14 +149,11 @@ export const model = {
    * The returned builder is typed `HasManyBuilder<T>` where `T` is the
    * target model's property map, inferred automatically.
    */
-  hasMany<R extends ModelReference>(
+  hasMany<R extends Target<{ _tableName: string }>>(
     target: R,
     options?: HasManyOptions,
-  ): HasManyBuilder<InferModelProperties<R>> {
-    return new HasManyBuilder<InferModelProperties<R>>(
-      createLazyReference(target as ModelReference<ModelProperties>),
-      options,
-    );
+  ): HasManyBuilder<any> {
+    return new HasManyBuilder<any>(createLazyReference(target), options);
   },
 
   /**
@@ -162,14 +166,11 @@ export const model = {
    * The returned builder is typed `HasOneBuilder<T>` where `T` is the
    * target model's property map, inferred automatically.
    */
-  hasOne<R extends ModelReference>(
+  hasOne<R extends Target<{ _tableName: string }>>(
     target: R,
-    options?: HasManyOptions,
-  ): HasOneBuilder<InferModelProperties<R>> {
-    return new HasOneBuilder<InferModelProperties<R>>(
-      createLazyReference(target as ModelReference<ModelProperties>),
-      options,
-    );
+    options?: HasOneOptions,
+  ): HasOneBuilder<any> {
+    return new HasOneBuilder<any>(createLazyReference(target), options);
   },
 };
 
