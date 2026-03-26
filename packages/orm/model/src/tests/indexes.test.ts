@@ -37,7 +37,7 @@ describe("transform › indexes", () => {
       (i.columns as { name: string }[]).some((c) => c.name === "sku"),
     )!;
     expect(idx.unique).toBe(true);
-    expect(idx.name).toBe("products_sku");
+    expect(idx.name).toBe("product_sku");
   });
 
   it("multi-column index lists columns in order with btree type", () => {

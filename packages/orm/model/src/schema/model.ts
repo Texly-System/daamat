@@ -104,7 +104,7 @@ export class ModelDefinition {
    *
    * Iterates every property:
    *   - `ColumnBuilder`     → column + optional PK tracking
-   *   - `BelongsToBuilder`  → FK column + ForeignKeySchema
+   *   - `BelongsToBuilder`  → FK column(s) + ForeignKeySchema + RelationSchema
    *   - `HasManyBuilder`    → RelationSchema (no DB column)
    *   - `HasOneBuilder`     → RelationSchema (no DB column)
    */
@@ -120,36 +120,30 @@ export class ModelDefinition {
         propValue._setName(propName);
         columns.push(propValue.toSchema());
       } else if (propValue instanceof BelongsToBuilder) {
-        // Set property name so default FK column naming works
-        propValue._setPropertyName(propName);
-
-        // Create the FK column on this table
-        const fkColName = propValue.getField();
-        const colBuilder = propValue.toColumnBuilder();
-        colBuilder._setName(fkColName);
-        columns.push(colBuilder.toSchema());
+        // Create the FK column(s) on this table — toColumnBuilder() returns an
+        // array (one builder per FK column, supporting composite FKs).
+        const fkKeys = propValue.getForeignKey();
+        const colSchemas = propValue.toColumnSchema();
+        columns.push(...colSchemas);
 
         // Create the FK constraint
-        foreignKeys.push(propValue.toForeignKeySchema(this._tableName));
+        foreignKeys.push(propValue.toForeignKeySchema());
 
-        // If the relation is flagged as indexed, add an index entry
+        // Module-level relation metadata — from = this table name
+        relations.push(propValue.toRelationSchema(this._tableName));
+
+        // If the relation is flagged as indexed, add an index entry per FK col
         if (propValue.isIndexed()) {
-          indexes.push({ columns: [fkColName] });
+          for (const fkKey of fkKeys) {
+            indexes.push({ columns: [fkKey.name] });
+          }
         }
       } else if (
         propValue instanceof HasManyBuilder ||
         propValue instanceof HasOneBuilder
       ) {
-        const rel: RelationSchema = {
-          name: propName,
-          type: propValue instanceof HasManyBuilder ? "hasMany" : "hasOne",
-          targetTable: propValue.getTargetTable(),
-        };
-        const inv = propValue.getInverse();
-        if (inv !== undefined) {
-          rel.mappedBy = inv;
-        }
-        relations.push(rel);
+        // from = this table name, not the property name
+        relations.push(propValue.toRelationSchema(this._tableName));
       }
     }
 
@@ -202,11 +196,14 @@ export class ModelDefinition {
         propValue._setName(propName);
         lines.push(`  ${propName}: ${propValue.toTsType()};`);
       } else if (propValue instanceof BelongsToBuilder) {
-        propValue._setPropertyName(propName);
-        const fkColName = propValue.getField();
-        const colBuilder = propValue.toColumnBuilder();
-        colBuilder._setName(fkColName);
-        lines.push(`  ${fkColName}: ${colBuilder.toTsType()};`);
+        // Emit one TS field per FK column (supports composite FKs)
+        const fkKeys = propValue.getForeignKey();
+        const colBuilders = propValue.toColumnBuilder();
+        for (let i = 0; i < colBuilders.length; i++) {
+          const colName = fkKeys[i]!.name;
+          colBuilders[i]!._setName(colName);
+          lines.push(`  ${colName}: ${colBuilders[i]!.toTsType()};`);
+        }
       }
       // HasMany / HasOne are not row-level fields — intentionally omitted.
     }

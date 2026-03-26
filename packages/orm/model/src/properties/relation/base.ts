@@ -1,79 +1,65 @@
-import type { RelationType } from "@/types/relation";
+import { ModelDefinition } from '@/schema';
+import type { RelationType, RelationSchema } from "@/types/relation";
+import { ModelTarget, resolveModuleTarget } from '@/utils/target';
+
+
+// ─── Abstract Relation base ───────────────────────────────────────────────────
 
 /**
- * Minimal interface for what relations need from a model
- */
-export interface ModelLike {
-  _tableName: string;
-}
-
-/**
- * Target can be a model directly or a lazy function (for circular refs)
+ * Abstract base for all relation builders (BelongsTo, HasMany, HasOne).
  *
- * Direct: belongsTo(UserSchema)
- * Lazy:   belongsTo(() => UserSchema)  // for circular references
- */
-export type Target<T extends ModelLike> = T | (() => T);
-
-/**
- * Resolve target to its value
- */
-function resolve<T extends ModelLike>(target: Target<T>): T {
-  return typeof target === "function" ? (target as () => T)() : target;
-}
-
-/**
- * Base class for all relations
+ * Carries only the cross-cutting concerns:
+ * - Holding the target reference (direct or lazy).
+ * - Tracking the property name assigned during `ModelDefinition.toTableSchema()`.
+ * - Requiring subclasses to implement `createsForeignKey()` and
+ *   `toRelationSchema(fromProp)`.
  *
- * Relations receive the target MODEL directly:
- * - Access to _tableName for FK generation
- * - Access to _properties for type inference
- * - Clean API: belongsTo(UserSchema)
- *
- * For circular references, wrap in a function: belongsTo(() => UserSchema)
+ * There is deliberately **no generic parameter** here.
+ * Relations are structural builders; full model-type propagation is the
+ * concern of the higher-level model layer, not the relation classes themselves.
  */
-export abstract class Relation<TModel extends ModelLike = ModelLike> {
+export abstract class Relation {
+  /** Discriminator tag matching `RelationType`. */
   readonly kind: RelationType;
 
-  /** The target model (or lazy function for circular refs) */
-  protected target: Target<TModel>;
+  /** The target model (or lazy thunk for circular references). */
+  protected target: ModelTarget;
 
-  /** Inverse property name on target model */
-  protected _inverse?: string;
-
-  /** Property name this relation is assigned to (set during schema build) */
+  /**
+   * The property name this relation is registered under on the owning model.
+   * Set by `ModelDefinition` before schema generation via `_setPropertyName`.
+   */
   protected _propertyName?: string;
 
-  constructor(kind: RelationType, target: Target<TModel>) {
+  constructor(kind: RelationType, target: ModelTarget) {
     this.kind = kind;
     this.target = target;
   }
 
-  /** Get the target model (resolves lazy reference if needed) */
-  getTarget(): TModel {
-    return resolve(this.target);
+  // ─── ModelTarget helpers ─────────────────────────────────────────────────────────
+
+  /** Return the resolved target model. */
+  getModuleTarget(): ModelDefinition {
+    return resolveModuleTarget(this.target);
   }
 
-  /** Get the target table name */
-  getTargetTable(): string {
-    return this.getTarget()._tableName;
+  /** Return the target's SQL table name. */
+  getModuleTargetTable(): string {
+    return this.getModuleTarget()._tableName;
   }
 
-  /** Get inverse property name */
-  getInverse(): string | undefined {
-    return this._inverse;
-  }
+  // ─── Abstract contract ──────────────────────────────────────────────────────
 
-  /** Set property name (called during schema conversion) */
-  _setPropertyName(name: string): void {
-    this._propertyName = name;
-  }
-
-  /** Get property name */
-  getPropertyName(): string | undefined {
-    return this._propertyName;
-  }
-
-  /** Whether this relation creates a FK on this table */
+  /**
+   * `true` for BelongsTo (creates a FK column on this table).
+   * `false` for HasMany / HasOne (no DB artifact on this side).
+   */
   abstract createsForeignKey(): boolean;
+
+  /**
+   * Produce a `RelationSchema` for the module-level relationship map.
+   *
+   * @param fromProp  The property name this relation is registered under.
+   */
+  abstract toRelationSchema(fromProp: string): RelationSchema;
 }

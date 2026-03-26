@@ -6,7 +6,7 @@ import { ProductSchema } from "./product";
 // ---------------------------------------------------------------------------
 // OrderItem
 // ---------------------------------------------------------------------------
-export const OrderItemSchema = model("order_items", {
+export const OrderItemSchema = model("order_item", {
   id: columns.id({ prefix: "oi" }).primaryKey(),
   quantity: columns.integer(),
   unitPrice: columns.numeric(10, 2),

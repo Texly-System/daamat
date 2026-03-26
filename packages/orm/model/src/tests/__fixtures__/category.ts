@@ -4,7 +4,7 @@ import { columns } from "@/properties";
 // ---------------------------------------------------------------------------
 // Category
 // ---------------------------------------------------------------------------
-export const CategorySchema = model("categories", {
+export const CategorySchema = model("category", {
   id: columns.id({ prefix: "cat" }).primaryKey(),
   name: columns.varchar().length(128),
   slug: columns.varchar().length(128).unique(),

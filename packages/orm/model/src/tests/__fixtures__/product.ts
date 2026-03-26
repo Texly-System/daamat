@@ -13,7 +13,7 @@ export const ProductStatusEnum = new EnumBuilder([
   "archived",
 ]).name("product_status");
 
-export const ProductSchema = model("products", {
+export const ProductSchema = model("product", {
   id: columns.id({ prefix: "prd" }).primaryKey(),
   sku: columns.varchar().length(64).unique(),
   title: columns.text(),

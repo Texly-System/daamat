@@ -38,11 +38,11 @@ describe("module snapshots", () => {
   it("snapshot contains all 5 tables", () => {
     const names = snapshot.tables.map((t) => t.name);
     expect(names).toEqual([
-      "categories",
-      "products",
-      "orders",
-      "order_items",
-      "users",
+      "category",
+      "product",
+      "order",
+      "order_item",
+      "user",
     ]);
   });
 

@@ -1,3 +1,4 @@
+import { ColumnType } from './column';
 
 /**
  * Foreign key on delete/update action
@@ -10,6 +11,13 @@ export type ForeignKeyAction =
   | "NO ACTION";
 
 export type ForeignKeySchemaMatch = "SIMPLE" | "FULL"
+
+export type ForeignKeyType = {
+  name: string,
+  type: ColumnType,
+};
+
+
 /**
  * Foreign key definition
  */
@@ -17,7 +25,7 @@ export interface ForeignKeySchema {
   /** Constraint name */
   name: string;
   /** Local column(s) */
-  columns: string[];
+  columns: ForeignKeyType[];
   /** Referenced table */
   referencedTable: string;
   /** Referenced column(s) */
@@ -36,4 +44,6 @@ export interface ForeignKeySchema {
   unique?: boolean;
   /** Whether the foreign key is nullable or not**/
   nullable?: boolean;
+  /** Whether the foreign key is indexed or not**/
+  indexed?: boolean;
 }

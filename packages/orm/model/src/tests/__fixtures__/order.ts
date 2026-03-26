@@ -34,7 +34,7 @@ export const OrderStatusEnum = new EnumBuilder([
   "cancelled",
 ]).name("orders");
 
-export const OrderSchema = model("orders", {
+export const OrderSchema = model("order", {
   id: columns.id({ prefix: "ord" }).primaryKey(),
   total: columns.numeric(12, 2),
   status: columns.enum(OrderStatusEnum),

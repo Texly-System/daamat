@@ -29,22 +29,22 @@ describe("transform › belongsTo / foreign keys", () => {
 
   it("Product FK constraint references categories table", () => {
     const fk = ProductSchema.toTableSchema().foreignKeys.find((f) =>
-      f.columns.includes("category_id"),
+      f.columns.map((c) => c.name).includes("category_id"),
     )!;
-    expect(fk.referencedTable).toBe("categories");
+    expect(fk.referencedTable).toBe("category");
     expect(fk.referencedColumns).toEqual(["id"]);
   });
 
   it("nullable FK sets onDelete to SET NULL", () => {
     const fk = ProductSchema.toTableSchema().foreignKeys.find((f) =>
-      f.columns.includes("category_id"),
+      f.columns.map((c) => c.name).includes("category_id"),
     )!;
     expect(fk.onDelete).toBe("SET NULL");
   });
 
   it("non-nullable FK has no onDelete", () => {
     const fk = OrderItemSchema.toTableSchema().foreignKeys.find((f) =>
-      f.columns.includes("order_id"),
+      f.columns.map((c) => c.name).includes("order_id"),
     )!;
     expect(fk.onDelete).toBeUndefined();
   });
@@ -60,8 +60,8 @@ describe("transform › belongsTo / foreign keys", () => {
   });
 
   it("FK column name defaults to property name + _id", () => {
-    const Author = model("authors", { id: columns.id().primaryKey() });
-    const Book = model("books", {
+    const Author = model("author", { id: columns.id().primaryKey() });
+    const Book = model("book", {
       id: columns.id().primaryKey(),
       author: columns.belongsTo(Author),
     });
@@ -72,11 +72,11 @@ describe("transform › belongsTo / foreign keys", () => {
     expect(fkColumn!.type).toBe("text");
   });
 
-  it("FK column name can be overridden via .fields()", () => {
+  it("FK column name can be overridden via .link({ foreignKey })", () => {
     const Publisher = model("publishers", { id: columns.id().primaryKey() });
     const Magazine = model("magazines", {
       id: columns.id().primaryKey(),
-      publisher: columns.belongsTo(Publisher).fields("pub_ref"),
+      publisher: columns.belongsTo(Publisher).link({ foreignKey: "pub_ref" }),
     });
     const schema = Magazine.toTableSchema();
     expect(schema.columns.find((c) => c.name === "pub_ref")).toBeDefined();

@@ -7,7 +7,7 @@ import { CategorySchema, UserSchema } from "./__fixtures__/models";
 
 describe("transform › model definition", () => {
   it("sets table name", () => {
-    expect(CategorySchema.toTableSchema().name).toBe("categories");
+    expect(CategorySchema.toTableSchema().name).toBe("category");
   });
 
   it("sets postgres schema name when provided", () => {

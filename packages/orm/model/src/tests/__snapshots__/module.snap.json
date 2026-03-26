@@ -3,7 +3,7 @@
   "schema": "public",
   "tables": [
     {
-      "name": "categories",
+      "name": "category",
       "columns": [
         {
           "name": "id",
@@ -57,11 +57,10 @@
       ],
       "indexes": [],
       "foreignKeys": [],
-      "constraints": [],
-      "relations": []
+      "constraints": []
     },
     {
-      "name": "products",
+      "name": "product",
       "columns": [
         {
           "name": "id",
@@ -163,7 +162,7 @@
       ],
       "indexes": [
         {
-          "name": "products_sku",
+          "name": "product_sku",
           "columns": [
             {
               "name": "sku"
@@ -173,7 +172,7 @@
           "type": "btree"
         },
         {
-          "name": "products_status_createdAt",
+          "name": "product_status_createdAt",
           "columns": [
             {
               "name": "status"
@@ -188,11 +187,14 @@
       ],
       "foreignKeys": [
         {
-          "name": "fk_products_category_id",
+          "name": "category_category_id_fk",
           "columns": [
-            "category_id"
+            {
+              "name": "category_id",
+              "type": "text"
+            }
           ],
-          "referencedTable": "categories",
+          "referencedTable": "category",
           "referencedColumns": [
             "id"
           ],
@@ -200,11 +202,10 @@
           "nullable": true
         }
       ],
-      "constraints": [],
-      "relations": []
+      "constraints": []
     },
     {
-      "name": "orders",
+      "name": "order",
       "columns": [
         {
           "name": "id",
@@ -259,7 +260,7 @@
       ],
       "indexes": [
         {
-          "name": "orders_total",
+          "name": "order_total",
           "columns": [
             {
               "name": "total"
@@ -276,11 +277,10 @@
           "type": "check",
           "condition": "total > 0"
         }
-      ],
-      "relations": []
+      ]
     },
     {
-      "name": "order_items",
+      "name": "order_item",
       "columns": [
         {
           "name": "id",
@@ -348,31 +348,36 @@
       ],
       "foreignKeys": [
         {
-          "name": "fk_order_items_order_id",
+          "name": "order_order_id_fk",
           "columns": [
-            "order_id"
+            {
+              "name": "order_id",
+              "type": "text"
+            }
           ],
-          "referencedTable": "orders",
+          "referencedTable": "order",
           "referencedColumns": [
             "id"
           ]
         },
         {
-          "name": "fk_order_items_product_id",
+          "name": "product_product_id_fk",
           "columns": [
-            "product_id"
+            {
+              "name": "product_id",
+              "type": "text"
+            }
           ],
-          "referencedTable": "products",
+          "referencedTable": "product",
           "referencedColumns": [
             "id"
           ]
         }
       ],
-      "constraints": [],
-      "relations": []
+      "constraints": []
     },
     {
-      "name": "users",
+      "name": "user",
       "columns": [
         {
           "name": "id",
@@ -475,14 +480,6 @@
       ],
       "foreignKeys": [],
       "constraints": [],
-      "relations": [
-        {
-          "name": "orders",
-          "type": "hasMany",
-          "targetTable": "orders",
-          "mappedBy": "user"
-        }
-      ],
       "schema": "store"
     }
   ],
@@ -503,6 +500,49 @@
         "shipped",
         "delivered",
         "cancelled"
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "from": "product",
+      "to": "category",
+      "type": "belongsTo",
+      "mappedBy": [
+        "category"
+      ],
+      "linkedBy": [
+        "category_id"
+      ]
+    },
+    {
+      "from": "order_item",
+      "to": "order",
+      "type": "belongsTo",
+      "mappedBy": [
+        "order"
+      ],
+      "linkedBy": [
+        "order_id"
+      ]
+    },
+    {
+      "from": "order_item",
+      "to": "product",
+      "type": "belongsTo",
+      "mappedBy": [
+        "product"
+      ],
+      "linkedBy": [
+        "product_id"
+      ]
+    },
+    {
+      "from": "user",
+      "to": "order",
+      "type": "hasMany",
+      "mappedBy": [
+        "user"
       ]
     }
   ]

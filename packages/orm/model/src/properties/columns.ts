@@ -1,7 +1,6 @@
-import { BelongsToBuilder } from "./relation/belongsToBuilder";
-import { HasManyBuilder } from "./relation/hasManyBuilder";
-import { HasOneBuilder } from "./relation/hasOneBuilder";
-import { Target } from "./relation/base";
+import { BelongsTo, belongsTo } from "./relation/belongsToBuilder";
+import { HasMany, hasMany } from "./relation/hasManyBuilder";
+import { HasOne, hasOne } from "./relation/hasOneBuilder";
 import { BooleanColumnBuilder } from "./column/boolean";
 import { ByteaColumnBuilder } from "./column/bytea";
 import {
@@ -29,18 +28,11 @@ import { UuidColumnBuilder } from "./column/uuid";
 import { VectorColumnBuilder } from "./column/vector";
 import { EnumBuilder } from "./enum/base";
 import {
-  BelongsToConfig as BelongsToOptions,
-  HasManyConfig as HasManyOptions,
-  HasOneConfig as HasOneOptions,
-} from "@/types";
+  RelationOptions
+} from "@/types/relation";
 import { IndexBuilder } from "./indexes";
 import { ConstraintBuilder } from "./constraints";
-
-function createLazyReference<T extends { _tableName: string }>(
-  target: Target<T>,
-): Target<T> {
-  return target;
-}
+import { ModelTarget } from '@/utils/target';
 
 // Column and relation builders
 export const columns = {
@@ -148,61 +140,63 @@ export const columns = {
     return new VectorColumnBuilder(dimensions);
   },
 
-  // Relation builders
+  // ─── Relation builders ──────────────────────────────────────────────────────
 
   /**
-   * Create a belongsTo relation (creates a foreign key column).
+   * Create a BelongsTo relation (creates a FK column on this table).
    *
-   * Pass the target model directly or as a lazy arrow for circular references:
+   * Pass the target model directly or as a lazy thunk for circular references:
    *   - `columns.belongsTo(UserSchema)`            — direct
-   *   - `columns.belongsTo(() => UserSchema)`       — lazy (no annotation needed)
+   *   - `columns.belongsTo(() => UserSchema)`       — lazy (breaks circular init)
    *
-   * The returned builder is typed `BelongsToBuilder<T>` where `T` is the
-   * target model's property map, inferred automatically.
+   * Chain `.link()`, `.onDelete()`, `.onUpdate()`, `.nullable()`, `.unique()`,
+   * `.indexed()`, `.deferrable()`, `.constraint()` as needed.
+   *
+   * ```ts
+   * author: columns.belongsTo(UserSchema)
+   *   .link({ foreignKey: "author_id" })
+   *   .onDelete("CASCADE")
+   *   .indexed()
+   * ```
    */
-  belongsTo<R extends Target<{ _tableName: string }>>(
-    target: R,
-    options?: BelongsToOptions,
-  ): BelongsToBuilder<any> {
-    return new BelongsToBuilder<any>(createLazyReference(target), options);
+  belongsTo(target: ModelTarget, options?: RelationOptions): BelongsTo {
+    return belongsTo(target, options);
   },
 
   /**
-   * Create a hasMany relation (no column created - inverse side).
+   * Create a HasMany relation (no column — inverse side of a 1:N).
    *
-   * Pass the target model directly or as a lazy arrow for circular references:
-   *   - `columns.hasMany(OrderSchema, { mappedBy: 'user' })`
-   *   - `columns.hasMany(() => OrderSchema, { mappedBy: 'user' })`  — lazy
+   * Pass the target model directly or as a lazy thunk:
+   *   - `columns.hasMany(PostSchema, { mappedBy: "author" })`
+   *   - `columns.hasMany(() => PostSchema).mappedBy("author")`  — lazy
    *
-   * The returned builder is typed `HasManyBuilder<T>` where `T` is the
-   * target model's property map, inferred automatically.
+   * ```ts
+   * posts: columns.hasMany(PostSchema).mappedBy("author")
+   * ```
    */
-  hasMany<R extends Target<{ _tableName: string }>>(
-    target: R,
-    options?: HasManyOptions,
-  ): HasManyBuilder<any> {
-    return new HasManyBuilder<any>(createLazyReference(target), options);
+  hasMany(target: ModelTarget, options?: RelationOptions): HasMany {
+    return hasMany(target, options);
   },
 
   /**
-   * Create a hasOne relation (no column created - inverse side).
+   * Create a HasOne relation (no column — inverse side of a 1:1).
    *
-   * Pass the target model directly or as a lazy arrow for circular references:
-   *   - `columns.hasOne(ProfileSchema, { mappedBy: 'account' })`
-   *   - `columns.hasOne(() => ProfileSchema, { mappedBy: 'account' })`  — lazy
+   * Pass the target model directly or as a lazy thunk:
+   *   - `columns.hasOne(ProfileSchema, { mappedBy: "user" })`
+   *   - `columns.hasOne(() => ProfileSchema).mappedBy("user")`  — lazy
    *
-   * The returned builder is typed `HasOneBuilder<T>` where `T` is the
-   * target model's property map, inferred automatically.
+   * ```ts
+   * profile: columns.hasOne(ProfileSchema).mappedBy("user")
+   * ```
    */
-  hasOne<R extends Target<{ _tableName: string }>>(
-    target: R,
-    options?: HasOneOptions,
-  ): HasOneBuilder<any> {
-    return new HasOneBuilder<any>(createLazyReference(target), options);
+  hasOne(target: ModelTarget, options?: RelationOptions): HasOne {
+    return hasOne(target, options);
   },
+
   indexes(name?: string): IndexBuilder {
     return new IndexBuilder(name);
   },
+
   constrains(name?: string): ConstraintBuilder {
     return new ConstraintBuilder(name);
   },

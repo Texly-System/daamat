@@ -6,7 +6,7 @@ import { OrderSchema } from "./order";
 // User
 // ---------------------------------------------------------------------------
 export const UserSchema = model(
-  "users",
+  "user",
   {
     id: columns.id({ prefix: "usr" }).primaryKey(),
     email: columns.text().unique(),
@@ -18,7 +18,7 @@ export const UserSchema = model(
     updatedAt: columns.timestamp({ withTimezone: true }).defaultNow(),
 
     // hasMany Orders — lazy arrow breaks the circular-init error at runtime.
-    orders: columns.hasMany(() => OrderSchema).inverse("user"),
+    orders: columns.hasMany(() => OrderSchema).mappedBy("user"),
   },
   { schema: "store" },
 ).indexes([

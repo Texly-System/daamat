@@ -1,312 +1,392 @@
-import type { ForeignKeySchema, ForeignKeyAction, ColumnType } from "@/types";
-import type { BelongsToConfig } from "@/types/relation";
+import type {
+  ForeignKeySchema,
+  ForeignKeyAction,
+  ForeignKeySchemaMatch,
+  ForeignKeyType,
+  ColumnSchema,
+} from "@/types";
+import type {
+  LinkConfig,
+  ConstraintOptions,
+  RelationSchema,
+  RelationOptions,
+} from "@/types/relation";
 import {
   ColumnBuilder,
   TextColumnBuilder,
   UuidColumnBuilder,
   IntegerColumnBuilder,
 } from "../column";
-import { ForeignKeyBuilder } from "../foreignKeys/base";
-import { Relation, ModelLike, Target } from "./base";
+import { Relation } from "./base";
+import { ModelTarget, removeLastS } from "@/utils/target";
+
+// ─── BelongsTo ────────────────────────────────────────────────────────────────
 
 /**
- * TODO: This is better but still not what i have in mind so will need to redo 
- * this but before that i need to make model first so that the type inference 
- * is correct and the extraction is done right
-**/
-
-/**
- * BelongsTo - The owning side of a relationship
+ * BelongsTo — the owning side of a relationship.
  *
- * Creates a FK column pointing to another table.
+ * Creates a FK column on this table pointing to the target table.
  *
- * Usage:
  * ```ts
- * const PostSchema = model('posts', {
- *   // Simple: author_id -> users.id
- *   author: belongsTo(UserSchema),
+ * // Minimal
+ * author: BelongsTo(UserSchema)
  *
- *   // With options:
- *   category: belongsTo(CategorySchema, {
- *     fields: 'category_id',
- *     references: 'id',
- *     onDelete: 'SET NULL',
- *     nullable: true
- *   }),
+ * // With options
+ * author: BelongsTo(UserSchema, { mappedBy: "posts" })
+ *           .link({ foreignKey: "author_id", reference: "id" })
+ *           .onDelete("CASCADE")
+ *           .indexed()
  *
- *   // Composite FK:
- *   product: belongsTo(ProductSchema, {
- *     fields: ['vendor_id', 'sku'],
- *     references: ['vendor_id', 'sku']
- *   })
- * })
+ * // Composite FK
+ * product: BelongsTo(ProductSchema)
+ *            .link({ foreignKey: ["vendor_id", "sku"], reference: ["vendor_id", "sku"] })
+ *
+ * // Nullable 1:1
+ * profile: BelongsTo(ProfileSchema)
+ *            .nullable()
+ *            .unique()
  * ```
  */
-export class BelongsTo<
-  TModel extends ModelLike = ModelLike,
-> extends Relation<TModel> {
-  /** Explicit FK column name(s) */
-  private _fields?: string[];
+export class BelongsTo extends Relation {
+  // ── Link config ─────────────────────────────────────────────────────────────
 
-  /** Referenced columns on target (default: ['id']) */
-  private _references: string[] = ["id"];
+  /** Explicit FK column name(s). Defaults to `<propertyName>_id`. */
+  private _foreignKey: ForeignKeyType[] = [];
 
-  /** FK column type */
-  private _type?: ColumnType;
+  /** Referenced columns on the target table. Defaults to `["id"]`. */
+  private _reference: string[] = ["id"];
 
-  /** FK column nullable */
+  // ── Column modifiers ────────────────────────────────────────────────────────
+
   private _nullable = false;
-
-  /** FK column unique (for 1:1) */
   private _unique = false;
-
-  /** Create index on FK */
   private _indexed = false;
 
-  /** Constraint name */
+  // ── Constraint config ───────────────────────────────────────────────────────
+
   private _constraintName?: string;
-
-  /** ON DELETE */
   private _onDelete?: ForeignKeyAction;
-
-  /** ON UPDATE */
   private _onUpdate?: ForeignKeyAction;
-
-  /** Deferrable */
   private _deferrable = false;
-
-  /** Initially deferred */
   private _initiallyDeferred = false;
+  private _match?: ForeignKeySchemaMatch;
 
-  constructor(target: Target<TModel>, config?: BelongsToConfig) {
+  // ── Relation metadata ───────────────────────────────────────────────────────
+
+  /**
+   * The property name on the **target** model that holds the inverse
+   * `hasMany` / `hasOne`.  Defaults to `deriveNameFromTable(target._tableName)`
+   * (e.g. `"users"` → `"user"`).
+   */
+  private _mappedBy?: string;
+
+  // ─── Constructor ─────────────────────────────────────────────────────────────
+
+  constructor(target: ModelTarget, options?: RelationOptions) {
     super("belongsTo", target);
-
-    if (config) {
-      // Fields config
-      if (config.fields) {
-        this._fields = Array.isArray(config.fields)
-          ? config.fields
-          : [config.fields];
-      }
-      if (config.references) {
-        this._references = Array.isArray(config.references)
-          ? config.references
-          : [config.references];
-      }
-      if (config.type) this._type = config.type;
-      if (config.nullable) this._nullable = config.nullable;
-      if (config.unique) this._unique = config.unique;
-      if (config.indexed) this._indexed = config.indexed;
-
-      // Constraint config
-      if (config.constraintName) this._constraintName = config.constraintName;
-      if (config.onDelete) this._onDelete = config.onDelete;
-      if (config.onUpdate) this._onUpdate = config.onUpdate;
-      if (config.deferrable) this._deferrable = config.deferrable;
-      if (config.initiallyDeferred)
-        this._initiallyDeferred = config.initiallyDeferred;
-
-      // Inverse
-      if (config.inverse) this._inverse = config.inverse;
+    if (options?.mappedBy !== undefined) {
+      this._mappedBy = options.mappedBy;
     }
   }
 
-  // ─── Fluent API: Fields ────────────────────────────────────────────
+  // ─── Fluent: link ─────────────────────────────────────────────────────────
 
-  /** Set FK column name(s) */
-  fields(columns: string | string[]): this {
-    this._fields = Array.isArray(columns) ? columns : [columns];
+  /**
+   * Configure the FK column(s) and the referenced column(s) on the target.
+   *
+   * ```ts
+   * .link({ foreignKey: "author_id", reference: "id" })
+   * .link({ foreignKey: ["vendor_id", "sku"], reference: ["vendor_id", "sku"] })
+   * ```
+   */
+  link(config: LinkConfig): this {
+    if (config.foreignKey === undefined) {
+      config.foreignKey = [`${this.getModuleTarget()._tableName}_id`];
+    }
+    if (config.reference === undefined) {
+      config.reference = ["id"];
+    }
+    const foreignKey = Array.isArray(config.foreignKey)
+      ? config.foreignKey
+      : [config.foreignKey];
+
+    const reference = Array.isArray(config.reference)
+      ? config.reference
+      : [config.reference];
+
+    if (foreignKey.length !== reference.length)
+      throw new Error("Foreign key and reference must have the same length");
+
+    this._foreignKey = foreignKey.map((fk) => {
+      if (typeof fk === "string") {
+        return { name: fk, type: "text" };
+      }
+      return fk;
+    });
+    this._reference = reference;
+
+    if (config.name) this._constraintName = config.name;
+
     return this;
   }
 
-  /** Set referenced column(s) on target */
-  references(columns: string | string[]): this {
-    this._references = Array.isArray(columns) ? columns : [columns];
-    return this;
-  }
+  // ─── Fluent: column modifiers ─────────────────────────────────────────────
 
-  /** Set FK column type */
-  type(t: ColumnType): this {
-    this._type = t;
-    return this;
-  }
-
-  /** Mark FK as nullable */
+  /** Mark the FK column as nullable (also defaults ON DELETE to SET NULL). */
   nullable(): this {
     this._nullable = true;
     return this;
   }
 
-  /** Mark FK as unique (1:1 relationship) */
+  /** Add UNIQUE on the FK column — turns this into a 1:1 relation. */
   unique(): this {
     this._unique = true;
     return this;
   }
 
-  /** Create index on FK column */
+  /** Create a btree index on the FK column. */
   indexed(): this {
     this._indexed = true;
     return this;
   }
 
-  // ─── Fluent API: Constraint ────────────────────────────────────────
+  // ─── Fluent: constraint ───────────────────────────────────────────────────
 
-  /** Set constraint name */
-  constraint(name: string): this {
-    this._constraintName = name;
+  /**
+   * Set FK constraint options in one call.
+   *
+   * ```ts
+   * .constraint({ name: "fk_posts_users", onDelete: "CASCADE" })
+   * ```
+   */
+  constraint(options: ConstraintOptions): this {
+    if (options.name !== undefined) this._constraintName = options.name;
+    if (options.onDelete !== undefined) this._onDelete = options.onDelete;
+    if (options.onUpdate !== undefined) this._onUpdate = options.onUpdate;
+    if (options.deferrable !== undefined) this._deferrable = options.deferrable;
+    if (options.initiallyDeferred !== undefined)
+      this._initiallyDeferred = options.initiallyDeferred;
+    if (options.match !== undefined) this._match = options.match;
     return this;
   }
 
-  /** Set ON DELETE action */
+  /** Set the ON DELETE referential action. */
   onDelete(action: ForeignKeyAction): this {
     this._onDelete = action;
     return this;
   }
 
-  /** Set ON UPDATE action */
+  /** Set the ON UPDATE referential action. */
   onUpdate(action: ForeignKeyAction): this {
     this._onUpdate = action;
     return this;
   }
 
-  /** Make constraint deferrable */
+  /** Set the MATCH */
+  match(action: ForeignKeySchemaMatch): this {
+    this._match = action;
+    return this;
+  }
+
+  /** Make the FK constraint DEFERRABLE (optionally INITIALLY DEFERRED). */
   deferrable(initially = false): this {
     this._deferrable = true;
     this._initiallyDeferred = initially;
     return this;
   }
 
-  /** Set inverse property name */
-  inverse(propertyName: string): this {
-    this._inverse = propertyName;
-    return this;
-  }
-
-  // ─── Getters ───────────────────────────────────────────────────────
+  // ─── Getters ──────────────────────────────────────────────────────────────
 
   createsForeignKey(): boolean {
     return true;
   }
 
   /**
-   * Get FK column names
-   * Default: `<propertyName>_id`
+   * Resolved FK column name(s).
+   * Falls back to `<propertyName>_id` when a property name has been set,
+   * otherwise falls back to `<targetTable>_id`.
    */
-  getFields(): string[] {
-    if (this._fields) return this._fields;
-    if (this._propertyName) return [`${this._propertyName}_id`];
-    return [`${this.getTargetTable()}_id`];
+  getForeignKey(): ForeignKeyType[] {
+    if (!this._foreignKey || this._foreignKey.length === 0) {
+      this._foreignKey = [{
+        name: `${this.getModuleTarget()._tableName}_id`,
+        type: "text"
+      }]
+    }
+    return this._foreignKey;
   }
 
-  /** Get primary FK column */
-  getField(): string {
-    return this.getFields()[0]!;
+  getConstrainName(): string {
+    if (!this._constraintName) {
+      const fk = this.getForeignKey();
+      this._constraintName = `${this.getModuleTarget()._tableName}_${fk.map((fk) => fk.name).join("_")}_fk`
+    }
+    return this._constraintName;
   }
 
-  /** Get referenced columns */
-  getReferences(): string[] {
-    return this._references;
+
+  getReference(): string[] {
+    if (!this._reference || this._reference.length === 0) {
+      this._reference = ["id"]
+    }
+    return this._reference;
   }
 
   isNullable(): boolean {
     return this._nullable;
   }
-
   isUnique(): boolean {
     return this._unique;
   }
-
   isIndexed(): boolean {
     return this._indexed;
   }
 
-  // ─── Schema Generation ─────────────────────────────────────────────
+  /**
+   * The resolved `mappedBy` value — the property name on the target model
+   * that points back to this side.
+   * Falls back to `deriveNameFromTable(target._tableName)`.
+   */
+  getMappedBy(): string {
+    return this._mappedBy ?? removeLastS(this.getModuleTarget()._tableName);
+  }
+
+  // ─── Schema generation ────────────────────────────────────────────────────
 
   /**
-   * Create ForeignKeyBuilder for this relation
+   * Produce the `ForeignKeySchema` for the table-level snapshot.
+   *
+   * @param sourceTable  Name of the table this relation lives on (used for
+   *                     auto-generating the constraint name).
    */
-  toForeignKeyBuilder(sourceTable: string): ForeignKeyBuilder {
-    const params: {
-      sourceTable: string;
-      relationName: string;
-      targetTable: string;
-      fields?: string | string[];
-      references?: string | string[];
-    } = {
-      sourceTable,
-      relationName: this._propertyName ?? "unknown",
-      targetTable: this.getTargetTable(),
-      references: this._references,
+  toForeignKeySchema(): ForeignKeySchema {
+    const foreignKey = this.getForeignKey();
+    const name = this.getConstrainName();
+    const reference = this.getReference();
+
+    const fk: ForeignKeySchema = {
+      name: name,
+      columns: foreignKey,
+      referencedTable: this.getModuleTarget()._tableName,
+      referencedColumns: reference,
     };
 
-    if (this._fields) {
-      params.fields = this._fields;
-    }
+    if (this._onDelete) fk.onDelete = this._onDelete;
+    else if (this._nullable) fk.onDelete = "SET NULL";
 
-    const fk = ForeignKeyBuilder.fromRelation(params);
+    if (this._onUpdate) fk.onUpdate = this._onUpdate;
+    if (this._deferrable) fk.deferrable = this._deferrable;
+    if (this._deferrable && this._initiallyDeferred)
+      fk.initiallyDeferred = this._initiallyDeferred;
+    if (this._match) fk.match = this._match;
 
-    // Constraint
-    if (this._constraintName) fk.name(this._constraintName);
-    if (this._onDelete) {
-      fk.onDelete(this._onDelete);
-    } else if (this._nullable) {
-      fk.onDelete("SET NULL");
-    }
-    if (this._onUpdate) fk.onUpdate(this._onUpdate);
-    if (this._deferrable) fk.deferrable(this._initiallyDeferred);
-
-    // Column
-    if (this._nullable) fk.nullable();
-    if (this._unique) fk.unique();
-    if (this._type) fk.columnType(this._type);
-    if (this._indexed) fk.indexed();
+    if (this._nullable) fk.nullable = this._nullable;
+    if (this._unique) fk.unique = this._unique;
+    if (this._indexed) fk.indexed = this._indexed;
 
     return fk;
   }
 
   /**
-   * Create column builder for FK column
+   * Build a `ColumnBuilder` for the FK column.
+   * The column name is set externally by `ModelDefinition` via `_setName`.
    */
-  toColumnBuilder(): ColumnBuilder {
-    const t = this._type ?? "text";
+  toColumnBuilder(): ColumnBuilder[] {
+    let cols: ColumnBuilder[] = [];
+    this.getForeignKey().forEach((fk) => {
+      let value: ColumnBuilder;
+      switch (fk.type) {
+        case "uuid":
+          value = new UuidColumnBuilder();
+          break;
+        case "integer":
+        case "smallint":
+        case "bigint":
+          value = new IntegerColumnBuilder();
+          break;
+        default:
+          value = new TextColumnBuilder();
+      }
+      if (this._nullable) value.nullable();
+      if (this._unique) value.unique();
+      value._setName(fk.name);
+      cols.push(value);
+    });
 
-    let col: ColumnBuilder;
-    switch (t) {
-      case "uuid":
-        col = new UuidColumnBuilder();
-        break;
-      case "integer":
-      case "smallint":
-      case "bigint":
-        col = new IntegerColumnBuilder();
-        break;
-      default:
-        col = new TextColumnBuilder();
-    }
+    return cols;
+  }
+  /**
+  * Build a `ColumnBuilder` for the FK column.
+  * The column name is set externally by `ModelDefinition` via `_setName`.
+  */
+  toColumnSchema(): ColumnSchema[] {
+    const cols = this.toColumnBuilder().map((columnBuilder) => {
+      return columnBuilder.toSchema()
+    });
 
-    if (this._nullable) col.nullable();
-    if (this._unique) col.unique();
-
-    return col;
+    return cols;
   }
 
   /**
-   * Generate FK schema
+   * Produce the `RelationSchema` for the module-level relationship map.
+   *
+   * `linkedBy` = FK column name(s) (lives on this table).
+   * `mappedBy` = inverse property name on the target model.
+   *
+   * @param fromProp  Property name this relation is registered under.
    */
-  toForeignKeySchema(sourceTable: string): ForeignKeySchema {
-    return this.toForeignKeyBuilder(sourceTable).toSchema();
+  toRelationSchema(fromProp: string): RelationSchema {
+    const schema: RelationSchema = {
+      from: fromProp,
+      to: this.getModuleTarget()._tableName,
+      type: "belongsTo",
+      mappedBy: [this.getMappedBy()],
+      linkedBy: this.getForeignKey().map((fk) => fk.name),
+    };
+
+    const hasRule =
+      this._onDelete !== undefined ||
+      this._onUpdate !== undefined ||
+      this._deferrable ||
+      this._initiallyDeferred ||
+      this._match !== undefined;
+
+    if (hasRule) {
+      schema.rule = {};
+      if (this._onDelete) schema.rule.onDelete = this._onDelete;
+      if (this._onUpdate) schema.rule.onUpdate = this._onUpdate;
+      if (this._deferrable) schema.rule.deferrable = true;
+      if (this._initiallyDeferred) schema.rule.initiallyDeferred = true;
+      if (this._match) schema.rule.match = this._match;
+    }
+
+    return schema;
+  }
+
+  toTsType(): any {
+    return `${this.getModuleTarget().toTsType()}`;
   }
 }
 
+// ─── Factory function ─────────────────────────────────────────────────────────
+
 /**
- * Create a belongsTo relation
+ * Create a `BelongsTo` relation builder.
+ *
+ * ```ts
+ * author: belongsTo(UserSchema)
+ * author: belongsTo(UserSchema, { mappedBy: "posts" })
+ *           .link({ foreignKey: "author_id" })
+ *           .onDelete("CASCADE")
+ *           .indexed()
+ * ```
  */
-export function belongsTo<TModel extends ModelLike>(
-  target: Target<TModel>,
-  config?: BelongsToConfig,
-): BelongsTo<TModel> {
-  return new BelongsTo(target, config);
+export function belongsTo(
+  target: ModelTarget,
+  options?: RelationOptions,
+): BelongsTo {
+  return new BelongsTo(target, options);
 }
 
-// Keep old name for backwards compat
+// Backwards-compat alias (used by schema/model.ts instanceof checks)
 export { BelongsTo as BelongsToBuilder };

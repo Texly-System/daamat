@@ -1,51 +1,105 @@
-import type { HasOneConfig } from "@/types/relation";
-import { Relation, ModelLike, Target } from "./base";
+import type { RelationOptions, RelationSchema } from "@/types/relation";
+import { Relation } from "./base";
+import { ModelTarget } from '@/utils/target';
+
+// ─── HasOne ───────────────────────────────────────────────────────────────────
 
 /**
- * HasOne - Inverse side of a one-to-one relationship
+ * HasOne — the inverse side of a one-to-one relationship.
  *
- * Does NOT create any DB artifacts. This is metadata for the ORM.
- * The FK lives on the other side (the model with belongsTo + unique).
+ * Does **not** create any DB artifacts (no column, no FK constraint).
+ * The FK lives on the other side (the model with `BelongsTo` + `.unique()`).
+ * This is pure ORM metadata used at module build time.
  *
- * Usage:
  * ```ts
- * const UserSchema = model('users', {
- *   // User has one profile (FK is on profiles table, unique)
- *   profile: hasOne(ProfileSchema, { inverse: 'user' })
- * })
+ * // User has one Profile — FK is on the profiles table (unique)
+ * profile: hasOne(ProfileSchema, { mappedBy: "user" })
+ *
+ * // Without mappedBy — FK side is unlinked, no cross-validation
+ * profile: hasOne(ProfileSchema)
  * ```
  */
-export class HasOne<
-  TModel extends ModelLike = ModelLike,
-> extends Relation<TModel> {
-  constructor(target: Target<TModel>, config?: HasOneConfig) {
-    super("hasOne", target);
+export class HasOne extends Relation {
+  /**
+   * Property name on the **target** model that holds the `BelongsTo`
+   * pointing back here.  When omitted, defaults to
+   * `deriveNameFromTable(target._tableName)`.
+   */
+  private _mappedBy?: string;
 
-    if (config?.inverse) {
-      this._inverse = config.inverse;
+  constructor(target: ModelTarget, options?: RelationOptions) {
+    super("hasOne", target);
+    if (options?.mappedBy !== undefined) {
+      this._mappedBy = options.mappedBy;
     }
   }
 
-  /** Set inverse property name */
-  inverse(propertyName: string): this {
-    this._inverse = propertyName;
+  // ─── Fluent ───────────────────────────────────────────────────────────────
+
+  /**
+   * Set the inverse property name on the target model.
+   *
+   * ```ts
+   * hasOne(ProfileSchema).mappedBy("user")
+   * ```
+   */
+  mappedBy(propertyName: string): this {
+    this._mappedBy = propertyName;
     return this;
   }
+
+  // ─── Getters ──────────────────────────────────────────────────────────────
 
   createsForeignKey(): boolean {
     return false;
   }
+
+  getMappedBy(): string | undefined {
+    return this._mappedBy;
+  }
+
+  // ─── Schema generation ────────────────────────────────────────────────────
+
+  /**
+   * Produce the `RelationSchema` for the module-level relationship map.
+   *
+   * @param fromProp  Property name this relation is registered under.
+   */
+  toRelationSchema(fromProp: string): RelationSchema {
+    const schema: RelationSchema = {
+      from: fromProp,
+      to: this.getModuleTarget()._tableName,
+      type: "hasOne",
+    };
+
+    const mapped = this._mappedBy;
+    if (mapped !== undefined) {
+      schema.mappedBy = [mapped];
+    }
+
+    return schema;
+  }
+
+  toTsType(): any {
+    return `${this.getModuleTarget().toTsType()}`;
+  }
+
 }
+
+// ─── Factory function ─────────────────────────────────────────────────────────
 
 /**
- * Create a hasOne relation
+ * Create a `HasOne` relation builder.
+ *
+ * ```ts
+ * profile: hasOne(ProfileSchema)
+ * profile: hasOne(ProfileSchema, { mappedBy: "user" })
+ * profile: hasOne(ProfileSchema).mappedBy("user")
+ * ```
  */
-export function hasOne<TModel extends ModelLike>(
-  target: Target<TModel>,
-  config?: HasOneConfig,
-): HasOne<TModel> {
-  return new HasOne(target, config);
+export function hasOne(target: ModelTarget, options?: RelationOptions): HasOne {
+  return new HasOne(target, options);
 }
 
-// Keep old name for backwards compat
+// Backwards-compat alias
 export { HasOne as HasOneBuilder };

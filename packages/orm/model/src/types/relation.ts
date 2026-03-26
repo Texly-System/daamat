@@ -1,40 +1,56 @@
-import { ColumnType } from "./column";
-import { ForeignKeyAction, ForeignKeySchemaMatch } from "./foreignKey";
+import {
+  ForeignKeyAction,
+  ForeignKeySchemaMatch,
+  ForeignKeyType,
+} from "./foreignKey";
 
-/**
- * Relation types
- */
+// ─── Relation type tag ────────────────────────────────────────────────────────
+
 export type RelationType = "belongsTo" | "hasMany" | "hasOne";
 
+// ─── Constructor-level options ────────────────────────────────────────────────
+
 /**
- * FK column configuration
+ * Options accepted by BelongsTo(Model, options) at construction time.
+ *
+ * `mappedBy` is the property name on the *owning* model that points back here.
+ * When omitted the builder defaults to `<model._name>` (lowercased).
  */
-export interface FieldsConfig {
-  /** Local FK column name(s) - defaults to `<propertyName>_id` */
-  fields?: string | string[];
-
-  /** Referenced column(s) on target - defaults to 'id' */
-  references?: string | string[];
-
-  /** Column type for FK column - defaults to 'text' */
-  type?: ColumnType;
-
-  /** Whether FK column allows NULL */
-  nullable?: boolean;
-
-  /** Whether FK column is unique (1:1 relation) */
-  unique?: boolean;
-
-  /** Create index on FK column */
-  indexed?: boolean;
+export interface RelationOptions {
+  mappedBy?: string;
 }
 
+// ─── .link() sub-builder payload ─────────────────────────────────────────────
+
 /**
- * FK constraint configuration
+ * Describes the FK column(s) and the referenced column(s) on the target.
+ * Passed to `.link({ foreignKey, reference })` on BelongsTo.
  */
-export interface ConstraintConfig {
-  /** Custom constraint name */
-  constraintName?: string;
+export interface LinkConfig {
+  /** The name of the FK column. */
+  name?: string;
+
+  /**
+   * FK column name(s) on the **owning** (this) table.
+   * Defaults to `<propertyName>_id` when not provided.
+   */
+  foreignKey?: string | string[] | ForeignKeyType | ForeignKeyType[];
+
+  /**
+   * Referenced column(s) on the **target** table.
+   * Defaults to `["id"]` when not provided.
+   */
+  reference?: string | string[];
+}
+
+// ─── Constraint sub-builder payload ──────────────────────────────────────────
+
+/**
+ * Options accepted by the `.constraint(options)` method on BelongsTo.
+ */
+export interface ConstraintOptions {
+  /** Explicit constraint name. Auto-generated when omitted. */
+  name?: string;
 
   /** ON DELETE action */
   onDelete?: ForeignKeyAction;
@@ -42,36 +58,58 @@ export interface ConstraintConfig {
   /** ON UPDATE action */
   onUpdate?: ForeignKeyAction;
 
-  /** Deferrable constraint */
+  /** Make the constraint DEFERRABLE */
   deferrable?: boolean;
 
-  /** Initially deferred */
+  /** When deferrable, start as INITIALLY DEFERRED */
   initiallyDeferred?: boolean;
 
-  /** Match type for composite FKs */
+  /** MATCH type for composite FK constraints */
   match?: ForeignKeySchemaMatch;
 }
 
-/**
- * BelongsTo options - the owning side that creates FK
- */
-export interface BelongsToConfig extends FieldsConfig, ConstraintConfig {
-  /** Inverse property name on target model */
-  inverse?: string;
-}
+// ─── RelationSchema ───────────────────────────────────────────────────────────
 
 /**
- * HasMany options - inverse side of 1:N
+ * Serializable, snapshot-level description of a single relation.
+ *
+ * This is **not** the FK constraint record (that lives in `ForeignKeySchema`).
+ * It is the module-level view used by the ORM to understand the graph of
+ * relationships between models without inspecting the full table schemas.
+ *
+ * Produced by every relation class via `.toRelationSchema(fromProp)`.
  */
-export interface HasManyConfig {
-  /** Property on target that holds the belongsTo */
-  inverse?: string;
-}
+export interface RelationSchema {
+  /** The property name on **this** model (e.g. `"orders"`, `"author"`). */
+  from: string;
 
-/**
- * HasOne options - inverse side of 1:1
- */
-export interface HasOneConfig {
-  /** Property on target that holds the belongsTo */
-  inverse?: string;
+  /** The target table name. */
+  to: string;
+
+  /** The type of relation from this model's perspective. */
+  type: RelationType;
+
+  /**
+   * For `hasMany` / `hasOne`: the property name(s) on the target model that
+   * holds the corresponding `BelongsTo` back to this model.
+   *
+   * For `belongsTo`: the property name(s) on the target model that holds the
+   * corresponding `hasMany` / `hasOne` back to this model.
+   */
+  mappedBy?: string[];
+
+  /**
+   * The FK column name(s) that physically links the two tables.
+   * Only populated on `belongsTo` (where the FK lives on this table).
+   */
+  linkedBy?: string[];
+
+  /** Referential-integrity rules carried from the FK constraint. */
+  rule?: {
+    onDelete?: ForeignKeyAction;
+    onUpdate?: ForeignKeyAction;
+    deferrable?: boolean;
+    initiallyDeferred?: boolean;
+    match?: ForeignKeySchemaMatch;
+  };
 }
