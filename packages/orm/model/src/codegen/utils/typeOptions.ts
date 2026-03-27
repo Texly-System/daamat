@@ -1,4 +1,3 @@
-
 // ─── Options ──────────────────────────────────────────────────────────────────
 
 export interface GenerateTypesOptions {
@@ -15,3 +14,14 @@ export interface GenerateTypesOptions {
    */
   banner?: string | false;
 }
+
+// ─── Multi-file result ────────────────────────────────────────────────────────
+
+/**
+ * Result of `generateFilesMap()`.
+ *
+ * Keys are relative file names (e.g. `"product.ts"`, `"index.ts"`).
+ * Values are the full contents of the corresponding `.ts` file, ready to be
+ * written to disk.
+ */
+export type GeneratedFilesMap = Map<string, string>;

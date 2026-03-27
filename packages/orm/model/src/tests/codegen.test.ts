@@ -52,17 +52,17 @@ describe("generateTypes › enum types", () => {
   it("emits a type alias for each enum", () => {
     const out = generateTypes(ecommerceSchema());
     expect(out).toContain(
-      "export type product_status = 'draft' | 'active' | 'archived';",
+      "export type ProductStatusEnum = 'draft' | 'active' | 'archived';",
     );
     expect(out).toContain(
-      "export type orders = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';",
+      "export type OrdersEnum = 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';",
     );
   });
 
   it("emits no enum block when the module has no enums", () => {
     const schema = toModuleSchema("bare", [CategorySchema]);
     const out = generateTypes(schema);
-    expect(out).not.toContain("export type product_status");
+    expect(out).not.toContain("export type ProductStatusEnum");
   });
 });
 
@@ -96,8 +96,8 @@ describe("generateTypes › row interfaces", () => {
 
   it("uses the enum type name for enum columns", () => {
     const out = generateTypes(ecommerceSchema());
-    expect(out).toMatch(/status: product_status;/);
-    expect(out).toMatch(/status: orders;/);
+    expect(out).toMatch(/status: ProductStatusEnum;/);
+    expect(out).toMatch(/status: OrdersEnum;/);
   });
 
   it("emits FK columns on the owning table", () => {
@@ -258,7 +258,7 @@ describe("generateTypes › edge cases", () => {
     const schema = toModuleSchema("store", [CategorySchema]);
     const out = generateTypes(schema);
     expect(out).toContain("export interface Category {");
-    expect(out).not.toContain("export type product_status");
+    expect(out).not.toContain("export type ProductStatusEnum");
   });
 
   it("handles a module with no relations", () => {

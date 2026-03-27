@@ -1,5 +1,6 @@
 import { ColumnSchema, ColumnType } from "@/types/column";
 import { pgTypeToTsBase } from "@/utils/pgTypeToTsBase";
+import { toEnumTypeName } from "@/utils/stringConvertor";
 
 // ─── Column TS type resolution ────────────────────────────────────────────────
 
@@ -10,10 +11,10 @@ import { pgTypeToTsBase } from "@/utils/pgTypeToTsBase";
  * serialized `ColumnSchema` rather than a live builder instance.
  */
 export const columnToTsType = (col: ColumnSchema): string => {
-  // Named enum — use the enum name directly as the type reference.
+  // Named enum — convert the raw enum name to the generated alias name.
   const base: string =
     col.type === "enum" && col.enum
-      ? col.enum
+      ? toEnumTypeName(col.enum)
       : pgTypeToTsBase(col.type as ColumnType);
 
   // Inline object-literal types (e.g. geometric / range types) need parens
@@ -34,4 +35,4 @@ export const columnToTsType = (col: ColumnSchema): string => {
   if (!col.nullable) return withArray;
   if (!col.array && needsParens(base)) return `(${base}) | null`;
   return `${withArray} | null`;
-}
+};

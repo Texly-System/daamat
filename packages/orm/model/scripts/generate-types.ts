@@ -1,21 +1,21 @@
 /**
- * Type generator — writes src/generated/types.ts
+ * Type generator — writes one .ts file per table into scripts/generated/types/
  *
  * Run with:
  *   bun run codegen
  *
- * Builds the ecommerce fixture module schema and passes it to generateTypes(),
- * then writes the result to src/generated/types.ts.
+ * Builds the ecommerce fixture module schema and passes it to generateFilesMap(),
+ * then writes each file into scripts/generated/types/.
  *
  * Replace the model imports and toModuleSchema() call below with your own
  * models when using this in a real project.
  */
 
 import { mkdirSync, writeFileSync } from "fs";
-import { dirname, join } from "path";
+import { join } from "path";
 
 import { toModuleSchema } from "../src/schema/toModuleSchema";
-import { generateTypes } from "../src/codegen/index";
+import { generateFilesMap } from "../src/codegen/index";
 import {
   CategorySchema,
   OrderSchema,
@@ -36,13 +36,18 @@ const schema = toModuleSchema(
 
 // ─── Generate types ───────────────────────────────────────────────────────────
 
-const output = generateTypes(schema);
+const files = generateFilesMap(schema);
 
 // ─── Write output ─────────────────────────────────────────────────────────────
 
-const outPath = join(import.meta.dir, "./generated/types.ts");
+const outDir = join(import.meta.dir, "../src/tests/__snapshots__/generated/types");
 
-mkdirSync(dirname(outPath), { recursive: true });
-writeFileSync(outPath, output, "utf8");
+mkdirSync(outDir, { recursive: true });
 
-console.log(`Types written to ${outPath}`);
+for (const [name, content] of files) {
+  const outPath = join(outDir, name);
+  writeFileSync(outPath, content, "utf8");
+  console.log(`  written → ${outPath}`);
+}
+
+console.log(`\nTypes written to ${outDir}/`);
