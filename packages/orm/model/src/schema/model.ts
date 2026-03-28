@@ -154,7 +154,7 @@ export class ModelDefinition {
       default: "now()",
       primaryKey: false,
       unique: false,
-    })
+    });
 
     columns.push({
       name: "updated_at",
@@ -162,7 +162,7 @@ export class ModelDefinition {
       nullable: true,
       primaryKey: false,
       unique: false,
-    })
+    });
 
     const schema: TableSchema & { schema?: string } = {
       name: this._tableName,
@@ -181,7 +181,6 @@ export class ModelDefinition {
   }
 
   // ─── toTsType ───────────────────────────────────────────────────────────────
-
   /**
    * Generate a TypeScript interface string that represents the row shape of
    * this model.
