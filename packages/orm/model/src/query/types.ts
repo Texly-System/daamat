@@ -372,7 +372,53 @@ export interface DeleteDescriptor {
 }
 
 /**
- * Discriminated union of all four query descriptor types.
+ * JSON descriptor for an `UPSERT` query
+ * (`INSERT … ON CONFLICT … DO UPDATE SET …`).
+ *
+ * @example
+ * ```ts
+ * {
+ *   type: "upsert",
+ *   table: "user",
+ *   schema: "store",
+ *   rows: [{ id: "usr_1", email: "a@b.com", name: "Alice" }],
+ *   conflictColumns: ["email"],
+ *   updateColumns: ["name"],
+ *   set: { name: "Alice" },
+ *   returning: ["id", "email"],
+ * }
+ * ```
+ */
+export interface UpsertDescriptor {
+  type: "upsert";
+  table: string;
+  schema?: string;
+  /** One entry per row to insert / update. */
+  rows: Record<string, unknown>[];
+  /**
+   * The unique-constraint column(s) that define the conflict target.
+   * Maps to `ON CONFLICT (col1, col2, …)`.
+   */
+  conflictColumns: string[];
+  /**
+   * Columns to update when a conflict is detected.
+   * When provided, only these columns are touched.
+   * When omitted, every inserted column except the conflict columns
+   * is updated via `EXCLUDED.<col>`.
+   */
+  updateColumns?: string[];
+  /**
+   * Explicit column → value overrides to use in the `DO UPDATE SET` clause.
+   * Takes precedence over `updateColumns` / `EXCLUDED` fallback for the
+   * keys it specifies.
+   */
+  set?: Record<string, unknown>;
+  /** Columns to return — empty means `RETURNING *`. */
+  returning: string[];
+}
+
+/**
+ * Discriminated union of all query descriptor types.
  * Switch on `.type` to handle each case.
  *
  * @example
@@ -380,7 +426,7 @@ export interface DeleteDescriptor {
  * const json = new SelectBuilder(UserSchema).columns(["id"]).generateJson();
  * switch (json.type) {
  *   case "select": ...
- *   case "insert": ...
+ *   case "upsert": ...
  * }
  * ```
  */
@@ -388,7 +434,8 @@ export type QueryDescriptor =
   | SelectDescriptor
   | InsertDescriptor
   | UpdateDescriptor
-  | DeleteDescriptor;
+  | DeleteDescriptor
+  | UpsertDescriptor;
 
 // ─── Re-export ColumnSchema / ColumnBuilder for base class usage ─────────────
 export type { ColumnSchema, ColumnBuilder, BelongsToBuilder };

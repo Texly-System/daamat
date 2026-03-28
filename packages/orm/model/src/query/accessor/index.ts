@@ -4,13 +4,23 @@ import {
   InsertDescriptor,
   SelectDescriptor,
   UpdateDescriptor,
+  UpsertDescriptor,
 } from "../types";
 import { SelectBuilder } from "../select";
 import { InsertBuilder } from "../insert";
 import { UpdateBuilder } from "../update";
 import { DeleteBuilder } from "../delete";
-import { FindOptions, QueryResult, CreateOptions, CreateManyOptions, UpdateOptions, DeleteOptions } from './type';
-
+import { UpsertBuilder } from "../upsert";
+import {
+  FindOptions,
+  QueryResult,
+  CreateOptions,
+  CreateManyOptions,
+  UpdateOptions,
+  DeleteOptions,
+  UpsertOptions,
+  UpsertManyOptions,
+} from "./type";
 
 // ─── ModelAccessor ────────────────────────────────────────────────────────────
 
@@ -109,6 +119,7 @@ export class ModelAccessor<Cols extends string = string> {
     get insert(): InsertBuilder<Cols>;
     get update(): UpdateBuilder<Cols>;
     get delete(): DeleteBuilder<Cols>;
+    get upsert(): UpsertBuilder<Cols>;
   };
 
   constructor(model: ModelDefinition) {
@@ -127,6 +138,9 @@ export class ModelAccessor<Cols extends string = string> {
       },
       get delete() {
         return new DeleteBuilder<Cols>(self._model);
+      },
+      get upsert() {
+        return new UpsertBuilder<Cols>(self._model);
       },
     };
   }
@@ -256,6 +270,57 @@ export class ModelAccessor<Cols extends string = string> {
     }
     if (options.returning) b.returning(options.returning);
     if (options.allowFullTable) b.allowFullTable();
+    return { sql: b.generateSql(), json: b.generateJson() };
+  }
+
+  // ─── upsert ───────────────────────────────────────────────────────────────
+
+  /**
+   * Build an upsert query for a single row
+   * (`INSERT … ON CONFLICT … DO UPDATE SET …`).
+   *
+   * ```ts
+   * const { sql } = user.upsert({
+   *   data: { id: "usr_1", email: "a@b.com", name: "Alice" },
+   *   onConflict: ["email"],
+   *   returning: ["id", "email"],
+   * });
+   * ```
+   */
+  upsert(options: UpsertOptions<Cols>): QueryResult<UpsertDescriptor> {
+    const b = new UpsertBuilder<Cols>(this._model);
+    b.values(options.data);
+    b.onConflict(options.onConflict);
+    if (options.updateColumns) b.updateColumns(options.updateColumns);
+    if (options.set) b.set(options.set);
+    if (options.returning) b.returning(options.returning);
+    return { sql: b.generateSql(), json: b.generateJson() };
+  }
+
+  // ─── upsertMany ───────────────────────────────────────────────────────────
+
+  /**
+   * Build a bulk upsert query
+   * (`INSERT … ON CONFLICT … DO UPDATE SET …`).
+   *
+   * ```ts
+   * const { sql } = user.upsertMany({
+   *   data: [
+   *     { id: "usr_1", email: "a@b.com", name: "Alice" },
+   *     { id: "usr_2", email: "b@b.com", name: "Bob" },
+   *   ],
+   *   onConflict: ["email"],
+   *   returning: ["id"],
+   * });
+   * ```
+   */
+  upsertMany(options: UpsertManyOptions<Cols>): QueryResult<UpsertDescriptor> {
+    const b = new UpsertBuilder<Cols>(this._model);
+    b.values(options.data);
+    b.onConflict(options.onConflict);
+    if (options.updateColumns) b.updateColumns(options.updateColumns);
+    if (options.set) b.set(options.set);
+    if (options.returning) b.returning(options.returning);
     return { sql: b.generateSql(), json: b.generateJson() };
   }
 

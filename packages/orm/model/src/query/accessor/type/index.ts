@@ -1,13 +1,10 @@
-import {
-  BuiltQuery,
-  QueryDescriptor,
-} from "../../types";
+import { BuiltQuery, QueryDescriptor } from "../../types";
 
-
-export * from "./create"
-export * from "./delete"
-export * from "./find"
-export * from "./update"
+export * from "./create";
+export * from "./delete";
+export * from "./find";
+export * from "./update";
+export * from "./upsert";
 
 // ─── Each method can return SQL or JSON ───────────────────────────────────────
 
