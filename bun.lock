@@ -170,6 +170,20 @@
         "typescript": "^5.9.3",
       },
     },
+    "packages/orm/pg": {
+      "name": "@damatjs/orm-pg",
+      "version": "0.0.1",
+      "dependencies": {
+        "@damatjs/deps": "*",
+        "@damatjs/orm-model": "*",
+        "@damatjs/types": "*",
+      },
+      "devDependencies": {
+        "@damatjs/typescript-config": "*",
+        "@types/bun": "1.3.9",
+        "typescript": "^5.9.3",
+      },
+    },
     "packages/orm/processor": {
       "name": "@damatjs/orm-processor",
       "version": "0.0.1",
@@ -296,6 +310,8 @@
     "@damatjs/orm-migration": ["@damatjs/orm-migration@workspace:packages/orm/migration"],
 
     "@damatjs/orm-model": ["@damatjs/orm-model@workspace:packages/orm/model"],
+
+    "@damatjs/orm-pg": ["@damatjs/orm-pg@workspace:packages/orm/pg"],
 
     "@damatjs/orm-processor": ["@damatjs/orm-processor@workspace:packages/orm/processor"],
 
@@ -1440,6 +1456,8 @@
     "@damatjs/orm-migration/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@damatjs/orm-model/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
+
+    "@damatjs/orm-pg/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
     "@damatjs/orm-processor/typescript": ["typescript@5.9.3", "", { "bin": { "tsc": "bin/tsc", "tsserver": "bin/tsserver" } }, "sha512-jl1vZzPDinLr9eUt3J/t7V6FgNEw9QjvBPdysz9KfQDD41fQrC2Y4vKQdiaUpFT4bXlb1RHhLpp8wtm6M5TgSw=="],
 
