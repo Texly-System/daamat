@@ -13,15 +13,13 @@ import path from "node:path";
 import { log } from "../logger";
 import { getMigrationTemplateWithSQL } from "../utils/template";
 import { generateTimestamp } from "../utils/timestamp";
-import {
-  loadSnapshot,
-  saveSnapshot,
-  buildSnapshot,
-  diffSnapshots,
-  generateFromDiff,
-} from "@damatjs/orm-processor";
+import { diffSchemas, generateMigration } from "@damatjs/orm-processor";
+import { loadSnapshot, saveSnapshot, toModuleSchema } from "@damatjs/orm-model";
 import { discoverModels } from "../discovery";
-import type { CreateDiffMigrationOptions, DiffMigrationResult } from "@damatjs/orm-processor";
+import type {
+  CreateDiffMigrationOptions,
+  DiffMigrationResult,
+} from "@damatjs/orm-processor";
 
 const DEFAULT_MODULES_DIR = "src/modules";
 
@@ -68,13 +66,13 @@ export async function createDiffMigration(
   const models = await discoverModels(modulesDir, moduleName);
 
   // Load previous snapshot from disk
-  const previousSnapshot = loadSnapshot(migrationsDir);
+  const previousSnapshot = loadSnapshot(migrationsDir, moduleName);
 
   // Build current snapshot from model definitions (pure — no I/O)
-  const currentSnapshot = buildSnapshot(moduleName, models);
+  const currentSnapshot = toModuleSchema(moduleName, models);
 
   // Compute the diff between the two snapshots
-  const diff = diffSnapshots(previousSnapshot, currentSnapshot);
+  const diff = diffSchemas.diffSchemas(previousSnapshot, currentSnapshot);
 
   // If no changes and not forcing, return early
   if (!diff.hasChanges && !options.force) {
@@ -88,19 +86,14 @@ export async function createDiffMigration(
   }
 
   // Generate migration SQL from the diff
-  const migration = generateFromDiff(
-    diff,
-    previousSnapshot,
-    currentSnapshot,
-    options,
-  );
+  const migration = generateMigration.generateFromDiff(diff, options);
 
   // Use the capitalized module name as the migration label
   const now = new Date();
   const timestamp = generateTimestamp(now);
   const label = moduleName.charAt(0).toUpperCase() + moduleName.slice(1);
   const className = `Migration${timestamp}_${label}`;
-  const filename = `${className}.ts`;
+  const filename = `${className}.sql`;
   const filePath = path.join(migrationsDir, filename);
 
   const template = getMigrationTemplateWithSQL(

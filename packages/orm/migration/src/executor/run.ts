@@ -53,7 +53,6 @@ async function runModuleMigrations(
     success: true,
     module: moduleName,
     applied: [],
-    reverted: [],
     pending: [],
   };
 
@@ -78,7 +77,6 @@ async function runModuleMigrations(
         migration,
         moduleName,
         tracker,
-        "up",
       );
 
       if (migrationResult.success) {

@@ -1,23 +1,18 @@
 /**
  * Migrations Module
  *
- * Module-based migration system with UP/DOWN support.
- * Each module can have its own migrations folder.
+ * Module-based SQL migration system.
+ * Each module can have its own migrations folder containing .sql files.
  *
  * @example
  * ```typescript
  * import {
  *   runMigrations,
- *   revertMigrations,
  *   createMigration,
  *   runCli,
- *   BaseMigration,
  * } from '@damatjs/orm-migration';
  * ```
  */
-
-// Base migration class (used by generated migration files)
-export * from "./migration";
 
 // Logger
 export * from "./logger";

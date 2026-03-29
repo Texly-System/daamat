@@ -16,7 +16,7 @@ import {
   DEFAULT_MODULES_DIR,
 } from "../../generator";
 import { log } from "../../logger";
-import { snapshotExist } from "@damatjs/orm-processor";
+import { snapshotExist } from "@damatjs/orm-model";
 import type { CommandResult } from "./types";
 
 /**

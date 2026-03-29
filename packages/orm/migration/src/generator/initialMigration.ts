@@ -10,7 +10,8 @@ import fs from "node:fs";
 import path from "node:path";
 
 import { log } from "../logger";
-import { captureSnapshot, generateFromSnapshot } from "@damatjs/orm-processor";
+import { generateMigration } from "@damatjs/orm-processor";
+import { saveSnapshot, toModuleSchema } from "@damatjs/orm-model";
 import { getMigrationTemplateWithSQL } from "../utils/template";
 import { generateTimestamp } from "../utils/timestamp";
 import { discoverModels } from "../discovery";
@@ -31,7 +32,7 @@ const DEFAULT_MODULES_DIR = "src/modules";
  * @example
  * ```typescript
  * const filePath = await createInitialMigration('user');
- * // → src/modules/user/migrations/Migration20260316103000_Initial.ts
+ * // → src/modules/user/migrations/Migration20260316103000_Initial.sql
  * ```
  */
 export async function createInitialMigration(
@@ -54,17 +55,18 @@ export async function createInitialMigration(
   const models = await discoverModels(modulesDir, moduleName);
 
   // Build snapshot from models then persist it
-  const snapshot = captureSnapshot(migrationsDir, moduleName, models);
+  const snapshot = toModuleSchema(moduleName, models);
+  saveSnapshot(migrationsDir, snapshot);
 
   // Generate full baseline SQL from the snapshot
-  const migration = generateFromSnapshot(snapshot, options);
+  const migration = generateMigration.generateFromSnapshot(snapshot, options);
 
   // Use "Initial" as the migration label
   const now = new Date();
   const timestamp = generateTimestamp(now);
   const label = "Initial";
   const className = `Migration${timestamp}_${label}`;
-  const filename = `${className}.ts`;
+  const filename = `${className}.sql`;
   const filePath = path.join(migrationsDir, filename);
 
   const template = getMigrationTemplateWithSQL(

@@ -12,7 +12,6 @@ import {
   commandUp,
   commandStatus,
   commandCreate,
-  commandRevert,
   commandList,
   commandHelp,
   commandUnknown,
@@ -61,10 +60,6 @@ export async function runCli(options: CliOptions = {}): Promise<void> {
 
       case "create":
         result = await commandCreate(options, args);
-        break;
-
-      case "revert":
-        result = await commandRevert(options, args);
         break;
 
       case "list":

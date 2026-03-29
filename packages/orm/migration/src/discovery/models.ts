@@ -11,10 +11,7 @@
 
 import fs from "node:fs";
 import path from "node:path";
-import type {
-  ModelDefinition,
-  ModelProperties,
-} from "@damatjs/orm-model";
+import type { ModelDefinition } from "@damatjs/orm-model";
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -42,13 +39,13 @@ import type {
 export async function discoverModels(
   modulesDir: string,
   moduleName: string,
-): Promise<ModelDefinition<ModelProperties>[]> {
+): Promise<ModelDefinition[]> {
   const modelsDir = path.join(modulesDir, moduleName, "models");
 
   if (!fs.existsSync(modelsDir)) {
     throw new Error(
       `Models directory not found: ${modelsDir}\n` +
-      `Expected convention: {modulesDir}/{moduleName}/models/`,
+        `Expected convention: {modulesDir}/{moduleName}/models/`,
     );
   }
 
@@ -67,11 +64,11 @@ export async function discoverModels(
   if (files.length === 0) {
     throw new Error(
       `No model files found in ${modelsDir}.\n` +
-      `Create at least one .ts file that exports a createModelDefinition() value.`,
+        `Create at least one .ts file that exports a createModelDefinition() value.`,
     );
   }
 
-  const models: ModelDefinition<ModelProperties>[] = [];
+  const models: ModelDefinition[] = [];
 
   for (const file of files) {
     const mod = await import(file);
@@ -85,7 +82,7 @@ export async function discoverModels(
   if (models.length === 0) {
     throw new Error(
       `No ModelDefinition exports found in ${modelsDir}.\n` +
-      `Make sure each model file exports a value created with createModelDefinition().`,
+        `Make sure each model file exports a value created with createModelDefinition().`,
     );
   }
 
@@ -101,15 +98,11 @@ export async function discoverModels(
  * Checks for the two properties that every model definition must have:
  * a string `_tableName` and a callable `toTableSchema`.
  */
-function isModelDefinition(
-  value: unknown,
-): value is ModelDefinition<ModelProperties> {
+function isModelDefinition(value: unknown): value is ModelDefinition {
   return (
     value !== null &&
     typeof value === "object" &&
-    typeof (value as ModelDefinition<ModelProperties>)._tableName ===
-    "string" &&
-    typeof (value as ModelDefinition<ModelProperties>).toTableSchema ===
-    "function"
+    typeof (value as ModelDefinition)._tableName === "string" &&
+    typeof (value as ModelDefinition).toTableSchema === "function"
   );
 }

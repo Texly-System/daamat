@@ -6,7 +6,7 @@
  * Information about a single migration file
  */
 export interface MigrationInfo {
-  /** Migration class name */
+  /** Migration filename without extension */
   name: string;
   /** Module the migration belongs to */
   module: string;
@@ -28,8 +28,6 @@ export interface ModuleMigrationResult {
   module: string;
   /** List of applied migration names */
   applied: string[];
-  /** List of reverted migration names */
-  reverted: string[];
   /** List of pending migration names */
   pending: string[];
   /** Error if migration failed */
@@ -57,6 +55,3 @@ export interface MigrationStatus {
   /** Status for each module */
   modules: ModuleMigrationStatus[];
 }
-
-
-export type MigrationDirection = "up" | "down";
