@@ -17,11 +17,17 @@ export function generateCreateIndex(
   options: MigrationGeneratorOptions,
 ): string {
   const fullTable = qualifiedTable(tableName, schema);
-  const indexName = quoteIdentifier(index.name);
+  const nameToUse =
+    index.name ||
+    `${tableName}_${index.columns.map((c) => (typeof c === "string" ? c : c.name)).join("_")}_idx`;
+  const indexName = quoteIdentifier(nameToUse);
+
   const cols = index.columns
     .map((c) => {
-      const col = quoteIdentifier(c.name);
-      return c.order ? `${col} ${c.order}` : col;
+      const colName = typeof c === "string" ? c : c.name;
+      const order = typeof c === "string" ? undefined : c.order;
+      const col = quoteIdentifier(colName);
+      return order ? `${col} ${order}` : col;
     })
     .join(", ");
 

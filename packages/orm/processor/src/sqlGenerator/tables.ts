@@ -22,18 +22,25 @@ export function generateCreateTable(
   options: MigrationGeneratorOptions,
 ): string[] {
   const { table } = change;
-  const schema = resolveSchema(options, table.schema);
+  const schema = resolveSchema(options);
   const fullName = qualifiedTable(table.name, schema);
   const statements: string[] = [];
 
+  const pkColumns = table.columns
+    .filter((c) => c.primaryKey)
+    .map((c) => c.name);
+  const isCompositePk = pkColumns.length > 1;
+
   // Column definitions
-  const colDefs = table.columns.map(columnDefinitionSql);
+  const colDefs = table.columns.map((c) =>
+    columnDefinitionSql(c, isCompositePk),
+  );
 
   // Inline PRIMARY KEY constraint when composite
-  if (table.primaryKey.columns.length > 1) {
-    const pkCols = table.primaryKey.columns.map(quoteIdentifier).join(", ");
+  if (isCompositePk) {
+    const pkCols = pkColumns.map(quoteIdentifier).join(", ");
     colDefs.push(
-      `CONSTRAINT ${quoteIdentifier(table.primaryKey.name)} PRIMARY KEY (${pkCols})`,
+      `CONSTRAINT ${quoteIdentifier(`${table.name}_pkey`)} PRIMARY KEY (${pkCols})`,
     );
   }
 
@@ -43,11 +50,14 @@ export function generateCreateTable(
   );
 
   // Indexes (skip any that duplicate the primary key)
-  const pkCols = new Set(table.primaryKey.columns);
+  const pkColsSet = new Set(pkColumns);
   for (const index of table.indexes) {
     const isRedundantPk =
-      index.columns.length === pkCols.size &&
-      index.columns.every((c) => pkCols.has(c.name));
+      index.columns.length === pkColsSet.size &&
+      index.columns.every((c) => {
+        const name = typeof c === "string" ? c : c.name;
+        return pkColsSet.has(name);
+      });
     if (!isRedundantPk) {
       statements.push(generateCreateIndex(index, table.name, schema, options));
     }
@@ -91,7 +101,7 @@ export function generateRenameTable(
  * Used by the snapshot-based generator.
  */
 export function generateTableSql(
-  table: TableSchema,
+  table: Omit<TableSchema, "relations">,
   options: MigrationGeneratorOptions,
 ): string[] {
   return generateCreateTable(

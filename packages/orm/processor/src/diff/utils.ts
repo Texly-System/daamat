@@ -2,16 +2,17 @@ import type {
   ColumnSchema,
   ForeignKeySchema,
   IndexSchema,
+  EnumSchema,
 } from "@damatjs/orm-model";
-import type { NativeEnum } from "../types/snapshot";
 
 /**
  * Build a lookup map keyed by `name` from any array of named items.
  */
-export function createNameMap<T extends { name: string }>(
+export function createNameMap<T>(
   items: T[],
+  getName: (item: T) => string = (item: any) => item.name,
 ): Map<string, T> {
-  return new Map(items.map((item) => [item.name, item]));
+  return new Map(items.map((item) => [getName(item), item]));
 }
 
 /**
@@ -27,7 +28,7 @@ export function columnsEqual(a: ColumnSchema, b: ColumnSchema): boolean {
     a.scale === b.scale &&
     a.default === b.default &&
     a.array === b.array &&
-    JSON.stringify(a.enumValues) === JSON.stringify(b.enumValues)
+    a.enum === b.enum
   );
 }
 
@@ -64,10 +65,10 @@ export function foreignKeysEqual(
 /**
  * Check if two native enums are structurally equal (order-insensitive).
  */
-export function nativeEnumsEqual(a: NativeEnum, b: NativeEnum): boolean {
+export function nativeEnumsEqual(a: EnumSchema, b: EnumSchema): boolean {
   return (
     a.schema === b.schema &&
     JSON.stringify(a.values.slice().sort()) ===
-    JSON.stringify(b.values.slice().sort())
+      JSON.stringify(b.values.slice().sort())
   );
 }

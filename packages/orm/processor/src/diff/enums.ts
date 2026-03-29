@@ -1,27 +1,29 @@
+import type { EnumSchema } from "@damatjs/orm-model";
 import type {
   AlterEnumChange,
   CreateEnumChange,
   DropEnumChange,
   SchemaChange,
 } from "../types/diff";
-import type { NativeEnum } from "../types/snapshot";
 import { PRIORITY } from "./priority";
-import { nativeEnumsEqual } from "./utils";
+import { createNameMap, nativeEnumsEqual } from "./utils";
 
 /**
  * Diff native enum types between two snapshots.
- * Both sides are keyed records — the same shape stored in `ModuleSnapshot.nativeEnums`.
  */
 export function diffEnums(
-  oldEnums: Record<string, NativeEnum>,
-  newEnums: Record<string, NativeEnum>,
+  oldEnums: EnumSchema[],
+  newEnums: EnumSchema[],
 ): { changes: SchemaChange[]; warnings: string[] } {
   const changes: SchemaChange[] = [];
   const warnings: string[] = [];
 
+  const oldMap = createNameMap(oldEnums);
+  const newMap = createNameMap(newEnums);
+
   // Added enums
-  for (const [name, newEnum] of Object.entries(newEnums)) {
-    if (!(name in oldEnums)) {
+  for (const [name, newEnum] of newMap.entries()) {
+    if (!oldMap.has(name)) {
       changes.push({
         type: "create_enum",
         enumDef: newEnum,
@@ -31,8 +33,8 @@ export function diffEnums(
   }
 
   // Removed enums
-  for (const name of Object.keys(oldEnums)) {
-    if (!(name in newEnums)) {
+  for (const name of oldMap.keys()) {
+    if (!newMap.has(name)) {
       changes.push({
         type: "drop_enum",
         enumName: name,
@@ -42,8 +44,8 @@ export function diffEnums(
   }
 
   // Altered enums
-  for (const [name, newEnum] of Object.entries(newEnums)) {
-    const oldEnum = oldEnums[name];
+  for (const [name, newEnum] of newMap.entries()) {
+    const oldEnum = oldMap.get(name);
     if (oldEnum && !nativeEnumsEqual(oldEnum, newEnum)) {
       const oldSet = new Set(oldEnum.values);
       const newSet = new Set(newEnum.values);

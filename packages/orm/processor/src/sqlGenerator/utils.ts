@@ -15,7 +15,7 @@ export function qualifiedTable(tableName: string, schema: string): string {
 }
 
 /**
- * Resolve the effective schema: explicit option > table-level schema > "public".
+ * Resolve the effective schema: explicit option > "public".
  */
 export function resolveSchema(
   options: { schema?: string },
@@ -30,16 +30,19 @@ export function resolveSchema(
  */
 export function columnTypeSql(col: ColumnSchema): string {
   // Named enum — reference the type directly
-  if (col.type === "enum" && col.enumName) {
-    const base = quoteIdentifier(col.enumName);
+  if (col.type === "enum" && col.enum) {
+    const base = quoteIdentifier(col.enum);
     return col.array ? `${base}[]` : base;
   }
 
   let sql: string;
 
   switch (col.type) {
-    case "varchar":
-      sql = col.length ? `VARCHAR(${col.length})` : "VARCHAR";
+    case "character varying":
+    case "character":
+      sql = col.length
+        ? `${col.type.toUpperCase()}(${col.length})`
+        : col.type.toUpperCase();
       break;
     case "decimal":
     case "numeric":
@@ -62,16 +65,19 @@ export function columnTypeSql(col: ColumnSchema): string {
  *
  *   "col_name" VARCHAR(128) NOT NULL UNIQUE DEFAULT 'x'
  */
-export function columnDefinitionSql(col: ColumnSchema): string {
+export function columnDefinitionSql(
+  col: ColumnSchema,
+  skipPrimaryKey = false,
+): string {
   const parts: string[] = [quoteIdentifier(col.name), columnTypeSql(col)];
 
-  if (col.primaryKey) {
+  if (col.primaryKey && !skipPrimaryKey) {
     parts.push("PRIMARY KEY");
   } else {
     parts.push(col.nullable ? "NULL" : "NOT NULL");
-    if (col.unique) parts.push("UNIQUE");
   }
 
+  if (col.unique) parts.push("UNIQUE");
   if (col.default !== undefined) parts.push(`DEFAULT ${col.default}`);
 
   return parts.join(" ");

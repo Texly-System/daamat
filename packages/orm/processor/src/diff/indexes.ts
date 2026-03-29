@@ -7,6 +7,14 @@ import type {
 import { PRIORITY } from "./priority";
 import { createNameMap, indexesEqual } from "./utils";
 
+function getIndexName(tableName: string, index: IndexSchema): string {
+  if (index.name) return index.name;
+  const cols = index.columns
+    .map((c) => (typeof c === "string" ? c : c.name))
+    .join("_");
+  return `${tableName}_${cols}_idx`;
+}
+
 /**
  * Diff indexes between two versions of a table.
  * A changed index is handled as drop + re-add since indexes cannot be altered in place.
@@ -18,8 +26,12 @@ export function diffIndexes(
 ): SchemaChange[] {
   const changes: SchemaChange[] = [];
 
-  const oldMap = createNameMap(oldIndexes);
-  const newMap = createNameMap(newIndexes);
+  const oldMap = createNameMap(oldIndexes, (idx) =>
+    getIndexName(tableName, idx),
+  );
+  const newMap = createNameMap(newIndexes, (idx) =>
+    getIndexName(tableName, idx),
+  );
 
   // Added or changed
   for (const [name, newIdx] of newMap) {
@@ -28,7 +40,7 @@ export function diffIndexes(
       changes.push({
         type: "add_index",
         tableName,
-        index: newIdx,
+        index: { ...newIdx, name },
         priority: PRIORITY.ADD_INDEX,
       } as AddIndexChange);
     } else if (!indexesEqual(oldIdx, newIdx)) {
@@ -41,7 +53,7 @@ export function diffIndexes(
       changes.push({
         type: "add_index",
         tableName,
-        index: newIdx,
+        index: { ...newIdx, name },
         priority: PRIORITY.ADD_INDEX,
       } as AddIndexChange);
     }

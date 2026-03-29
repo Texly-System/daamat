@@ -17,7 +17,7 @@ export function generateAddForeignKey(
 ): string {
   const fullTable = qualifiedTable(tableName, schema);
   const constraint = quoteIdentifier(fk.name);
-  const cols = fk.columns.map(quoteIdentifier).join(", ");
+  const cols = fk.columns.map((c) => quoteIdentifier(c.name)).join(", ");
   const refTable = quoteIdentifier(fk.referencedTable);
   const refCols = fk.referencedColumns.map(quoteIdentifier).join(", ");
 

@@ -4,15 +4,15 @@ import type {
   ForeignKeySchema,
   IndexSchema,
   TableSchema,
+  EnumSchema,
 } from "@damatjs/orm-model";
-import type { NativeEnum } from "../snapshot";
 
 // ─── tables ──────────────────────────────────────────────────────────────────
 
 export interface CreateTableChange {
   type: "create_table";
   tableName: string;
-  table: TableSchema;
+  table: Omit<TableSchema, "relations">;
   priority: number;
 }
 
@@ -106,7 +106,7 @@ export interface DropForeignKeyChange {
 
 export interface CreateEnumChange {
   type: "create_enum";
-  enumDef: NativeEnum;
+  enumDef: EnumSchema;
   priority: number;
 }
 

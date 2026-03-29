@@ -4,16 +4,12 @@ import type { SchemaDiff } from "./schema";
  * Options controlling how SQL is generated from a diff or snapshot.
  */
 export interface MigrationGeneratorOptions {
-  /** Include down migration statements (default: true) */
-  generateDown?: boolean;
   /** Add CASCADE to DROP statements (default: false) */
   cascadeDrops?: boolean;
   /** Emit IF EXISTS / IF NOT EXISTS guards (default: true) */
   safeMode?: boolean;
   /** Target PostgreSQL schema name (default: "public") */
   schema?: string;
-  /** Generate reversible migrations wherever possible */
-  reversible?: boolean;
 }
 
 /**
@@ -22,8 +18,6 @@ export interface MigrationGeneratorOptions {
 export interface GeneratedMigration {
   /** Ordered UP statements */
   upStatements: string[];
-  /** Ordered DOWN / rollback statements */
-  downStatements: string[];
   /** Human-readable summary of what changed */
   description: string;
   /** Non-fatal warnings surfaced to the caller */

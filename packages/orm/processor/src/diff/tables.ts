@@ -13,8 +13,8 @@ import { diffForeignKeys } from "./foreignKeys";
  * Diff a single table between two snapshots.
  */
 export function diffTable(
-  oldTable: TableSchema | undefined,
-  newTable: TableSchema | undefined,
+  oldTable: Omit<TableSchema, "relations"> | undefined,
+  newTable: Omit<TableSchema, "relations"> | undefined,
 ): { changes: SchemaChange[]; warnings: string[] } {
   const changes: SchemaChange[] = [];
   const warnings: string[] = [];

@@ -1,8 +1,7 @@
 /**
  * ORM Processor Module - Type Definitions
  *
- * Types for schema snapshots and diff representations.
+ * Types for schema diff representations.
  */
 
-export * from "./snapshot";
 export * from "./diff";

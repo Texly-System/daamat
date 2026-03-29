@@ -11,3 +11,6 @@ export * from "./codegen";
 
 // Export query builders (SELECT / INSERT / UPDATE / DELETE)
 export * from "./query";
+
+// Export snapshot management
+export * from "./snapshot";

@@ -5,5 +5,4 @@ export * as indexesSqlGenerator from "./indexes";
 export * as foreignKeysSqlGenerator from "./foreignKeys";
 export * as enumsSqlGenerator from "./enums";
 export * as changeSqlGenerator from "./changeSql";
-export * as reverseSqlGenerator from "./reverseSql";
 export * as generateMigration from "./generateMigration";
