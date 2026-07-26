@@ -49,7 +49,7 @@ export function generateAddIndex(
   change: AddIndexChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   return generateCreateIndex(change.index, change.tableName, schema, options);
 }
 
@@ -61,7 +61,7 @@ export function generateDropIndex(
   change: DropIndexChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullIndex = qualifiedTable(change.indexName, schema);
   const ifExists = options.safeMode !== false ? " IF EXISTS" : "";
   return `DROP INDEX${ifExists} ${fullIndex}`;

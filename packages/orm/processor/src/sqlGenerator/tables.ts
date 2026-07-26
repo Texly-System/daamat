@@ -36,7 +36,7 @@ export function generateCreateTable(
   options: MigrationGeneratorOptions,
 ): TableSqlResult {
   const { table } = change;
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullName = qualifiedTable(table.name, schema);
   const tableStatements: string[] = [];
   const foreignKeyStatements: string[] = [];
@@ -81,7 +81,7 @@ export function generateDropTable(
   change: DropTableChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullName = qualifiedTable(change.tableName, schema);
   const ifExists = options.safeMode !== false ? " IF EXISTS" : "";
   const cascade = change.cascade || options.cascadeDrops ? " CASCADE" : "";
@@ -95,7 +95,7 @@ export function generateRenameTable(
   change: RenameTableChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   return `ALTER TABLE ${qualifiedTable(change.fromName, schema)} RENAME TO ${quoteIdentifier(change.toName)}`;
 }
 
@@ -109,7 +109,13 @@ export function generateTableSql(
   options: MigrationGeneratorOptions,
 ): TableSqlResult {
   return generateCreateTable(
-    { type: "create_table", tableName: table.name, table, priority: 0 },
+    {
+      type: "create_table",
+      tableName: table.name,
+      table,
+      schema: table.schema ?? "public",
+      priority: 0,
+    },
     options,
   );
 }

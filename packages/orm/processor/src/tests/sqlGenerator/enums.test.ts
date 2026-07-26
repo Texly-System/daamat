@@ -107,35 +107,33 @@ describe("generateAlterEnum", () => {
     ]);
   });
 
-  it("emits an instructional comment (not DDL) for removed values", () => {
-    const sql = generateAlterEnum(
-      {
-        type: "alter_enum",
-        enumName: "user_status",
-        removeValues: ["legacy"],
-        priority: 60,
-      },
-      opts,
-    );
-    expect(sql).toHaveLength(1);
-    expect(sql[0]).toContain("-- Removing enum values requires recreating");
-    expect(sql[0]).toContain("legacy");
+  it("fails closed for removed values", () => {
+    expect(() =>
+      generateAlterEnum(
+        {
+          type: "alter_enum",
+          enumName: "user_status",
+          removeValues: ["legacy"],
+          priority: 60,
+        },
+        opts,
+      ),
+    ).toThrow("Removing enum values is unsupported: legacy");
   });
 
-  it("emits adds first, then the removal comment", () => {
-    const sql = generateAlterEnum(
-      {
-        type: "alter_enum",
-        enumName: "e",
-        addValues: ["new"],
-        removeValues: ["old"],
-        priority: 60,
-      },
-      opts,
-    );
-    expect(sql).toHaveLength(2);
-    expect(sql[0]).toContain("ADD VALUE");
-    expect(sql[1]).toContain("-- Removing");
+  it("fails closed instead of partially emitting additions", () => {
+    expect(() =>
+      generateAlterEnum(
+        {
+          type: "alter_enum",
+          enumName: "e",
+          addValues: ["new"],
+          removeValues: ["old"],
+          priority: 60,
+        },
+        opts,
+      ),
+    ).toThrow("Removing enum values is unsupported: old");
   });
 
   it("returns an empty array when nothing to add or remove", () => {

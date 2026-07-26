@@ -63,8 +63,7 @@ describe("diffSchemas › tables", () => {
     expect(diff.warnings[0]).toContain("Dropping table 'user'");
   });
 
-  it("does not diff internals of a freshly added table", () => {
-    // Adding a table with indexes/FKs should still produce only one change.
+  it("orders a fresh table before its indexes and foreign keys", () => {
     const withExtras = moduleSchema({
       tables: [
         table("post", [idColumn], {
@@ -81,12 +80,28 @@ describe("diffSchemas › tables", () => {
       ],
     });
     const diff = diffSchemas(moduleSchema(), withExtras);
-    expect(diff.changes).toHaveLength(1);
-    expect(diff.changes[0]!.type).toBe("create_table");
+    expect(diff.changes.map((change) => change.type)).toEqual([
+      "create_table",
+      "add_index",
+      "add_foreign_key",
+    ]);
   });
 });
 
 describe("diffSchemas › columns", () => {
+  it("ignores codegen-only numeric representation metadata", () => {
+    const before = moduleSchema({
+      tables: [table("items", [{ ...idColumn, type: "numeric" }])],
+    });
+    const after = moduleSchema({
+      tables: [
+        table("items", [
+          { ...idColumn, type: "numeric", numericRepresentation: "string" },
+        ]),
+      ],
+    });
+    expect(diffSchemas(before, after).hasChanges).toBe(false);
+  });
   const base = moduleSchema({ tables: [table("user", [idColumn])] });
 
   it("detects an added column", () => {

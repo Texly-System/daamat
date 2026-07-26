@@ -15,6 +15,7 @@ export function diffForeignKeys(
   tableName: string,
   oldFKs: ForeignKeySchema[],
   newFKs: ForeignKeySchema[],
+  schema = "public",
 ): SchemaChange[] {
   const changes: SchemaChange[] = [];
 
@@ -29,6 +30,7 @@ export function diffForeignKeys(
         type: "add_foreign_key",
         tableName,
         foreignKey: newFK,
+        schema,
         priority: PRIORITY.ADD_FOREIGN_KEY,
       } as AddForeignKeyChange);
     } else if (!foreignKeysEqual(oldFK, newFK)) {
@@ -36,12 +38,14 @@ export function diffForeignKeys(
         type: "drop_foreign_key",
         tableName,
         constraintName: name,
+        schema,
         priority: PRIORITY.DROP_FOREIGN_KEY,
       } as DropForeignKeyChange);
       changes.push({
         type: "add_foreign_key",
         tableName,
         foreignKey: newFK,
+        schema,
         priority: PRIORITY.READD_FOREIGN_KEY,
       } as AddForeignKeyChange);
     }
@@ -54,6 +58,7 @@ export function diffForeignKeys(
         type: "drop_foreign_key",
         tableName,
         constraintName: name,
+        schema,
         priority: PRIORITY.DROP_FOREIGN_KEY,
       } as DropForeignKeyChange);
     }

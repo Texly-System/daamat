@@ -392,7 +392,7 @@ describe("up/down migration via diff + reverse", () => {
     expect(down.some((s) => s.includes("SET NOT NULL"))).toBe(true);
   });
 
-  it("an enum value addition reverses to the removal advisory comment", () => {
+  it("an enum value addition cannot generate an unsafe reverse", () => {
     const diff = diffSchemas(
       moduleSchema({ enums: [statusEnum] }),
       moduleSchema({ enums: [statusEnumExtended] }),
@@ -402,7 +402,8 @@ describe("up/down migration via diff + reverse", () => {
       true,
     );
 
-    const down = generateFromDiff(reverseDiff(diff)).upStatements;
-    expect(down.some((s) => s.includes("-- Removing enum values"))).toBe(true);
+    expect(() => generateFromDiff(reverseDiff(diff))).toThrow(
+      "Removing enum values is unsupported",
+    );
   });
 });

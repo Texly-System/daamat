@@ -15,6 +15,8 @@ import { RelationSchema } from "./relation";
 export interface TableSchema {
   /** Table name */
   name: string;
+  /** PostgreSQL schema; module/default generation rules apply when omitted. */
+  schema?: string;
   /** Column definitions */
   columns: ColumnSchema[];
   /** Index definitions */

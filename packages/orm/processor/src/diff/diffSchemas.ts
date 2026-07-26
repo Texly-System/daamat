@@ -25,6 +25,8 @@ export function diffSchemas(
   const { changes: enumChanges, warnings: enumWarnings } = diffEnums(
     previous.enums ?? [],
     current.enums ?? [],
+    previous.schema ?? "public",
+    current.schema ?? "public",
   );
   allChanges.push(...enumChanges);
   allWarnings.push(...enumWarnings);
@@ -37,6 +39,8 @@ export function diffSchemas(
     const { changes, warnings } = diffTable(
       oldMap.get(tableName),
       newMap.get(tableName),
+      previous.schema ?? "public",
+      current.schema ?? "public",
     );
     allChanges.push(...changes);
     allWarnings.push(...warnings);

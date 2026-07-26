@@ -9,15 +9,14 @@ import { PRIORITY } from "../../diff/priority";
 
 // ─── shared defaults ──────────────────────────────────────────────────────────
 
-const DEFAULT_OPTIONS: Required<MigrationGeneratorOptions> = {
+const DEFAULT_OPTIONS: MigrationGeneratorOptions = {
   cascadeDrops: false,
   safeMode: true,
-  schema: "public",
 };
 
 function resolveOptions(
   options: MigrationGeneratorOptions,
-): Required<MigrationGeneratorOptions> {
+): MigrationGeneratorOptions {
   return { ...DEFAULT_OPTIONS, ...options };
 }
 
@@ -33,10 +32,6 @@ export function generateFromSnapshot(
   snapshot: ModuleSchema,
   options: MigrationGeneratorOptions = {},
 ): GeneratedMigration {
-  // Use module schema if provided, else default to "public"
-  if (!options.schema && snapshot.schema) {
-    options = { ...options, schema: snapshot.schema };
-  }
   const opts = resolveOptions(options);
   const upStatements: string[] = [];
   const warnings: string[] = [];
@@ -50,6 +45,7 @@ export function generateFromSnapshot(
       changes.push({
         type: "create_enum",
         enumDef,
+        schema: snapshot.schema ?? "public",
         priority: PRIORITY.CREATE_ENUM,
       });
     }
@@ -62,6 +58,7 @@ export function generateFromSnapshot(
       type: "create_table",
       tableName: table.name,
       table: table as any,
+      schema: table.schema ?? snapshot.schema ?? "public",
       priority: PRIORITY.CREATE_TABLE,
     });
 
@@ -72,7 +69,20 @@ export function generateFromSnapshot(
           type: "add_index",
           tableName: table.name,
           index,
+          schema: table.schema ?? snapshot.schema ?? "public",
           priority: PRIORITY.ADD_INDEX,
+        });
+      }
+    }
+
+    if (table.constraints) {
+      for (const constraint of table.constraints) {
+        changes.push({
+          type: "add_constraint",
+          tableName: table.name,
+          constraint,
+          schema: table.schema ?? snapshot.schema ?? "public",
+          priority: PRIORITY.ADD_CONSTRAINT,
         });
       }
     }
@@ -84,6 +94,7 @@ export function generateFromSnapshot(
           type: "add_foreign_key",
           tableName: table.name,
           foreignKey: fk,
+          schema: table.schema ?? snapshot.schema ?? "public",
           priority: PRIORITY.ADD_FOREIGN_KEY,
         });
       }

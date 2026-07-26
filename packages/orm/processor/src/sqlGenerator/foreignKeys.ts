@@ -14,11 +14,15 @@ export function generateAddForeignKey(
   fk: ForeignKeySchema,
   tableName: string,
   schema: string,
+  referencedSchema?: string,
 ): string {
   const fullTable = qualifiedTable(tableName, schema);
   const constraint = quoteIdentifier(fk.name);
   const cols = fk.columns.map((c) => quoteIdentifier(c.name)).join(", ");
-  const refTable = quoteIdentifier(fk.referencedTable);
+  const targetSchema = referencedSchema ?? fk.referencedSchema;
+  const refTable = targetSchema
+    ? qualifiedTable(fk.referencedTable, targetSchema)
+    : quoteIdentifier(fk.referencedTable);
   const refCols = fk.referencedColumns.map(quoteIdentifier).join(", ");
 
   let sql = `ALTER TABLE ${fullTable} ADD CONSTRAINT ${constraint} FOREIGN KEY (${cols}) REFERENCES ${refTable} (${refCols})`;
@@ -41,8 +45,13 @@ export function generateAddForeignKeyFromChange(
   change: AddForeignKeyChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
-  return generateAddForeignKey(change.foreignKey, change.tableName, schema);
+  const schema = resolveSchema(options, change.schema);
+  return generateAddForeignKey(
+    change.foreignKey,
+    change.tableName,
+    schema,
+    options.schema,
+  );
 }
 
 /**
@@ -52,7 +61,7 @@ export function generateDropForeignKey(
   change: DropForeignKeyChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullTable = qualifiedTable(change.tableName, schema);
   const constraint = quoteIdentifier(change.constraintName);
   const ifExists = options.safeMode !== false ? " IF EXISTS" : "";

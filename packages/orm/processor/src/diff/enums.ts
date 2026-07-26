@@ -14,6 +14,8 @@ import { createNameMap, nativeEnumsEqual } from "./utils";
 export function diffEnums(
   oldEnums: EnumSchema[],
   newEnums: EnumSchema[],
+  oldDefaultSchema = "public",
+  newDefaultSchema = "public",
 ): { changes: SchemaChange[]; warnings: string[] } {
   const changes: SchemaChange[] = [];
   const warnings: string[] = [];
@@ -27,17 +29,19 @@ export function diffEnums(
       changes.push({
         type: "create_enum",
         enumDef: newEnum,
+        schema: newEnum.schema ?? newDefaultSchema,
         priority: PRIORITY.CREATE_ENUM,
       } as CreateEnumChange);
     }
   }
 
   // Removed enums
-  for (const name of oldMap.keys()) {
+  for (const [name, oldEnum] of oldMap) {
     if (!newMap.has(name)) {
       changes.push({
         type: "drop_enum",
         enumName: name,
+        schema: oldEnum.schema ?? oldDefaultSchema,
         priority: PRIORITY.DROP_ENUM,
       } as DropEnumChange);
     }
@@ -57,6 +61,7 @@ export function diffEnums(
         changes.push({
           type: "alter_enum",
           enumName: name,
+          schema: newEnum.schema ?? newDefaultSchema,
           addValues: addValues.length > 0 ? addValues : undefined,
           removeValues: removeValues.length > 0 ? removeValues : undefined,
           priority: PRIORITY.ALTER_ENUM,

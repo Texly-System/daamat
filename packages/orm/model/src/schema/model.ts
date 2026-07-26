@@ -213,7 +213,7 @@ export class ModelDefinition<Name extends string = string> {
       }
     }
 
-    const schema: TableSchema & { schema?: string } = {
+    const schema: TableSchema = {
       name: this._tableName,
       columns,
       indexes,

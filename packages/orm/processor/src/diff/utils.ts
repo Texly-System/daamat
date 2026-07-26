@@ -53,6 +53,7 @@ export function foreignKeysEqual(
 ): boolean {
   return (
     a.referencedTable === b.referencedTable &&
+    a.referencedSchema === b.referencedSchema &&
     a.onDelete === b.onDelete &&
     a.onUpdate === b.onUpdate &&
     a.deferrable === b.deferrable &&

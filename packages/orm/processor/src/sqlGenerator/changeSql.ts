@@ -21,6 +21,7 @@ import {
   generateAlterEnum,
 } from "./enums";
 import type { SchemaDiff } from "../types";
+import { generateAddConstraint, generateDropConstraint } from "./constraints";
 
 /**
  * Dispatch a single SchemaChange to the appropriate SQL generator.
@@ -56,6 +57,10 @@ export function generateChangeSQL(
       return [generateAddForeignKeyFromChange(change, options)];
     case "drop_foreign_key":
       return [generateDropForeignKey(change, options)];
+    case "add_constraint":
+      return [generateAddConstraint(change, options)];
+    case "drop_constraint":
+      return [generateDropConstraint(change, options)];
     case "create_enum":
       return [generateCreateEnum(change, options)];
     case "drop_enum":
@@ -94,6 +99,8 @@ export function generateDescription(diff: SchemaDiff): string {
       "foreign key dropped",
       "foreign keys dropped",
     ),
+    label(counts.add_constraint, "constraint added", "constraints added"),
+    label(counts.drop_constraint, "constraint dropped", "constraints dropped"),
     label(counts.create_enum, "enum created", "enums created"),
     label(counts.drop_enum, "enum dropped", "enums dropped"),
     label(counts.alter_enum, "enum altered", "enums altered"),

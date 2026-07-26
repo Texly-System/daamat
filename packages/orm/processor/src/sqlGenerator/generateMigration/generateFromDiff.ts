@@ -7,15 +7,14 @@ import { generateChangeSQL, generateDescription } from "../changeSql";
 
 // ─── shared defaults ──────────────────────────────────────────────────────────
 
-const DEFAULT_OPTIONS: Required<MigrationGeneratorOptions> = {
+const DEFAULT_OPTIONS: MigrationGeneratorOptions = {
   cascadeDrops: false,
   safeMode: true,
-  schema: "public",
 };
 
 function resolveOptions(
   options: MigrationGeneratorOptions,
-): Required<MigrationGeneratorOptions> {
+): MigrationGeneratorOptions {
   return { ...DEFAULT_OPTIONS, ...options };
 }
 

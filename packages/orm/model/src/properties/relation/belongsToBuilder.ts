@@ -277,6 +277,10 @@ export class BelongsTo extends Relation {
       referencedTable: this.getModuleTargetTable(),
       referencedColumns: reference,
     };
+    if (typeof this.target !== "string") {
+      const targetSchema = this.getModuleTarget()._schemaName;
+      if (targetSchema) fk.referencedSchema = targetSchema;
+    }
 
     if (this._onDelete) fk.onDelete = this._onDelete;
     else if (this._nullable) fk.onDelete = "SET NULL";

@@ -15,6 +15,7 @@ export function diffColumns(
   tableName: string,
   oldColumns: ColumnSchema[],
   newColumns: ColumnSchema[],
+  schema = "public",
 ): SchemaChange[] {
   const changes: SchemaChange[] = [];
 
@@ -28,6 +29,7 @@ export function diffColumns(
         type: "add_column",
         tableName,
         column: newCol,
+        schema,
         priority: PRIORITY.ADD_COLUMN,
       } as AddColumnChange);
     }
@@ -40,6 +42,7 @@ export function diffColumns(
         type: "drop_column",
         tableName,
         columnName: name,
+        schema,
         priority: PRIORITY.DROP_COLUMN,
       } as DropColumnChange);
     }
@@ -67,6 +70,11 @@ export function diffColumns(
         from: oldCol.unique ?? false,
         to: newCol.unique ?? false,
       };
+    if (oldCol.primaryKey !== newCol.primaryKey)
+      columnChanges.primaryKey = {
+        from: oldCol.primaryKey ?? false,
+        to: newCol.primaryKey ?? false,
+      };
     if (oldCol.array !== newCol.array)
       columnChanges.array = { from: !!oldCol.array, to: !!newCol.array };
 
@@ -75,6 +83,7 @@ export function diffColumns(
         type: "alter_column",
         tableName,
         columnName: name,
+        schema,
         changes: columnChanges,
         priority: PRIORITY.ALTER_COLUMN,
       } as AlterColumnChange);

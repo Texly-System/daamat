@@ -51,11 +51,8 @@ export async function createInitialMigration(
   // Auto-discover model definitions from {modulesDir}/{moduleName}/models/
   const models = await discoverModels(moduleResolver);
 
-  // Build snapshot from models then persist it
+  // Generate and validate before writing either artifact.
   const snapshot = toModuleSchema(moduleName, models);
-  saveSnapshot(migrationsDir, snapshot);
-
-  // Generate full baseline SQL from the snapshot
   const migration = generateMigration.generateFromSnapshot(snapshot, options);
 
   // Use "Initial" as the migration label
@@ -75,6 +72,7 @@ export async function createInitialMigration(
   );
 
   fs.writeFileSync(filePath, template);
+  saveSnapshot(migrationsDir, snapshot);
   log("success", `Created initial migration: ${moduleName}/${filename}`);
 
   // NOTE: `generateFromSnapshot` never emits warnings (a baseline only CREATEs,

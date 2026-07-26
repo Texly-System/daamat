@@ -23,6 +23,7 @@ export function diffIndexes(
   tableName: string,
   oldIndexes: IndexSchema[],
   newIndexes: IndexSchema[],
+  schema = "public",
 ): SchemaChange[] {
   const changes: SchemaChange[] = [];
 
@@ -41,6 +42,7 @@ export function diffIndexes(
         type: "add_index",
         tableName,
         index: { ...newIdx, name },
+        schema,
         priority: PRIORITY.ADD_INDEX,
       } as AddIndexChange);
     } else if (!indexesEqual(oldIdx, newIdx)) {
@@ -48,12 +50,14 @@ export function diffIndexes(
         type: "drop_index",
         tableName,
         indexName: name,
+        schema,
         priority: PRIORITY.DROP_INDEX,
       } as DropIndexChange);
       changes.push({
         type: "add_index",
         tableName,
         index: { ...newIdx, name },
+        schema,
         priority: PRIORITY.READD_INDEX,
       } as AddIndexChange);
     }
@@ -66,6 +70,7 @@ export function diffIndexes(
         type: "drop_index",
         tableName,
         indexName: name,
+        schema,
         priority: PRIORITY.DROP_INDEX,
       } as DropIndexChange);
     }

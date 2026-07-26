@@ -15,7 +15,7 @@ export function generateCreateEnum(
   options: MigrationGeneratorOptions,
 ): string {
   const { enumDef } = change;
-  const schema = enumDef.schema ?? options.schema ?? "public";
+  const schema = enumDef.schema ?? options.schema ?? change.schema ?? "public";
   const typeName = qualifiedTable(enumDef.name, schema);
   const values = enumDef.values
     .map((v) => `'${v.replace(/'/g, "''")}'`)
@@ -41,7 +41,7 @@ export function generateDropEnum(
   change: DropEnumChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = options.schema ?? "public";
+  const schema = options.schema ?? change.schema ?? "public";
   const typeName = qualifiedTable(change.enumName, schema);
   const ifExists = options.safeMode !== false ? " IF EXISTS" : "";
   const cascade = options.cascadeDrops ? " CASCADE" : "";
@@ -58,7 +58,7 @@ export function generateAlterEnum(
   change: AlterEnumChange,
   options: MigrationGeneratorOptions,
 ): string[] {
-  const schema = options.schema ?? "public";
+  const schema = options.schema ?? change.schema ?? "public";
   const typeName = qualifiedTable(change.enumName, schema);
   const stmts: string[] = [];
 
@@ -69,8 +69,8 @@ export function generateAlterEnum(
   }
 
   if (change.removeValues?.length) {
-    stmts.push(
-      `-- Removing enum values requires recreating the type. Values to remove: ${change.removeValues.join(", ")}`,
+    throw new Error(
+      `Removing enum values is unsupported: ${change.removeValues.join(", ")}`,
     );
   }
 

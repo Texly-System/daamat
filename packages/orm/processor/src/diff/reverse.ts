@@ -6,6 +6,7 @@ import type {
   DropForeignKeyChange,
   DropIndexChange,
   DropTableChange,
+  DropConstraintChange,
   SchemaDiff,
   SchemaChange,
 } from "../types/diff";
@@ -29,6 +30,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
           type: "drop_table",
           tableName: change.table.name,
           cascade: true,
+          schema: change.schema,
           priority: PRIORITY.DROP_TABLE,
         } as DropTableChange);
         break;
@@ -38,6 +40,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
           type: "drop_column",
           tableName: change.tableName,
           columnName: change.column.name,
+          schema: change.schema,
           priority: PRIORITY.DROP_COLUMN,
         } as DropColumnChange);
         break;
@@ -74,6 +77,11 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
             from: change.changes.unique.to,
             to: change.changes.unique.from,
           };
+        if (change.changes.primaryKey)
+          rev.primaryKey = {
+            from: change.changes.primaryKey.to,
+            to: change.changes.primaryKey.from,
+          };
         if (change.changes.array)
           rev.array = {
             from: change.changes.array.to,
@@ -83,6 +91,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
           type: "alter_column",
           tableName: change.tableName,
           columnName: change.columnName,
+          schema: change.schema,
           changes: rev,
           priority: PRIORITY.ALTER_COLUMN,
         } as AlterColumnChange);
@@ -94,6 +103,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
           type: "drop_index",
           tableName: change.tableName,
           indexName: change.index.name,
+          schema: change.schema,
           priority: PRIORITY.DROP_INDEX,
         } as DropIndexChange);
         break;
@@ -103,6 +113,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
           type: "drop_foreign_key",
           tableName: change.tableName,
           constraintName: change.foreignKey.name,
+          schema: change.schema,
           priority: PRIORITY.DROP_FOREIGN_KEY,
         } as DropForeignKeyChange);
         break;
@@ -111,6 +122,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
         reversed.push({
           type: "drop_enum",
           enumName: change.enumDef.name,
+          schema: change.schema,
           priority: PRIORITY.DROP_ENUM,
         } as DropEnumChange);
         break;
@@ -119,10 +131,21 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
         reversed.push({
           type: "alter_enum",
           enumName: change.enumName,
+          schema: change.schema,
           addValues: change.removeValues,
           removeValues: change.addValues,
           priority: PRIORITY.ALTER_ENUM,
         } as AlterEnumChange);
+        break;
+
+      case "add_constraint":
+        reversed.push({
+          type: "drop_constraint",
+          tableName: change.tableName,
+          constraint: change.constraint,
+          schema: change.schema,
+          priority: PRIORITY.DROP_CONSTRAINT,
+        } as DropConstraintChange);
         break;
 
       // drop_* cannot be reversed without the original definition — skip
@@ -131,6 +154,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff {
       case "drop_index":
       case "drop_foreign_key":
       case "drop_enum":
+      case "drop_constraint":
       case "rename_table":
       case "rename_column":
         break;

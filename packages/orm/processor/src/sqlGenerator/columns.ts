@@ -19,7 +19,7 @@ export function generateAddColumn(
   change: AddColumnChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   return `ALTER TABLE ${qualifiedTable(change.tableName, schema)} ADD COLUMN ${columnDefinitionSql(change.column)}`;
 }
 
@@ -30,7 +30,7 @@ export function generateDropColumn(
   change: DropColumnChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullTable = qualifiedTable(change.tableName, schema);
   const col = quoteIdentifier(change.columnName);
   const ifExists = options.safeMode !== false ? " IF EXISTS" : "";
@@ -47,7 +47,7 @@ export function generateAlterColumn(
   change: AlterColumnChange,
   options: MigrationGeneratorOptions,
 ): string[] {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   const fullTable = qualifiedTable(change.tableName, schema);
   const col = quoteIdentifier(change.columnName);
   const stmts: string[] = [];
@@ -88,14 +88,25 @@ export function generateAlterColumn(
   }
 
   if (changes.unique) {
+    const name = quoteIdentifier(`${change.tableName}_${change.columnName}_key`);
     if (changes.unique.to) {
-      stmts.push(`ALTER TABLE ${fullTable} ADD UNIQUE (${col})`);
-    } else {
-      // Dropping a unique constraint requires the constraint name — emit a comment
       stmts.push(
-        `-- ALTER TABLE ${fullTable} DROP CONSTRAINT <unique_constraint_name_for_${change.columnName}>`,
+        `ALTER TABLE ${fullTable} ADD CONSTRAINT ${name} UNIQUE (${col})`,
+      );
+    } else {
+      stmts.push(
+        `ALTER TABLE ${fullTable} DROP CONSTRAINT${options.safeMode !== false ? " IF EXISTS" : ""} ${name}`,
       );
     }
+  }
+
+  if (changes.primaryKey) {
+    const name = quoteIdentifier(`${change.tableName}_pkey`);
+    stmts.push(
+      changes.primaryKey.to
+        ? `ALTER TABLE ${fullTable} ADD CONSTRAINT ${name} PRIMARY KEY (${col})`
+        : `ALTER TABLE ${fullTable} DROP CONSTRAINT${options.safeMode !== false ? " IF EXISTS" : ""} ${name}`,
+    );
   }
 
   return stmts;
@@ -108,6 +119,6 @@ export function generateRenameColumn(
   change: RenameColumnChange,
   options: MigrationGeneratorOptions,
 ): string {
-  const schema = resolveSchema(options);
+  const schema = resolveSchema(options, change.schema);
   return `ALTER TABLE ${qualifiedTable(change.tableName, schema)} RENAME COLUMN ${quoteIdentifier(change.fromName)} TO ${quoteIdentifier(change.toName)}`;
 }

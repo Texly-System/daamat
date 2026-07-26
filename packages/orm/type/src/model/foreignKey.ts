@@ -23,6 +23,8 @@ export interface ForeignKeySchema {
   columns: ForeignKeyType[];
   /** Referenced table */
   referencedTable: string;
+  /** PostgreSQL schema of the referenced table when explicitly declared. */
+  referencedSchema?: string;
   /** Referenced column(s) */
   referencedColumns: string[];
   /** On delete action */

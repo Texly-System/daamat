@@ -178,18 +178,37 @@ describe("generateAlterColumn", () => {
       alter({ unique: { from: false, to: true } }),
       opts,
     );
-    expect(sql).toEqual(['ALTER TABLE "public"."user" ADD UNIQUE ("age")']);
+    expect(sql).toEqual([
+      'ALTER TABLE "public"."user" ADD CONSTRAINT "user_age_key" UNIQUE ("age")',
+    ]);
   });
 
-  it("emits a placeholder comment when unique turns off (constraint name unknown)", () => {
+  it("drops the deterministic inline unique constraint when unique turns off", () => {
     const sql = generateAlterColumn(
       alter({ unique: { from: true, to: false } }),
       opts,
     );
     expect(sql).toHaveLength(1);
-    expect(sql[0]).toContain("-- ALTER TABLE");
-    expect(sql[0]).toContain("DROP CONSTRAINT");
-    expect(sql[0]).toContain("age");
+    expect(sql[0]).toBe(
+      'ALTER TABLE "public"."user" DROP CONSTRAINT IF EXISTS "user_age_key"',
+    );
+  });
+
+  it("adds and removes a single-column primary key constraint", () => {
+    expect(
+      generateAlterColumn(
+        alter({ primaryKey: { from: false, to: true } }),
+        opts,
+      )[0],
+    ).toBe(
+      'ALTER TABLE "public"."user" ADD CONSTRAINT "user_pkey" PRIMARY KEY ("age")',
+    );
+    expect(
+      generateAlterColumn(
+        alter({ primaryKey: { from: true, to: false } }),
+        { ...opts, safeMode: false },
+      )[0],
+    ).toBe('ALTER TABLE "public"."user" DROP CONSTRAINT "user_pkey"');
   });
 
   it("emits multiple statements in order: type, nullable, default", () => {
