@@ -33,6 +33,11 @@ async function ensureTables(pool: Pool): Promise<void> {
       if (!migration) throw new Error("Missing durability migration 001");
       await client.query(migration.sql);
     }
+    const intentMigration = durabilitySystemMigrations.migrations.find(
+      ({ id }) => id === "005",
+    );
+    if (!intentMigration) throw new Error("Missing durability migration 005");
+    await client.query(intentMigration.sql);
     await client.query(`
       CREATE TABLE IF NOT EXISTS "_damat_idempotency_test_effects" (
         "scope" TEXT PRIMARY KEY,
