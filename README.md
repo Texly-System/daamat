@@ -160,6 +160,10 @@ bun run test         # isolated tests + managed PostgreSQL/Redis + coverage audi
 bun run test:sites   # production browser routes, interactions, and accessibility
 ```
 
+Root `bunfig.toml` enforces a two-day `minimumReleaseAge` for third-party
+dependencies while excluding coordinated first-party `@damatjs/*` packages, so
+fresh lockstep releases remain installable without weakening the external gate.
+
 The root test runner migrates a dedicated recovery database, executes real
 SIGKILL recovery with both healthy and unavailable Redis, and rejects any
 instrumentable production source file absent from its package's LCOV report.

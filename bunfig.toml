@@ -9,6 +9,8 @@ optional = true
 
 # Don't install packages published to the registry in the last 2 days.
 minimumReleaseAge = 172800
+# Coordinated first-party releases must be installable immediately.
+minimumReleaseAgeExcludes = ["@damatjs/*"]
 
 # Never run dependency lifecycle scripts (postinstall etc.). None of our
 # dependencies need one: turbo ships its platform binaries as optional
