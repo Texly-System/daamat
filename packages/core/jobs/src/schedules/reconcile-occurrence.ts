@@ -1,4 +1,7 @@
-import type { DurabilityExecutor } from "@damatjs/durability";
+import {
+  intentFingerprint,
+  type DurabilityExecutor,
+} from "@damatjs/durability";
 import {
   appendJobActivity,
   claimJobDeduplication,
@@ -20,6 +23,18 @@ export async function reconcileScheduleOccurrence(
       name: schedule.jobName,
       key: schedule.deduplicationKey,
       runId: run.id,
+      fingerprint: intentFingerprint({
+        name: schedule.jobName,
+        queue: schedule.queue,
+        payload: schedule.payload,
+        maxAttempts: schedule.maxAttempts,
+        backoffMs: schedule.backoffMs,
+        backoffMultiplier: schedule.backoffMultiplier,
+        priority: schedule.priority,
+        delayMs: 0,
+        metadata: schedule.metadata,
+        correlationId: null,
+      }),
       ...(ttl !== undefined ? { expiresAt: new Date(Date.now() + ttl) } : {}),
     });
     if (!claim.acquired) {

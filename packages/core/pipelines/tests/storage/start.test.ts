@@ -56,6 +56,16 @@ test("start pins a version and persists its ready signal atomically", async () =
   expect(signals.rowCount).toBe(beforeReplay.rowCount);
 });
 
+test("start rejects an idempotency key reused with different intent", async () => {
+  const definition = defineSingle(uniqueName("pipeline-conflict"));
+  await syncPipelineDefinitions();
+  const options = { idempotencyKey: "same-start" };
+  await startPipeline(definition.name, { value: 1 }, options);
+  await expect(
+    startPipeline(definition.name, { value: 2 }, options),
+  ).rejects.toThrow(/existing intent/i);
+});
+
 test("caller transaction rollback removes the run, node, and wake-up", async () => {
   const definition = defineSingle(uniqueName("pipeline-rollback"));
   await syncPipelineDefinitions();

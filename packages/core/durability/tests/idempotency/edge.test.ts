@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, test } from "bun:test";
-import { withIdempotency } from "../../src";
+import { intentFingerprint, withIdempotency } from "../../src";
 import {
   cleanup,
   createTestContext,
@@ -15,9 +15,10 @@ test("reports a duplicate operation that is still running", async () => {
   const scope = uniqueScope("running");
   try {
     await context.pool.query(
-      `INSERT INTO "_damat_idempotency_keys" ("scope","key","status")
-       VALUES ($1,'same','running')`,
-      [scope],
+      `INSERT INTO "_damat_idempotency_keys"
+        ("scope","key","status","intent_fingerprint")
+       VALUES ($1,'same','running',$2)`,
+      [scope, intentFingerprint({})],
     );
     await expect(
       context.durability.transaction((executor) =>

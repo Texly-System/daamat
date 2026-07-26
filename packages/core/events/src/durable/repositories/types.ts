@@ -14,6 +14,7 @@ export interface DurableEventRecord {
   backoffMultiplier: number;
   retentionMs: RetentionDuration;
   idempotencyKey?: string;
+  intentFingerprint?: string;
   correlationId?: string;
   causationId?: string;
   occurredAt: Date;
@@ -34,6 +35,7 @@ export interface NewDurableEvent {
   backoffMultiplier: number;
   retentionMs: RetentionDuration;
   idempotencyKey?: string;
+  intentFingerprint: string;
   correlationId?: string;
   causationId?: string;
   occurredAt: Date;

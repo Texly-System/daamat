@@ -10,6 +10,7 @@ test("jobs catalog has stable migration ownership and order", () => {
     ["001", 300],
     ["002", 400],
     ["003", 450],
+    ["004", 490],
   ]);
 });
 

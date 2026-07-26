@@ -33,6 +33,23 @@ test("returns a completed result without rerunning the operation", async () => {
   }
 });
 
+test("rejects a completed key reused with different intent", async () => {
+  const scope = uniqueScope("conflict");
+  const run = (amount: number) =>
+    context.durability.transaction((executor) =>
+      withIdempotency(
+        { scope, key: "same", metadata: { amount }, executor },
+        async () => ({ saved: true }),
+      ),
+    );
+  try {
+    await run(1);
+    await expect(run(2)).rejects.toThrow(/existing intent/i);
+  } finally {
+    await cleanup(context, scope);
+  }
+});
+
 test("rejects a runtime value that is not JSON-safe", async () => {
   const scope = uniqueScope("json");
   try {

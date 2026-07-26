@@ -25,4 +25,5 @@ export type IdempotencyRow = QueryResultRow & {
   status: "running" | "completed";
   result: JsonValue;
   expired: boolean;
+  intent_fingerprint: string | null;
 };

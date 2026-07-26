@@ -12,6 +12,7 @@ export interface DurableEventRow extends QueryResultRow {
   backoff_multiplier: number;
   retention_ms: number | string | null;
   idempotency_key: string | null;
+  intent_fingerprint: string | null;
   correlation_id: string | null;
   causation_id: string | null;
   occurred_at: Date;
@@ -52,6 +53,9 @@ export function mapDurableEvent(row: DurableEventRow): DurableEventRecord {
     retentionMs:
       row.retention_ms === null ? "forever" : Number(row.retention_ms),
     ...(row.idempotency_key ? { idempotencyKey: row.idempotency_key } : {}),
+    ...(row.intent_fingerprint
+      ? { intentFingerprint: row.intent_fingerprint }
+      : {}),
     ...(row.correlation_id ? { correlationId: row.correlation_id } : {}),
     ...(row.causation_id ? { causationId: row.causation_id } : {}),
     occurredAt: row.occurred_at,

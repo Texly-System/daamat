@@ -18,6 +18,10 @@ export function getDurabilityClient(): DurabilityClient {
   return client;
 }
 
+export function getDurabilityClientOrUndefined(): DurabilityClient | undefined {
+  return storage[CLIENT];
+}
+
 export function clearDurabilityClient(): void {
   delete storage[CLIENT];
 }

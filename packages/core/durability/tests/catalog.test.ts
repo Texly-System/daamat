@@ -56,4 +56,5 @@ test("declares the shared durability tables with explicit names", () => {
   }
   expect(sql).not.toMatch(/CONSTRAINT\s+(?!")/);
   expect(sql).not.toMatch(/INDEX IF NOT EXISTS\s+(?!")/);
+  expect(sql).toContain('ADD COLUMN IF NOT EXISTS "intent_fingerprint" TEXT');
 });

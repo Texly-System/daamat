@@ -6,6 +6,7 @@ test("declares ordered pipeline storage with explicit names", () => {
   expect(catalog.owner).toBe("@damatjs/pipelines");
   expect(catalog.migrations.map(({ id, order }) => [id, order])).toEqual([
     ["001", 1000],
+    ["002", 1100],
   ]);
   const sql = catalog.migrations[0]!.sql;
   for (const table of [

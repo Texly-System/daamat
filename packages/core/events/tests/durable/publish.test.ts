@@ -57,7 +57,7 @@ test("duplicate idempotent publish returns the original event", async () => {
   );
   const duplicate = await publishDurableEvent(
     name,
-    { amount: 2 },
+    { amount: 1 },
     {
       idempotencyKey: "provider-1",
     },

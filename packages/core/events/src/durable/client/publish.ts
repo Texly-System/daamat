@@ -4,6 +4,7 @@ import {
   TransactionalExecutorRequiredError,
   type DurabilityExecutor,
   recordAccelerationSignal,
+  IdempotencyConflictError,
 } from "@damatjs/durability";
 import type {
   DurableEventName,
@@ -62,5 +63,11 @@ async function publishWith(
     : undefined;
   if (!existing)
     throw new Error("Durable event idempotency conflict has no event");
+  if (existing.intentFingerprint !== event.intentFingerprint) {
+    throw new IdempotencyConflictError(
+      `event:${event.name}`,
+      event.idempotencyKey!,
+    );
+  }
   return existing;
 }

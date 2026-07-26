@@ -61,9 +61,11 @@ test.serial("status reports all modules and system owners", async () => {
     "@damatjs/durability:002",
     "@damatjs/durability:003",
     "@damatjs/durability:004",
+    "@damatjs/durability:005",
     "@damatjs/jobs:001",
     "@damatjs/jobs:002",
     "@damatjs/jobs:003",
+    "@damatjs/jobs:004",
   ]);
   expect(logged(calls, "success", /durability: 2 applied/)).toBe(true);
   expect(logged(calls, "info", /post: 1 applied, 1 pending/)).toBe(true);

@@ -7,6 +7,7 @@ export * from "./coordinator";
 export * from "./controls";
 export * from "./errors";
 export * from "./idempotency";
+export * from "./intent";
 export * from "./inspection";
 export * from "./leases";
 export * from "./logs";
@@ -26,6 +27,7 @@ export {
 export {
   clearDurabilityClient,
   getDurabilityClient,
+  getDurabilityClientOrUndefined,
   setDurabilityClient,
 } from "./client/global";
 export { createDurabilityClient } from "./client/create";

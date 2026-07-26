@@ -3,6 +3,7 @@ import {
   clearDurabilityClient,
   createDurabilityClient,
   getDurabilityClient,
+  getDurabilityClientOrUndefined,
   isTransactionalExecutor,
   setDurabilityClient,
   withIdempotency,
@@ -83,6 +84,8 @@ test("stores a process-wide durability client", () => {
   });
   setDurabilityClient(durability);
   expect(getDurabilityClient()).toBe(durability);
+  expect(getDurabilityClientOrUndefined()).toBe(durability);
   clearDurabilityClient();
+  expect(getDurabilityClientOrUndefined()).toBeUndefined();
   expect(() => getDurabilityClient()).toThrow(/not configured/i);
 });

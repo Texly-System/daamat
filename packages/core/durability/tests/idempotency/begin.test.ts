@@ -58,8 +58,9 @@ test("replaces an expired completed key", async () => {
   try {
     await context.pool.query(
       `INSERT INTO "_damat_idempotency_keys"
-        ("scope", "key", "status", "result", "expires_at")
-       VALUES ($1, 'same', 'completed', '{"old":true}', NOW() - INTERVAL '1 second')`,
+        ("scope", "key", "status", "result", "expires_at", "intent_fingerprint")
+       VALUES ($1, 'same', 'completed', '{"old":true}',
+         NOW() - INTERVAL '1 second', 'known-old-intent')`,
       [scope],
     );
     const result = await context.durability.transaction((executor) =>
@@ -68,6 +69,28 @@ test("replaces an expired completed key", async () => {
       })),
     );
     expect(result).toEqual({ value: { fresh: true }, replayed: false });
+  } finally {
+    await cleanup(context, scope);
+  }
+});
+
+test("rejects an expired legacy key without a fingerprint", async () => {
+  const scope = uniqueScope("legacy-expired");
+  try {
+    await context.pool.query(
+      `INSERT INTO "_damat_idempotency_keys"
+        ("scope", "key", "status", "result", "expires_at")
+       VALUES ($1, 'same', 'completed', '{"old":true}',
+         NOW() - INTERVAL '1 second')`,
+      [scope],
+    );
+    await expect(
+      context.durability.transaction((executor) =>
+        withIdempotency({ scope, key: "same", executor }, async () => ({
+          fresh: true,
+        })),
+      ),
+    ).rejects.toThrow(/existing intent/i);
   } finally {
     await cleanup(context, scope);
   }

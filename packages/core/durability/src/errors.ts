@@ -12,6 +12,16 @@ export class IdempotencyInProgressError extends Error {
   }
 }
 
+export class IdempotencyConflictError extends Error {
+  constructor(
+    readonly scope: string,
+    readonly key: string,
+  ) {
+    super(`Idempotency key conflicts with an existing intent: ${scope}/${key}`);
+    this.name = "IdempotencyConflictError";
+  }
+}
+
 export class TransactionalExecutorRequiredError extends Error {
   constructor(operation = "idempotency") {
     super(

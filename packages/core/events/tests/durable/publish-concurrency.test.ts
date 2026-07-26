@@ -9,7 +9,7 @@ test("concurrent idempotent publishes create one event and activity", async () =
   const options = { idempotencyKey: crypto.randomUUID() };
   const [left, right] = await Promise.all([
     publishDurableEvent(name, { side: "left" }, options),
-    publishDurableEvent(name, { side: "right" }, options),
+    publishDurableEvent(name, { side: "left" }, options),
   ]);
   expect(right.id).toBe(left.id);
   expect(await listDurableEventActivity(left.id)).toHaveLength(1);

@@ -28,6 +28,7 @@ export interface PipelineRun {
   trigger: Record<string, unknown>;
   correlationId?: string;
   idempotencyKey?: string;
+  intentFingerprint?: string;
   parentRunId?: string;
   parentNodeExecutionId?: string;
   retentionAt?: Date;

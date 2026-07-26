@@ -46,6 +46,12 @@ Job deduplication and durable-event idempotency solve replay, not handler-side
 exactly-once effects. Use `context.withIdempotency` for database effects and pass
 the same stable key to external providers when supported.
 
+Each key is bound to a canonical fingerprint of its complete durable intent.
+The same key and intent replay the retained result; a changed payload, tenant,
+policy, scheduling mode, or other intent field throws
+`IdempotencyConflictError`. Rows created before fingerprints were recorded also
+raise this typed conflict because their original intent cannot be verified.
+
 ---
 
 Prev: [← Define jobs and durable events](./10ba-jobs-and-workers-runtime.md) · [Guide home](../GUIDE.md) · Next: [Inspect and recover durable work →](./10bb-events-jobs-observability.md)

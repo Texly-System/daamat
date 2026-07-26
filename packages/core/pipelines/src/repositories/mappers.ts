@@ -17,6 +17,9 @@ export function mapPipelineRun(row: RunRow): PipelineRun {
     trigger: row.trigger,
     ...(row.correlation_id ? { correlationId: row.correlation_id } : {}),
     ...(row.idempotency_key ? { idempotencyKey: row.idempotency_key } : {}),
+    ...(row.intent_fingerprint
+      ? { intentFingerprint: row.intent_fingerprint }
+      : {}),
     ...(row.parent_run_id ? { parentRunId: row.parent_run_id } : {}),
     ...(row.parent_node_execution_id
       ? { parentNodeExecutionId: row.parent_node_execution_id }

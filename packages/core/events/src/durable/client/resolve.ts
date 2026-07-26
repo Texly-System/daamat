@@ -3,6 +3,7 @@ import { getDurableEventDefinition } from "../definitions/registry";
 import type { PublishDurableEventOptions } from "../definitions/types";
 import type { NewDurableEvent } from "../repositories/types";
 import { validateDurableName } from "../definitions/validation";
+import { intentFingerprint } from "@damatjs/durability";
 
 export function resolveDurableEvent(
   name: string,
@@ -34,6 +35,20 @@ export function resolveDurableEvent(
     backoffMs: policy.backoffMs,
     backoffMultiplier: policy.backoffMultiplier,
     retentionMs: policy.retentionMs,
+    intentFingerprint: intentFingerprint({
+      name,
+      payload,
+      policy,
+      metadata: options.metadata ?? {},
+      correlationId: options.correlationId ?? null,
+      causationId: options.causationId ?? null,
+      scheduling:
+        options.delayMs !== undefined
+          ? { mode: "delay", delayMs: options.delayMs }
+          : options.availableAt
+            ? { mode: "at", availableAt: options.availableAt }
+            : { mode: "immediate" },
+    }),
     occurredAt,
     availableAt,
     ...(retentionAt ? { retentionAt } : {}),

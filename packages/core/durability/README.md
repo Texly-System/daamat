@@ -52,6 +52,13 @@ the same PostgreSQL transaction as the operation. Concurrent duplicates wait
 for that transaction and replay the completed value. Failures roll back the
 claim with the database work, while an expired key may be claimed again.
 
+The key also stores a SHA-256 fingerprint of canonical intent: object keys are
+sorted, array order is preserved, valid dates become ISO strings, and non-JSON
+values are rejected. The same key and fingerprint replay; changed or legacy
+unverifiable intent throws public `IdempotencyConflictError`, whose `scope` and
+`key` fields contain no payload data. Jobs, durable events, and pipelines apply
+the same conflict contract to their complete resolved intent.
+
 Pass `executor` when the caller already owns a transaction. A supplied executor
 must be the active callback executor from `createDurabilityClient().transaction`
 or another Damat transaction owner such as `ModuleService.transaction`.

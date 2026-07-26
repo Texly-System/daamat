@@ -4,6 +4,7 @@ import {
   TransactionalExecutorRequiredError,
   type DurabilityExecutor,
   recordAccelerationSignal,
+  intentFingerprint,
 } from "@damatjs/durability";
 import type { JobName, JobPayload } from "../definitions/types";
 import { validateEnqueue } from "../validation/enqueue";
@@ -51,6 +52,18 @@ async function enqueueWith(
       name,
       key: options.deduplication.key,
       runId: run.id,
+      fingerprint: intentFingerprint({
+        name: run.name,
+        queue: run.queue,
+        payload: run.payload,
+        maxAttempts: run.maxAttempts,
+        backoffMs: run.backoffMs,
+        backoffMultiplier: run.backoffMultiplier,
+        priority: run.priority,
+        delayMs: run.delayMs,
+        metadata: run.metadata,
+        correlationId: run.correlationId ?? null,
+      }),
       ...(options.deduplication.expiresAt
         ? { expiresAt: options.deduplication.expiresAt }
         : {}),

@@ -17,10 +17,13 @@ test("pipelines select durability and jobs before pipeline storage", async () =>
       "@damatjs/durability:002",
       "@damatjs/durability:003",
       "@damatjs/durability:004",
+      "@damatjs/durability:005",
       "@damatjs/jobs:001",
       "@damatjs/jobs:002",
       "@damatjs/jobs:003",
+      "@damatjs/jobs:004",
       "@damatjs/pipelines:001",
+      "@damatjs/pipelines:002",
     ]);
   } finally {
     fs.rmSync(root, { recursive: true, force: true });

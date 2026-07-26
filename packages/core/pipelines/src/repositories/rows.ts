@@ -37,6 +37,7 @@ export interface RunRow extends QueryResultRow {
   trigger: Record<string, unknown>;
   correlation_id: string | null;
   idempotency_key: string | null;
+  intent_fingerprint: string | null;
   parent_run_id: string | null;
   parent_node_execution_id: string | null;
   retention_ms: string | null;

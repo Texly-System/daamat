@@ -15,8 +15,9 @@ export async function insertDurableEvent(
     `INSERT INTO "_damat_event_outbox" (
        "id","name","payload","metadata","policy_version","max_attempts",
        "backoff_ms","backoff_multiplier","retention_ms","idempotency_key",
-       "correlation_id","causation_id","occurred_at","available_at","retention_at"
-     ) VALUES ($1,$2,$3::jsonb,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+       "correlation_id","causation_id","occurred_at","available_at","retention_at",
+       "intent_fingerprint"
+     ) VALUES ($1,$2,$3::jsonb,$4::jsonb,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
      ON CONFLICT ON CONSTRAINT "_damat_event_outbox_idempotency_uidx" DO NOTHING
      RETURNING *`,
     [
@@ -35,6 +36,7 @@ export async function insertDurableEvent(
       event.occurredAt,
       event.availableAt,
       event.retentionAt ?? null,
+      event.intentFingerprint,
     ],
   );
   return result.rows[0] ? mapDurableEvent(result.rows[0]) : undefined;
