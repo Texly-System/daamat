@@ -21,13 +21,7 @@ export async function runCli(
   const project = definition.configLoader
     ? withConfig(definition.configLoader, runtime.cwd)
     : undefined;
-  const cli = createCli(
-    definition,
-    runtime,
-    registry,
-    project,
-    global.options,
-  );
+  const cli = createCli(definition, runtime, registry, project, global.options);
 
   if (typeof definition.banner === "object") {
     printBanner(definition, runtime.output, definition.banner);

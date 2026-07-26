@@ -41,9 +41,19 @@ describe("parseCommandArgs", () => {
     expect(positional).toEqual(["build", "extra"]);
   });
 
-  test("--no-<name> for an unknown option is ignored, leaving the default", () => {
-    const { options } = parseCommandArgs(["--no-unknown"], defs);
+  test("reports unknown options while leaving defaults unchanged", () => {
+    const { options, unknown } = parseCommandArgs(["--no-unknown"], defs);
     expect(options.typecheck).toBe(true);
     expect("unknown" in options).toBe(false);
+    expect(unknown).toEqual(["--no-unknown"]);
+  });
+
+  test("treats every token after -- as positional", () => {
+    const { positional, unknown } = parseCommandArgs(
+      ["target", "--", "--literal", "-x"],
+      defs,
+    );
+    expect(positional).toEqual(["target", "--literal", "-x"]);
+    expect(unknown).toEqual([]);
   });
 });

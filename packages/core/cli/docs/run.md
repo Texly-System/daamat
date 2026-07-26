@@ -23,6 +23,7 @@ Normal outcomes never terminate the process:
 
 - help and version return `{ exitCode: 0 }`;
 - unknown commands return `{ exitCode: 1, command }`;
+- unknown options return exit code one without invoking the handler;
 - handlers return their exit code with the resolved command name;
 - validation, config, and handler errors are mapped to result codes.
 
@@ -42,13 +43,10 @@ The rest of core reads the resulting runtime rather than reading process state.
 
 ## Routing
 
-Leaf commands are registered with CAC. `runCli` parses
-`["bun", definition.name, ...runtime.args]` with `{ run: false }`, then awaits
-`runMatchedCommand()` so the action result is observable.
-
-Default commands and `<parent> <child>` invocations are resolved through
-`dispatchManual`. They use `parseCommandArgs` and then enter the same
-`runCommand`/`executeCommand` pipeline as CAC leaf commands.
+Command trees and defaults are resolved through `dispatchManual`, then enter the
+same `runCommand`/`executeCommand` pipeline. Parsing supports `--name value`,
+`--name=value`, aliases, boolean negation, and `--` as the terminator after which
+all tokens are positional.
 
 ## Shared execution pipeline
 

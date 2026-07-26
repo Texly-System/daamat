@@ -1,17 +1,23 @@
 import type { CliRuntime, CommandContext, CommandOption } from "../types";
+import { extractPositionalArgs } from "./extractPositional";
+export { extractPositionalArgs } from "./extractPositional";
 
 /**
  * Parse raw argv tokens against a command's option definitions.
  * Supports --name value, --name=value, -a value, boolean flags, and
  * `--no-name` negation of boolean flags (mirrors cac's top-level parsing).
- * Defaults from the option definitions are applied first.
  */
 export function parseCommandArgs(
   args: string[],
   optionDefs: CommandOption[] = [],
-): { options: Record<string, unknown>; positional: string[] } {
+): {
+  options: Record<string, unknown>;
+  positional: string[];
+  unknown: string[];
+} {
   const options: Record<string, unknown> = {};
   const positional: string[] = [];
+  const unknown: string[] = [];
 
   for (const def of optionDefs) {
     if (def.default !== undefined) {
@@ -31,6 +37,10 @@ export function parseCommandArgs(
     const arg = args[i];
     if (!arg) continue;
 
+    if (arg === "--") {
+      positional.push(...args.slice(i + 1));
+      break;
+    }
     if (arg.startsWith("-")) {
       let token = arg;
       let inlineValue: string | undefined;
@@ -52,7 +62,10 @@ export function parseCommandArgs(
       }
 
       const def = findDef(token);
-      if (!def) continue; // unknown flag — ignore rather than fail
+      if (!def) {
+        unknown.push(token);
+        continue;
+      }
 
       if (def.type === "boolean") {
         options[def.name] =
@@ -67,7 +80,7 @@ export function parseCommandArgs(
     }
   }
 
-  return { options, positional };
+  return { options, positional, unknown };
 }
 
 export function buildCommandContext(
@@ -83,18 +96,4 @@ export function buildCommandContext(
     logger: runtime.logger,
     cwd: runtime.cwd,
   };
-}
-
-export function extractPositionalArgs(args: string[]): string[] {
-  const positionalArgs: string[] = [];
-  for (let i = 0; i < args.length; i++) {
-    const arg = args[i];
-    if (!arg) continue;
-    if (arg.startsWith("-") || arg.startsWith("--")) {
-      i++;
-      continue;
-    }
-    positionalArgs.push(arg);
-  }
-  return positionalArgs;
 }

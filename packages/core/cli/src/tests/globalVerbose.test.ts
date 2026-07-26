@@ -39,9 +39,7 @@ describe("global verbose option", () => {
     const result = await runCli(definition(received), fixture.runtime);
     expect(result).toEqual({ exitCode: 0, command: "module:dev" });
     expect(received).toEqual([expected]);
-    expect(fixture.debugs).toEqual(
-      expected ? ["Verbose mode enabled"] : [],
-    );
+    expect(fixture.debugs).toEqual(expected ? ["Verbose mode enabled"] : []);
   });
 
   test("is not consumed when the CLI has not enabled it", async () => {

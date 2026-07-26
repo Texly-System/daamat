@@ -18,6 +18,10 @@ Command help includes the command description and either explicit `usage` or a
 generated `<name> [options]` form. Options, examples, and subcommands are emitted
 only when present.
 
+`-h` and `--help` are intercepted after resolving every command depth. For
+example, `damat module add --help` prints `module add` help and never invokes its
+handler.
+
 The `help [command]` CAC action uses the invocation registry. It returns a
 `CliRunResult`; an unknown target logs through `CliLogger` and returns code one.
 

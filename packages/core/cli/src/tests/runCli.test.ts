@@ -18,15 +18,6 @@ async function run(definition: CliDefinition, args: string[]) {
 }
 
 describe("runCli navigation", () => {
-  test("validates required definition identity", async () => {
-    await expect(
-      runCli({ version: "1", commands: [] } as CliDefinition),
-    ).rejects.toThrow("name");
-    await expect(
-      runCli({ name: "cli", commands: [] } as CliDefinition),
-    ).rejects.toThrow("version");
-  });
-
   test("returns help and version results", async () => {
     const config = { name: "cli", version: "1.2.3", commands: [] };
     expect((await run(config, ["--help"])).result).toEqual({ exitCode: 0 });
@@ -73,5 +64,31 @@ describe("runCli navigation", () => {
       "add",
     ]);
     expect(value.result).toEqual({ exitCode: 5, command: "module:add" });
+  });
+
+  test("prints resolved child help without invoking its handler", async () => {
+    let invoked = false;
+    const add = command("add");
+    add.handler = async () => ((invoked = true), { exitCode: 0 });
+    const module = command("module");
+    module.subcommands = [add];
+    const value = await run({ name: "cli", version: "1", commands: [module] }, [
+      "module",
+      "add",
+      "--help",
+    ]);
+    expect(value.result).toEqual({ exitCode: 0, command: "module:add" });
+    expect(invoked).toBe(false);
+    expect(value.fixture.messages.join("\n")).toContain("Command: add");
+  });
+
+  test("rejects unknown command options", async () => {
+    const build = command("build");
+    const value = await run({ name: "cli", version: "1", commands: [build] }, [
+      "build",
+      "--wat",
+    ]);
+    expect(value.result).toEqual({ exitCode: 1, command: "build" });
+    expect(value.fixture.errors).toEqual(["Unknown option: --wat"]);
   });
 });

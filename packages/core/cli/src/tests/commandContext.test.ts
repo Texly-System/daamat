@@ -1,5 +1,8 @@
 import { expect, test } from "bun:test";
-import { buildCommandContext } from "../run/buildCommand";
+import {
+  buildCommandContext,
+  extractPositionalArgs,
+} from "../run/buildCommand";
 import type { CliLogger } from "../types";
 
 const logger: CliLogger = {
@@ -27,4 +30,12 @@ test("command context uses only explicit invocation values", () => {
     logger,
     cwd: "/workspace",
   });
+});
+
+test("positional extraction honors the option terminator", () => {
+  expect(extractPositionalArgs(["target", "--", "--literal", "-x"])).toEqual([
+    "target",
+    "--literal",
+    "-x",
+  ]);
 });
