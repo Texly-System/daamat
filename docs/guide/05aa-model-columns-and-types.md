@@ -25,6 +25,16 @@ Common builder families:
 - time: `timestamp()`, `date()`, `time()`, `interval()`
 - structured values: `json()`, `jsonb()`, `bytea()`, `vector()`
 
+PostgreSQL `NUMERIC` keeps exact decimal values. Existing
+`columns.numeric()` declarations continue to generate `number` types. Opt into
+lossless row/input types and finite decimal-string Zod validation per column:
+
+```ts
+amount: columns.numeric(30, 8).representation("string");
+```
+
+The representation is codegen metadata only; changing it does not generate SQL.
+
 Modifiers such as `.primaryKey()`, `.unique()`, `.nullable()`, `.default()`,
 and `.defaultNow()` describe database behavior. Changing a model does not alter
 the database until you generate, review, and run a migration.

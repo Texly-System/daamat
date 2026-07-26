@@ -106,4 +106,6 @@ export interface ColumnSchema {
   fieldName?: string;
   /** Whether the column is auto-incrementing (serial / bigserial / smallserial) */
   autoincrement?: boolean;
+  /** Codegen representation for exact numeric values; omitted means number. */
+  numericRepresentation?: "number" | "string";
 }

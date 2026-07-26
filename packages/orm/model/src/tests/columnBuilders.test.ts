@@ -66,6 +66,14 @@ describe("NumericColumnBuilder", () => {
     expect(schema.length).toBe(10);
     expect(schema.scale).toBe(2);
   });
+
+  it("serializes exact string representation without changing defaults", () => {
+    expect(columns.numeric().toSchema().numericRepresentation).toBeUndefined();
+    const exact = columns.numeric(30, 8).representation("string");
+    expect(exact.toSchema().numericRepresentation).toBe("string");
+    expect(exact.toTsType()).toBe("string");
+    expect(exact.nullable().toTsType()).toBe("string | null");
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

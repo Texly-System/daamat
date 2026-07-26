@@ -48,6 +48,8 @@ export class IntegerColumnBuilder extends ColumnBuilder {
  * SQL type: numeric [ (p, s) ]  (decimal is an alias)
  */
 export class NumericColumnBuilder extends ColumnBuilder {
+  private _representation?: "number" | "string";
+
   constructor(precision?: number, scale?: number) {
     super("numeric");
     if (precision !== undefined) {
@@ -68,6 +70,26 @@ export class NumericColumnBuilder extends ColumnBuilder {
   scale(s: number): this {
     this._scale = s;
     return this;
+  }
+
+  /** Select lossless string codegen for PostgreSQL NUMERIC values. */
+  representation(value: "number" | "string"): this {
+    this._representation = value;
+    return this;
+  }
+
+  override toSchema() {
+    const schema = super.toSchema();
+    if (this._representation !== undefined) {
+      schema.numericRepresentation = this._representation;
+    }
+    return schema;
+  }
+
+  override toTsType(): string {
+    const type = this._representation === "string" ? "string" : "number";
+    const value = this._array ? `Array<${type}>` : type;
+    return this._nullable ? `${value} | null` : value;
   }
 }
 

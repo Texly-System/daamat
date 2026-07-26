@@ -11,9 +11,12 @@ import { pgTypeToTsBase } from "./type-mapping/ts";
 export const columnToTsType = (col: ColumnSchema): string => {
   // Named enum — convert the raw enum name to the generated alias name.
   const base: string =
-    col.type === "enum" && col.enum
-      ? toEnumTypeName(col.enum)
-      : pgTypeToTsBase(col.type as ColumnType);
+    ["numeric", "decimal"].includes(col.type) &&
+    col.numericRepresentation === "string"
+      ? "string"
+      : col.type === "enum" && col.enum
+        ? toEnumTypeName(col.enum)
+        : pgTypeToTsBase(col.type as ColumnType);
 
   // Inline object-literal types (e.g. geometric / range types) need parens
   // before `| null` to keep the union unambiguous.

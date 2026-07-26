@@ -20,6 +20,12 @@ const groups = [
 ];
 
 export function getZodBaseType(type: ColumnType, column: ColumnSchema): string {
+  if (
+    ["numeric", "decimal"].includes(type) &&
+    column.numericRepresentation === "string"
+  ) {
+    return "z.string().regex(/^[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+)$/)";
+  }
   if (["text", "character", "character varying"].includes(type)) {
     return column.length ? `z.string().max(${column.length})` : "z.string()";
   }
