@@ -23,6 +23,10 @@ await this.transaction(
 
 If the callback throws, all pending writes roll back.
 
+The callback owns one checked-out PostgreSQL client. Await executor-backed
+queries sequentially; do not run concurrent `Promise.all` queries through that
+single transaction executor.
+
 `TransactionOptions` includes:
 
 - `isolationLevel`: `READ UNCOMMITTED` | `READ COMMITTED` | `REPEATABLE READ` | `SERIALIZABLE`

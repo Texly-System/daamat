@@ -24,6 +24,8 @@ Use this package to:
 - Apply ordered inline system migrations before module migrations.
 - Report which migrations are applied vs pending (`getMigrationStatus`, `getModuleMigrationStatus`).
 - Inspect or maintain the migration log table directly (`MigrationTracker`).
+- Audit and adopt a committed pending non-transactional migration after exact
+  checksum verification (`damat-orm migrate:adopt`).
 
 Do **not** use it to:
 
@@ -97,6 +99,21 @@ console.log(status.modules);
 not the parent modules directory. `createDiffMigration` additionally accepts
 `{ migrationsDir }` as its fourth argument when manifest-declared models and
 migrations live in separate directories.
+
+Migration SQL, its SHA-256 source checksum, and tracker insertion use one
+checked-out client. Transactional tracker failure rolls back the SQL. If
+non-transactional SQL commits but tracking fails, execution reports
+`CommittedMigrationUntrackedError`. Recover only after inspection:
+
+```bash
+damat-orm migrate:adopt <module> <migration> \
+  --checksum <sha256> --actor <actor> --reason <reason>
+```
+
+Generation carries each table's schema through snapshots, diffs, indexes,
+constraints, and foreign keys. An explicit generator schema overrides table
+schema, then module schema, then `public`. Unsupported or invalid schema changes
+fail before either migration SQL or `schema-snapshot.json` is written.
 
 **Subpath exports:** none — everything is under `.`.
 

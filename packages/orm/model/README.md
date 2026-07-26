@@ -125,7 +125,7 @@ Single entry point (`.`). The package re-exports everything under `properties`,
 | `IdColumnBuilder`                                                                           | class | `columns.id({prefix})` — text PK with `generate_id('<prefix>')` default.                                                                            |
 | `BooleanColumnBuilder`                                                                      | class | `columns.boolean()`.                                                                                                                                |
 | `IntegerColumnBuilder`                                                                      | class | `columns.integer()` → `.bigInt()` / `.smallInt()` / `.serial()` / `.bigSerial()` / `.smallSerial()`.                                                |
-| `NumericColumnBuilder`                                                                      | class | `columns.numeric(p?, s?)` (decimal) with `.precision()` / `.scale()`.                                                                               |
+| `NumericColumnBuilder`                                                                      | class | `columns.numeric(p?, s?)` with `.precision()`, `.scale()`, and codegen-only `.representation("number" | "string")`.                              |
 | `RealColumnBuilder`, `DoublePrecisionColumnBuilder`, `MoneyColumnBuilder`                   | class | `columns.real()`, `columns.doublePrecision()`, `columns.money()`.                                                                                   |
 | `TextColumnBuilder`, `CharacterVaryingColumnBuilder`, `CharacterColumnBuilder`              | class | `columns.text()`, `columns.varchar(n?)`, `columns.char(n?)`.                                                                                        |
 | `TimestampColumnBuilder`, `DateColumnBuilder`, `TimeColumnBuilder`, `IntervalColumnBuilder` | class | `columns.timestamp({withTimezone?})`, `columns.date()`, `columns.time()`, `columns.interval()`.                                                     |
@@ -177,6 +177,11 @@ Single entry point (`.`). The package re-exports everything under `properties`,
 Everything from [`@damatjs/orm-type`](../type) (e.g. `ColumnType`, `TableSchema`,
 `ModuleSchema`, `RelationSchema`) is re-exported from this package's root, so
 model code rarely needs to import `@damatjs/orm-type` directly.
+
+Models include timestamps and soft delete unless explicitly disabled with
+`.timestamps(false)` or `.softDelete(false)`. Numeric representation defaults to
+the existing generated `number`; `"string"` emits lossless row/input strings and
+finite decimal-string Zod validation without producing a migration diff.
 
 > **Note:** the package's `exports` map only has `.`. There is no `codegen`
 > subpath export. Use `@damatjs/schema-codegen` for complete `ModuleSchema` to

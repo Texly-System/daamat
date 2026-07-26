@@ -19,6 +19,9 @@ export const AccountModel = model("accounts", {
   .timestamps();
 ```
 
+Timestamps and soft delete are enabled by default. Use `.timestamps(false)` or
+`.softDelete(false)` only when the table intentionally opts out.
+
 `indexes()` replaces the model's index list, so define related indexes in one
 call. Table checks use `.constrain([columns.constrains(...)])`; see the package
 reference for the exact builders.

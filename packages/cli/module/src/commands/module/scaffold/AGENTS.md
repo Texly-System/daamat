@@ -172,6 +172,13 @@ identifier, not an ORM relation or foreign key.
 Use `collectModels([...])` so accessor keys derive consistently from table
 names.
 
+Timestamps and soft delete are enabled by default; opt out explicitly with
+`.timestamps(false)` or `.softDelete(false)`. Exact PostgreSQL numeric values can
+opt into lossless generated strings with `.representation("string")`.
+
+Transaction callbacks own one checked-out PostgreSQL client. Await executor
+queries sequentially rather than using `Promise.all` on that executor.
+
 ## Service and credentials
 
 The service extends `ModuleService({ models, credentialsSchema })`. Credentials

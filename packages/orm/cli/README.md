@@ -39,6 +39,7 @@ damat-orm <command> [args] [options]
 | `migrate:status [module]` | Show applied/pending counts (optionally for one module) | `damat-orm migrate:status user` |
 | `migrate:list`            | List modules that have migrations, with counts          | `damat-orm migrate:list`        |
 | `migrate:create <module>` | Create an initial or diff migration for a module        | `damat-orm migrate:create user` |
+| `migrate:adopt <module> <migration>` | Audit an already committed non-transactional migration | `damat-orm migrate:adopt user Migration1_Index --checksum ... --actor ... --reason ...` |
 
 > `migrate:status` also accepts `--module <name>` / `-m <name>` as an
 > alternative to the positional argument.
