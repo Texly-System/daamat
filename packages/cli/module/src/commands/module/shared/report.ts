@@ -23,6 +23,14 @@ export function reportModulePlan(
     ...(plan.packageBackend && { packageBackend: plan.packageBackend }),
     operations: plan.operations.length,
   });
+  for (const mapping of plan.capabilityMappings ?? []) {
+    ctx.logger.info(`capability ${mapping.capability}`, {
+      providerSource: mapping.providerSource,
+      destination: mapping.destination,
+      destinationSource: mapping.destinationSource,
+      operations: mapping.operationCount,
+    });
+  }
   plan.warnings.forEach((warning) => ctx.logger.warn(warning));
   const defaults = moduleInstructions(plan.installationId);
   const instructions =

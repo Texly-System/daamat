@@ -5,7 +5,8 @@ import type { MatchProfilesInput } from "./types";
 export function createProfileRecipe(input: MatchProfilesInput): InstallRecipe {
   const { provider } = input;
   const profile = provider.install;
-  const mappings = matchProfiles(input)
+  const capabilityMappings = matchProfiles(input);
+  const mappings = capabilityMappings
     .map(({ from, to }) => ({ from, to }))
     .sort(
       (left, right) => Number(left.from === "**") - Number(right.from === "**"),
@@ -26,5 +27,6 @@ export function createProfileRecipe(input: MatchProfilesInput): InstallRecipe {
     ...(profile?.ignore && { ignore: profile.ignore }),
     ...(profile?.packages && { packages: profile.packages }),
     ...(profile?.usageHints && { usageHints: profile.usageHints }),
+    capabilityMappings,
   };
 }

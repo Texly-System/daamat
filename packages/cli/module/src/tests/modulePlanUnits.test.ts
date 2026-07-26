@@ -60,6 +60,12 @@ describe("module plan reporting and execution", () => {
     reportModulePlan(ctx, plan(), provider);
     expect(logger.warn).toHaveBeenCalledWith("check usage");
     expect(logger.info).toHaveBeenCalledWith("wire billing");
+    expect(logger.info).toHaveBeenCalledWith("capability module", {
+      providerSource: "src/**",
+      destination: "src/modules/billing",
+      destinationSource: "fallback",
+      operations: 3,
+    });
   });
 
   test("reports default removal instructions", () => {

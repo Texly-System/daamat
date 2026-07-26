@@ -69,6 +69,7 @@ export function createRemovePlan(input: RemoveInput): InstallerPlan {
         reference,
       })),
     ],
+    capabilityMappings: [],
     warnings: [
       usage.warning,
       ...usage.matches.map(

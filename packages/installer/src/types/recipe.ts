@@ -21,4 +21,10 @@ export interface InstallRecipe {
   package?: { name: string; ref?: string };
   packages?: Record<string, string>;
   usageHints?: UsageHint[];
+  capabilityMappings?: Array<{
+    capability: string;
+    from: string;
+    to: string;
+    source: "override" | "receiver" | "fallback";
+  }>;
 }

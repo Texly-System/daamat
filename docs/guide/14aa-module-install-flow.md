@@ -24,6 +24,8 @@ damat module add ./modules/user
 Review every destination and integration notice. Do not bypass rejected or
 revoked artifacts. Direct paths and Git origins may require an explicit
 unverified-source decision because no registry verification is available.
+Plan output lists each capability in stable order with its provider source,
+resolved override/receiver/fallback destination, and operation count.
 
 ## Complete host-owned wiring
 

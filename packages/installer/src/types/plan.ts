@@ -32,6 +32,13 @@ export interface InstallerPlan {
   verification: VerificationStatus;
   usageHints: UsageHint[];
   operations: InstallerOperation[];
+  capabilityMappings: Array<{
+    capability: string;
+    providerSource: string;
+    destination: string;
+    destinationSource: "override" | "receiver" | "fallback";
+    operationCount: number;
+  }>;
   warnings: string[];
   backupId?: string;
 }

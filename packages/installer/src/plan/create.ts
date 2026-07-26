@@ -48,6 +48,26 @@ export function createInstallPlan(
     }),
   });
   void input.lock;
+  const operations =
+    mode === "source"
+      ? createFileOperations(input.artifact, input.recipe)
+      : packageBackend === "damat"
+        ? createDamatPackageOperations(input.artifact, input.recipe)
+        : createPackageOperations(input.artifact, input.recipe);
+  const capabilityMappings = (input.recipe.capabilityMappings ?? [])
+    .map((mapping) => ({
+      capability: mapping.capability,
+      providerSource: mapping.from,
+      destination: mapping.to,
+      destinationSource: mapping.source,
+      operationCount: operations.filter(
+        (operation) =>
+          operation.type === "write-file" &&
+          (operation.target === mapping.to ||
+            operation.target.startsWith(`${mapping.to}/`)),
+      ).length,
+    }))
+    .sort((left, right) => left.capability.localeCompare(right.capability));
   return {
     schemaVersion: 1,
     action: "add",
@@ -62,12 +82,8 @@ export function createInstallPlan(
     recipeIntegrity: hashRecipe(input.recipe),
     verification: security.verification,
     usageHints: input.recipe.usageHints ?? [],
-    operations:
-      mode === "source"
-        ? createFileOperations(input.artifact, input.recipe)
-        : packageBackend === "damat"
-          ? createDamatPackageOperations(input.artifact, input.recipe)
-          : createPackageOperations(input.artifact, input.recipe),
+    operations,
+    capabilityMappings,
     warnings: security.warnings,
   };
 }

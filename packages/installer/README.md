@@ -108,6 +108,11 @@ carry a checksum for every write. Package plans carry immutable package
 references plus declared supporting packages. Plans are serializable and do not
 mutate the project.
 
+`InstallerPlan.capabilityMappings` is sorted by capability and records the
+provider source, resolved override/receiver/fallback destination, destination
+source, and operation count. `damat module plan` prints these entries before
+integration instructions.
+
 Package mode requires `experimentalPackage: true`. The Node backend delegates
 immutable package references to the detected package manager. The Damat alpha
 backend stores self-contained artifacts under `.damat/packages/<id>` and

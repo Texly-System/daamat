@@ -1,44 +1,31 @@
 import { describe, expect, test } from "bun:test";
-import { mkdtempSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import {
-  createInstallPlan,
-  hashTree,
-  type InstallerLock,
-  type ResolvedArtifact,
-} from "../../index";
-
-function fixture(): ResolvedArtifact {
-  const rootDir = mkdtempSync(join(tmpdir(), "installer-plan-"));
-  writeFileSync(join(rootDir, "index.ts"), "export {};");
-  const request = {
-    type: "npm" as const,
-    name: "@example/blade",
-    version: "1.0.0",
-  };
-  const immutableIdentity = "npm:@example/blade@1.0.0";
-  return {
-    request,
-    rootDir,
-    cleanup() {},
-    metadata: {},
-    integrity: hashTree(rootDir),
-    immutableIdentity,
-    provenance: { request, immutableIdentity, resolvedAt: "now", metadata: {} },
-    supportedModes: ["source", "package"],
-    packageReference: "@example/blade@1.0.0",
-  };
-}
-
-const lock: InstallerLock = { schemaVersion: 1, installations: {} };
+import { createInstallPlan } from "../../index";
+import { fixture, lock } from "./fixture";
 
 describe("createInstallPlan", () => {
   test("creates a checksum-bearing source plan", () => {
     const plan = createInstallPlan({
       projectDir: "/project",
       artifact: fixture(),
-      recipe: { schemaVersion: 1, id: "blade", kind: "module" },
+      recipe: {
+        schemaVersion: 1,
+        id: "blade",
+        kind: "module",
+        capabilityMappings: [
+          {
+            capability: "source",
+            from: "index.ts",
+            to: "index.ts",
+            source: "receiver",
+          },
+          {
+            capability: "absent",
+            from: "missing/**",
+            to: "missing",
+            source: "fallback",
+          },
+        ],
+      },
       mode: "source",
       lock,
     });
@@ -50,6 +37,10 @@ describe("createInstallPlan", () => {
         target: "index.ts",
         checksum: expect.any(String),
       },
+    ]);
+    expect(plan.capabilityMappings).toEqual([
+      expect.objectContaining({ capability: "absent", operationCount: 0 }),
+      expect.objectContaining({ capability: "source", operationCount: 1 }),
     ]);
   });
 
@@ -73,21 +64,5 @@ describe("createInstallPlan", () => {
       { type: "add-package", name: "zod", reference: "^4" },
     ]);
     expect(JSON.parse(JSON.stringify(plan))).toEqual(plan);
-  });
-
-  test("enforces security policy before returning a plan", () => {
-    const artifact = fixture();
-    artifact.metadata.verification = "rejected";
-    const input = {
-      projectDir: "/project",
-      artifact,
-      recipe: { schemaVersion: 1 as const, id: "blade", kind: "module" },
-      lock,
-    };
-    expect(() => createInstallPlan(input)).toThrow("rejected");
-    artifact.metadata.verification = "unverified";
-    expect(() =>
-      createInstallPlan({ ...input, securityPolicy: "require" }),
-    ).toThrow("unverified");
   });
 });

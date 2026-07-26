@@ -34,6 +34,20 @@ describe("createProfileRecipe", () => {
       ignore: ["**/*.test.ts"],
       packages: { hono: "^4" },
       usageHints: [{ token: "searchService", targets: ["src/**"] }],
+      capabilityMappings: [
+        {
+          capability: "feature",
+          from: "src/**",
+          source: "fallback",
+          to: "features/search",
+        },
+        {
+          capability: "package",
+          from: "**",
+          source: "fallback",
+          to: "packages/search",
+        },
+      ],
     });
   });
 });

@@ -55,6 +55,15 @@ export function plan(action: InstallerPlan["action"] = "add"): InstallerPlan {
     verification: "verified",
     usageHints: [],
     operations: [],
+    capabilityMappings: [
+      {
+        capability: "module",
+        providerSource: "src/**",
+        destination: "src/modules/billing",
+        destinationSource: "fallback",
+        operationCount: 3,
+      },
+    ],
     warnings: ["check usage"],
   };
 }
