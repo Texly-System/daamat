@@ -1,6 +1,6 @@
 [Damat Guide](../GUIDE.md) › Publishing modules
 
-# 14b. Git-driven registry releases
+# 14.3 Publish modules to a registry
 
 The CLI does not publish modules. Damat distribution is designed around Git
 sources and immutable tags: validate and build a module, push a tag, then let

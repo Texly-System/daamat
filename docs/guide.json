@@ -54,7 +54,7 @@
           "title": "Introduction",
           "slug": "introduction",
           "path": "docs/guide/01-introduction.md",
-          "summary": "What Damat is and the package map."
+          "summary": "Understand Damat's core idea: modular, TypeScript-first backends built from reusable domain blades."
         },
         {
           "id": "concepts",
@@ -62,7 +62,31 @@
           "title": "Concepts and architecture",
           "slug": "concepts",
           "path": "docs/guide/02-concepts.md",
-          "summary": "Modules, durable primitives, PostgreSQL authority, Redis acceleration, pools, and runtime roles."
+          "summary": "Build the mental model for modules, durable work, PostgreSQL truth, Redis acceleration, and runtime role separation."
+        },
+        {
+          "id": "concepts-module-boundaries",
+          "order": 2.05,
+          "title": "Module boundaries and portability",
+          "slug": "concepts-module-boundaries",
+          "path": "docs/guide/02aa-concepts-module-boundaries.md",
+          "summary": "Separate module-owned behavior from host-owned composition and lifecycle policy."
+        },
+        {
+          "id": "concepts-execution-primitives",
+          "order": 2.06,
+          "title": "Execution primitives",
+          "slug": "concepts-execution-primitives",
+          "path": "docs/guide/02ab-concepts-execution-primitives.md",
+          "summary": "Choose among route, workflow, job, event, and pipeline based on durability and restart needs."
+        },
+        {
+          "id": "composition-and-durability-runtime",
+          "order": 2.1,
+          "title": "Composition and durability runtime",
+          "slug": "composition-and-durability-runtime",
+          "path": "docs/guide/02b-composition-and-durability-runtime.md",
+          "summary": "Split durable truth from acceleration, and understand runtime modes and migrations."
         },
         {
           "id": "getting-started",
@@ -70,7 +94,23 @@
           "title": "Getting started",
           "slug": "getting-started",
           "path": "docs/guide/03-getting-started.md",
-          "summary": "Scaffold a backend, collect database credentials, create and migrate PostgreSQL, and understand the project structure."
+          "summary": "Create your first app quickly, provision PostgreSQL, understand generated structure, and run your first endpoint."
+        },
+        {
+          "id": "getting-started-prereqs",
+          "order": 3.1,
+          "title": "Prerequisites and local run",
+          "slug": "getting-started-prereqs",
+          "path": "docs/guide/03a-prerequisites-and-local-run.md",
+          "summary": "Provision local PostgreSQL, optional Redis, and run the initial CLI and app startup flow."
+        },
+        {
+          "id": "getting-started-structure",
+          "order": 3.2,
+          "title": "Project structure walkthrough",
+          "slug": "getting-started-structure",
+          "path": "docs/guide/03b-app-structure.md",
+          "summary": "Understand how app contracts, module folders, and durable artifacts are organized."
         },
         {
           "id": "configuration",
@@ -78,7 +118,39 @@
           "title": "Configuration & environment",
           "slug": "configuration",
           "path": "docs/guide/04-configuration.md",
-          "summary": "damat.config.ts, runtime workers, durability policy, and the environment cascade."
+          "summary": "Learn which knobs control modules, environment loading, worker selection, and policy settings in `damat.config.ts`."
+        },
+        {
+          "id": "configuration-sections",
+          "order": 4.01,
+          "title": "Configuration sections",
+          "slug": "configuration-sections",
+          "path": "docs/guide/04aa-configuration-sections.md",
+          "summary": "Map `projectConfig`, `services`, `modules`, and `providers` to ownership and responsibilities."
+        },
+        {
+          "id": "configuration-env-layers",
+          "order": 4.2,
+          "title": "Environment loading and variables",
+          "slug": "configuration-env-layers",
+          "path": "docs/guide/04a-configuration-environment.md",
+          "summary": "Understand env precedence, required variables, and module env declarations."
+        },
+        {
+          "id": "configuration-runtime-modes",
+          "order": 4.3,
+          "title": "Choosing a runtime role",
+          "slug": "configuration-runtime-modes",
+          "path": "docs/guide/04ab-configuration-runtime-modes.md",
+          "summary": "Choose server, worker, or combined runtime, and understand worker role behavior under restart."
+        },
+        {
+          "id": "runtime-startup",
+          "order": 4.4,
+          "title": "Startup behavior and safety",
+          "slug": "runtime-startup",
+          "path": "docs/guide/04b-runtime-startup.md",
+          "summary": "Learn `runtime.mode`, worker roles, Redis fallback, and startup migration checks."
         }
       ]
     },
@@ -92,7 +164,23 @@
           "title": "Defining models (the ORM DSL)",
           "slug": "models",
           "path": "docs/guide/05-models.md",
-          "summary": "The fluent, type-safe model/columns DSL."
+          "summary": "Compose typed PostgreSQL schemas with fluent columns, relations, indexes, constraints, and migrations-ready model metadata."
+        },
+        {
+          "id": "model-columns-and-types",
+          "order": 5.01,
+          "title": "Model columns and types",
+          "slug": "model-columns-and-types",
+          "path": "docs/guide/05aa-model-columns-and-types.md",
+          "summary": "Use column builders and modifiers to define stable types and defaults without ad-hoc SQL."
+        },
+        {
+          "id": "model-relations-and-indexes",
+          "order": 5.02,
+          "title": "Relations, indexes, and constraints",
+          "slug": "model-relations-and-indexes",
+          "path": "docs/guide/05ab-model-relations-and-indexes.md",
+          "summary": "Use module-local relations and constraints, then isolate cross-module links in app-owned link modules."
         },
         {
           "id": "migrations",
@@ -100,7 +188,23 @@
           "title": "Migrations",
           "slug": "migrations",
           "path": "docs/guide/06-migrations.md",
-          "summary": "The module-aware migration system and the damat-orm CLI."
+          "summary": "Plan schema changes safely across modules with generated snapshot diffs and shared durability/system migrations."
+        },
+        {
+          "id": "app-migrations",
+          "order": 6.01,
+          "title": "App migration workflow",
+          "slug": "app-migrations",
+          "path": "docs/guide/06a-app-migrations.md",
+          "summary": "Run host-owned migration setup, checks, and status commands for safe startup and deploy flow."
+        },
+        {
+          "id": "module-migrations",
+          "order": 6.02,
+          "title": "Standalone module migration workflow",
+          "slug": "module-migrations",
+          "path": "docs/guide/06b-module-migrations.md",
+          "summary": "Use module migration commands in local module context and keep ownership boundaries intact."
         },
         {
           "id": "modules-and-services",
@@ -108,7 +212,7 @@
           "title": "Modules & services",
           "slug": "modules-and-services",
           "path": "docs/guide/07-modules-and-services.md",
-          "summary": "ModuleService auto-CRUD, credentials, and defineModule."
+          "summary": "Turn model definitions into typed domain services, typed credentials, and module entrypoints."
         },
         {
           "id": "crud-reference",
@@ -116,7 +220,23 @@
           "title": "Querying & the CRUD service",
           "slug": "crud-reference",
           "path": "docs/guide/07b-crud-reference.md",
-          "summary": "The generated service methods, where operators, read caching, and transactions."
+          "summary": "Use generated find/write APIs, where-operators, transactions, and optional read-cache/event/logging features."
+        },
+        {
+          "id": "crud-filters",
+          "order": 7.55,
+          "title": "Querying options and filters",
+          "slug": "crud-filters",
+          "path": "docs/guide/07ba-crud-filters.md",
+          "summary": "Master paging, filtering, sorting, and projection for generated service queries."
+        },
+        {
+          "id": "crud-consistency",
+          "order": 7.6,
+          "title": "Transactions and consistency",
+          "slug": "crud-consistency",
+          "path": "docs/guide/07bb-crud-consistency.md",
+          "summary": "Understand transaction scopes, validation, caching, events, and query logging."
         },
         {
           "id": "http-apis",
@@ -124,7 +244,15 @@
           "title": "Building HTTP APIs",
           "slug": "http-apis",
           "path": "docs/guide/08-http-apis.md",
-          "summary": "File-based routing with Hono."
+          "summary": "Design file-based route trees with Hono, typed handlers, validation, and predictable response conventions."
+        },
+        {
+          "id": "http-validation",
+          "order": 8.15,
+          "title": "HTTP validation and composition",
+          "slug": "http-validation",
+          "path": "docs/guide/08ba-http-validation.md",
+          "summary": "Split request validation and route middleware into predictable handler files."
         },
         {
           "id": "authentication",
@@ -132,7 +260,15 @@
           "title": "Authentication",
           "slug": "authentication",
           "path": "docs/guide/08b-authentication.md",
-          "summary": "Bind an auth module for sessions and API keys, then use typed request principals."
+          "summary": "Attach an auth provider, shape request principals, and secure routes with session/API-key based access."
+        },
+        {
+          "id": "authentication-implementation",
+          "order": 8.55,
+          "title": "Authentication implementation",
+          "slug": "authentication-implementation",
+          "path": "docs/guide/08bd-authentication-implementation.md",
+          "summary": "Implement the auth role using provider contracts and explicit route-level enforcement."
         },
         {
           "id": "providers",
@@ -140,7 +276,15 @@
           "title": "Integration providers",
           "slug": "providers",
           "path": "docs/guide/08c-providers.md",
-          "summary": "ModuleService-based auth, payment, subscription, and custom provider standards."
+          "summary": "Adopt provider role contracts (auth/payment/subscription) and expose clean integration seams from modules."
+        },
+        {
+          "id": "provider-implementation",
+          "order": 8.65,
+          "title": "Provider implementation and integration",
+          "slug": "provider-implementation",
+          "path": "docs/guide/08d-provider-implementation.md",
+          "summary": "Implement payment and subscription-like providers with typed role methods and explicit module binding."
         },
         {
           "id": "workflows",
@@ -148,23 +292,111 @@
           "title": "Workflows (the saga engine)",
           "slug": "workflows",
           "path": "docs/guide/09-workflows.md",
-          "summary": "Steps with compensation and saga orchestration on Effect-TS."
+          "summary": "Orchestrate local, compensable business steps with retries and timeouts while one process remains alive."
+        },
+        {
+          "id": "workflow-implementation",
+          "order": 9.01,
+          "title": "Implement a workflow",
+          "slug": "workflow-implementation",
+          "path": "docs/guide/09a-workflow-implementation.md",
+          "summary": "Build typed steps, compensation payloads, and a composed in-process saga."
+        },
+        {
+          "id": "workflows-reliability",
+          "order": 9.1,
+          "title": "Workflow reliability and errors",
+          "slug": "workflows-reliability",
+          "path": "docs/guide/09b-workflows-reliability.md",
+          "summary": "Tune retries, timeouts, lock scope, and failure interpretation."
         },
         {
           "id": "redis",
-          "order": 10,
-          "title": "Redis: cache, queue, locks, rate limiting",
+          "order": 10.1,
+          "title": "Redis acceleration and utilities",
           "slug": "redis",
           "path": "docs/guide/10-redis.md",
-          "summary": "Batteries-included Redis helpers."
+          "summary": "Add optional acceleration for cache, liveness, pub/sub, locks, sessions, and rate limiting without changing durability semantics."
+        },
+        {
+          "id": "redis-cache-rate-limits",
+          "order": 10.2,
+          "title": "Cache and rate limits",
+          "slug": "redis-cache-rate-limits",
+          "path": "docs/guide/10aa-redis-cache-and-rate-limits.md",
+          "summary": "Use typed cache helpers, tag-based invalidation, and Redis-based per-identity request limits."
+        },
+        {
+          "id": "redis-locks-queues-sessions",
+          "order": 10.3,
+          "title": "Locks, queues, and sessions",
+          "slug": "redis-locks-queues-sessions",
+          "path": "docs/guide/10ab-redis-locks-and-queues.md",
+          "summary": "Protect critical sections and ephemeral queue patterns while keeping jobs/events durable in PostgreSQL."
         },
         {
           "id": "events-and-jobs",
           "order": 10.5,
-          "title": "Events & background jobs",
+          "title": "Events and background jobs",
           "slug": "events-and-jobs",
           "path": "docs/guide/10b-events-and-jobs.md",
-          "summary": "Typed events and PostgreSQL-backed jobs with retries, recovery, inspection, and optional Redis wake-ups."
+          "summary": "Build retryable async work and per-consumer event delivery with PostgreSQL-first persistence and observability."
+        },
+        {
+          "id": "events-and-jobs-runtime",
+          "order": 10.55,
+          "title": "Define jobs and durable events",
+          "slug": "events-and-jobs-runtime",
+          "path": "docs/guide/10ba-jobs-and-workers-runtime.md",
+          "summary": "Define durable jobs/events, enable capabilities, and wire request-level transaction context."
+        },
+        {
+          "id": "publish-durable-work",
+          "order": 10.56,
+          "title": "Publish durable work atomically",
+          "slug": "publish-durable-work",
+          "path": "docs/guide/10baa-publish-durable-work.md",
+          "summary": "Queue jobs and publish durable events with transaction alignment and idempotency metadata."
+        },
+        {
+          "id": "jobs-observability",
+          "order": 10.57,
+          "title": "Inspect and recover durable work",
+          "slug": "jobs-observability",
+          "path": "docs/guide/10bb-events-jobs-observability.md",
+          "summary": "Inspect failed work, retry safely, and understand operational semantics under Redis fallback."
+        },
+        {
+          "id": "durable-pipelines",
+          "order": 10.6,
+          "title": "Durable pipelines",
+          "slug": "durable-pipelines",
+          "path": "docs/guide/10c-pipelines.md",
+          "summary": "Persisted orchestration for restart-safe process flows with waits, branches, signals, and durable stage state."
+        },
+        {
+          "id": "pipeline-definition",
+          "order": 10.7,
+          "title": "Define a pipeline",
+          "slug": "pipeline-definition",
+          "path": "docs/guide/10d-pipeline-definition.md",
+          "summary": "Design node graphs with typed payload wiring, branches, loops, child pipelines, and resilient start/signal flows."
+        },
+        {
+          "id": "pipeline-runtime-and-signals",
+          "order": 10.75,
+          "title": "Start and signal a pipeline run",
+          "slug": "pipeline-runtime-and-signals",
+          "path": "docs/guide/10da-pipeline-runtime-and-signals.md",
+          "summary": "Start pipeline runs and send durable signals with actor, reason, and idempotency context."
+        },
+        {
+          "id": "pipeline-operations",
+          "order": 10.8,
+          "title": "Configure and operate pipelines",
+          "slug": "pipeline-operations",
+          "path": "docs/guide/10e-pipeline-operations.md",
+          "summary": "Configure workers, signals, migration readiness, retention, and production-safe fallback behavior."
         },
         {
           "id": "logging",
@@ -172,7 +404,7 @@
           "title": "Logging",
           "slug": "logging",
           "path": "docs/guide/11-logging.md",
-          "summary": "Structured logging with levels, formats, and file transport."
+          "summary": "Tune structured logs and outputs for local debugging, production diagnostics, and operational diagnostics."
         },
         {
           "id": "default-backend",
@@ -180,7 +412,7 @@
           "title": "The default backend, end to end",
           "slug": "default-backend",
           "path": "docs/guide/12-default-backend.md",
-          "summary": "The reference app as a worked example."
+          "summary": "Follow the reference app end-to-end to map every subsystem to a real project structure."
         }
       ]
     },
@@ -194,7 +426,23 @@
           "title": "Authoring a module",
           "slug": "authoring-modules",
           "path": "docs/guide/13-authoring-modules.md",
-          "summary": "Build one self-contained, single-purpose module (the blade) and test it in isolation."
+          "summary": "Design a single-purpose module with models, config, migrations, tests, and install-ready contracts."
+        },
+        {
+          "id": "module-service-and-layering",
+          "order": 13.1,
+          "title": "Module service and layering",
+          "slug": "module-service-and-layering",
+          "path": "docs/guide/13b-module-service-and-layering.md",
+          "summary": "Keep service boundaries strict from route to generated accessor, and stay portable."
+        },
+        {
+          "id": "module-testing-and-publishing",
+          "order": 13.2,
+          "title": "Test and prepare a module",
+          "slug": "module-testing-and-publishing",
+          "path": "docs/guide/13c-module-testing-and-publishing.md",
+          "summary": "Validate module behavior, publish safely, and keep install notes accurate."
         },
         {
           "id": "installing-modules",
@@ -202,15 +450,31 @@
           "title": "Installing existing modules",
           "slug": "installing-modules",
           "path": "docs/guide/14-installing-modules.md",
-          "summary": "damat module add / remove / update from a registry ref, path, or git."
+          "summary": "Learn module installation workflows across registry refs, local paths, and git sources."
+        },
+        {
+          "id": "module-install-flow",
+          "order": 14.1,
+          "title": "Plan and integrate an install",
+          "slug": "module-install-flow",
+          "path": "docs/guide/14aa-module-install-flow.md",
+          "summary": "Plan install targets, run module plan/add flows, and wire host-owned capabilities manually."
+        },
+        {
+          "id": "module-package-lifecycle",
+          "order": 14.2,
+          "title": "Source, package, and lifecycle",
+          "slug": "module-package-lifecycle",
+          "path": "docs/guide/14ab-module-package-lifecycle.md",
+          "summary": "Use package mode safely, review trust metadata, and update/remove modules cleanly."
         },
         {
           "id": "publishing-modules",
-          "order": 14.5,
-          "title": "Publishing modules",
+          "order": 14.3,
+          "title": "Publish modules to a registry",
           "slug": "publishing-modules",
           "path": "docs/guide/14b-publishing-modules.md",
-          "summary": "List a module in a registry — damat module publish, verification, running your own registry."
+          "summary": "Publish modules safely with verification, release metadata, and optional self-hosted registries."
         },
         {
           "id": "installing-modules-with-ai",
@@ -218,7 +482,7 @@
           "title": "Installing modules with AI (MCP)",
           "slug": "installing-modules-with-ai",
           "path": "docs/guide/15-installing-modules-with-ai.md",
-          "summary": "Discover and install modules through the MCP server."
+          "summary": "Use the MCP server to discover, inspect, and install modules with reduced command context."
         },
         {
           "id": "module-capabilities",
@@ -226,7 +490,23 @@
           "title": "Module capabilities",
           "slug": "module-capabilities",
           "path": "docs/guide/16-module-capabilities.md",
-          "summary": "Everything one module can do — the full model/service/config/migration/codegen/workflow/test/packaging surface."
+          "summary": "Understand the full capability surface: schema generation, migrations, workflows, orchestration, tests, and packaging."
+        },
+        {
+          "id": "provider-capabilities",
+          "order": 16.1,
+          "title": "Durable module capabilities",
+          "slug": "provider-capabilities",
+          "path": "docs/guide/16b-provider-capabilities.md",
+          "summary": "Map module capability families and choose stable boundaries for jobs, events, and pipelines."
+        },
+        {
+          "id": "capabilities-installation-and-runtime",
+          "order": 16.2,
+          "title": "Installation and runtime ownership",
+          "slug": "capabilities-installation-and-runtime",
+          "path": "docs/guide/16c-capabilities-installation-and-runtime.md",
+          "summary": "Align installer intent, transaction context, and runtime policy with host-owned behavior."
         },
         {
           "id": "composing-and-linking-modules",
@@ -234,7 +514,23 @@
           "title": "Composing & linking modules",
           "slug": "composing-and-linking-modules",
           "path": "docs/guide/17-composing-and-linking-modules.md",
-          "summary": "The backend owner's job: getModule, cross-module links, pairsWith hints, and wiring modules into the app."
+          "summary": "Compose a backend from independent modules using links, `getModule`, registration, and explicit wiring."
+        },
+        {
+          "id": "link-model-design",
+          "order": 17.1,
+          "title": "Design an app-owned link",
+          "slug": "link-model-design",
+          "path": "docs/guide/17b-link-model-design.md",
+          "summary": "Define app-owned cross-module relations with explicit link endpoints and ownership."
+        },
+        {
+          "id": "link-runtime-and-activation",
+          "order": 17.2,
+          "title": "Activate and query links",
+          "slug": "link-runtime-and-activation",
+          "path": "docs/guide/17c-link-runtime-and-activation.md",
+          "summary": "Run migrations, query linked graph fields, and manage dormant shipped links safely."
         }
       ]
     },
@@ -248,7 +544,7 @@
           "title": "CLI reference",
           "slug": "cli-reference",
           "path": "docs/guide/18-cli-reference.md",
-          "summary": "damat and damat-orm."
+          "summary": "Find exact commands for backend workflows: create, migrate, dev loops, install, build, and inspect."
         },
         {
           "id": "deployment",
@@ -256,7 +552,15 @@
           "title": "Deployment",
           "slug": "deployment",
           "path": "docs/guide/19-deployment.md",
-          "summary": "Docker and production release flow."
+          "summary": "Deploy confidently with explicit migration jobs, stable runtime roles, and process-mode guardrails."
+        },
+        {
+          "id": "deployment-platforms",
+          "order": 19.1,
+          "title": "Containers, health, and rollback",
+          "slug": "deployment-platforms",
+          "path": "docs/guide/19b-deployment-platforms.md",
+          "summary": "Split deployment into release, container, and rollback safety paths."
         },
         {
           "id": "package-reference",
@@ -264,7 +568,7 @@
           "title": "Package reference",
           "slug": "package-reference",
           "path": "docs/guide/20-package-reference.md",
-          "summary": "Links to every package's README and internals."
+          "summary": "Jump straight to package APIs and internal docs from the same navigation tree as the guide."
         },
         {
           "id": "troubleshooting",
@@ -272,7 +576,23 @@
           "title": "Troubleshooting",
           "slug": "troubleshooting",
           "path": "docs/guide/21-troubleshooting.md",
-          "summary": "Common symptoms and fixes."
+          "summary": "Resolve startup, runtime, migration, and durability issues quickly with symptom-first checklists."
+        },
+        {
+          "id": "troubleshooting-runtime",
+          "order": 21.1,
+          "title": "Runtime and durability faults",
+          "slug": "troubleshooting-runtime",
+          "path": "docs/guide/21b-troubleshooting-runtime.md",
+          "summary": "Diagnose pipeline, jobs, events, Redis, and startup signal issues."
+        },
+        {
+          "id": "troubleshooting-tooling",
+          "order": 21.2,
+          "title": "Tooling and build faults",
+          "slug": "troubleshooting-tooling",
+          "path": "docs/guide/21c-troubleshooting-tooling.md",
+          "summary": "Resolve module, MCP, and toolchain issues with command-first diagnostics."
         }
       ]
     }
@@ -334,9 +654,7 @@
           "dir": "packages/module-generator",
           "readme": "packages/module-generator/README.md",
           "docsIndex": "packages/module-generator/docs/README.md",
-          "docs": [
-            "packages/module-generator/docs/README.md"
-          ]
+          "docs": ["packages/module-generator/docs/README.md"]
         },
         {
           "name": "@damatjs/link",
@@ -344,9 +662,7 @@
           "dir": "packages/link",
           "readme": "packages/link/README.md",
           "docsIndex": "packages/link/docs/README.md",
-          "docs": [
-            "packages/link/docs/README.md"
-          ]
+          "docs": ["packages/link/docs/README.md"]
         },
         {
           "name": "@damatjs/workflow-engine",
@@ -530,9 +846,7 @@
           "dir": "packages/core/events",
           "readme": "packages/core/events/README.md",
           "docsIndex": "packages/core/events/docs/README.md",
-          "docs": [
-            "packages/core/events/docs/README.md"
-          ]
+          "docs": ["packages/core/events/docs/README.md"]
         },
         {
           "name": "@damatjs/jobs",
@@ -540,9 +854,7 @@
           "dir": "packages/core/jobs",
           "readme": "packages/core/jobs/README.md",
           "docsIndex": "packages/core/jobs/docs/README.md",
-          "docs": [
-            "packages/core/jobs/docs/README.md"
-          ]
+          "docs": ["packages/core/jobs/docs/README.md"]
         },
         {
           "name": "@damatjs/load-env",
@@ -651,9 +963,7 @@
           "dir": "packages/cli/damat",
           "readme": "packages/cli/damat/README.md",
           "docsIndex": "packages/cli/damat/docs/README.md",
-          "docs": [
-            "packages/cli/damat/docs/README.md"
-          ]
+          "docs": ["packages/cli/damat/docs/README.md"]
         },
         {
           "name": "@damatjs/cli-codegen",
@@ -661,9 +971,7 @@
           "dir": "packages/cli/codegen",
           "readme": "packages/cli/codegen/README.md",
           "docsIndex": "packages/cli/codegen/docs/README.md",
-          "docs": [
-            "packages/cli/codegen/docs/README.md"
-          ]
+          "docs": ["packages/cli/codegen/docs/README.md"]
         },
         {
           "name": "@damatjs/orm-cli",
@@ -684,9 +992,7 @@
           "dir": "packages/mcp",
           "readme": "packages/mcp/README.md",
           "docsIndex": "packages/mcp/docs/README.md",
-          "docs": [
-            "packages/mcp/docs/README.md"
-          ]
+          "docs": ["packages/mcp/docs/README.md"]
         }
       ]
     }

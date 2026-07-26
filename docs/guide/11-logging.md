@@ -77,5 +77,5 @@ and `skip`.
 
 ---
 
-Prev: [← Durable pipelines](./10c-pipelines.md) · [Guide home](../GUIDE.md) ·
+Prev: [← Pipeline operations](./10e-pipeline-operations.md) · [Guide home](../GUIDE.md) ·
 Next: [The default backend →](./12-default-backend.md)

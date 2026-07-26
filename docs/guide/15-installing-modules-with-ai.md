@@ -66,7 +66,7 @@ Just ask: _"Find a Damat auth module and install it."_ The assistant chains
 and reminds you to review the wiring and apply migrations:
 
 ```bash
-bun damat-orm migrate:up
+bun run db:migrate
 ```
 
 To extend the server with your own tools, see the

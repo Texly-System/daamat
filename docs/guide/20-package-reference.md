@@ -56,4 +56,4 @@ selected runtime roles.
 
 ---
 
-Prev: [← Deployment](./19-deployment.md) · [Guide home](../GUIDE.md) · Next: [Troubleshooting →](./21-troubleshooting.md)
+Prev: [← Deployment](./19b-deployment-platforms.md) · [Guide home](../GUIDE.md) · Next: [Troubleshooting →](./21-troubleshooting.md)

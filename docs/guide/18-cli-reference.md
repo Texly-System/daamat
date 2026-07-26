@@ -71,4 +71,4 @@ bunx @damatjs/damat-cli@latest module init my-mod   # module + .env + install + 
 
 ---
 
-Prev: [← Composing & linking modules](./17-composing-and-linking-modules.md) · [Guide home](../GUIDE.md) · Next: [Deployment →](./19-deployment.md)
+Prev: [← Link runtime and activation](./17c-link-runtime-and-activation.md) · [Guide home](../GUIDE.md) · Next: [Deployment →](./19-deployment.md)
