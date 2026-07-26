@@ -14,7 +14,11 @@ async function runHandler(
   options: ShutdownRunOptions,
 ): Promise<void> {
   const task = Promise.resolve().then(item.handler);
-  if (item.phase !== "drain" || options.graceMs === undefined) return task;
+  if (
+    (item.phase !== "drain" && item.phase !== "http") ||
+    options.graceMs === undefined
+  )
+    return task;
   let timer: ReturnType<typeof setTimeout>;
   const timeout = new Promise<never>((_, reject) => {
     timer = setTimeout(

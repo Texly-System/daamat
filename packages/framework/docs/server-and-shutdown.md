@@ -60,8 +60,9 @@ Use `registerShutdown(registration)` to append a handler.
 
 Handlers within one phase run concurrently with `Promise.allSettled`. Each
 failure is logged with its handler and phase, and later handlers and phases
-still run. A drain timeout rejects only that registration; leased work remains
-recoverable by another worker after expiry.
+still run. HTTP close and drain are each bounded by `graceMs`; an HTTP timeout is
+logged while claims, drain, heartbeat, bindings, Redis, durability, PostgreSQL,
+and logger cleanup continue. Leased work remains recoverable after expiry.
 
 `JobWorker.stop` and `DurableEventWorker.stop` already stage claim shutdown,
 graceful drain, and heartbeat/reconciliation cleanup internally. The framework
@@ -84,6 +85,8 @@ recovery across that overlap.
 `runtime.shutdownGraceMs` accepts 0 through 2,147,483,647 milliseconds. Invalid
 values fail before services start. Zero requests immediate drain timeout/worker
 abort while retaining lease-based recovery.
+Assembled apps default to 30 seconds when omitted. The standalone module runtime
+keeps its explicit five-second development override.
 
 ## Registrations created by the framework
 

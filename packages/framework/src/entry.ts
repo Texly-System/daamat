@@ -35,16 +35,15 @@ export async function start(
   const dependencies = { ...defaultDependencies, ...overrides };
   const config = await dependencies.loadConfigAsync(cwd);
   const runtime = resolveRuntime(config, environment);
-  const graceMs = resolveShutdownGraceMs(config.runtime?.shutdownGraceMs);
+  const graceMs = resolveShutdownGraceMs(
+    config.runtime?.shutdownGraceMs ?? 30_000,
+  )!;
   const logger = dependencies.initLogger(config.projectConfig.loggerConfig);
   await config.hooks?.beforeServices?.({
     config: config.projectConfig,
     logger,
   });
-  dependencies.setupShutdownHandlers(
-    logger,
-    graceMs === undefined ? {} : { graceMs },
-  );
+  dependencies.setupShutdownHandlers(logger, { graceMs });
   await startResolvedRuntime(runtime, {
     initialize: async (resolvedRuntime) => {
       const services = await dependencies.initializeServices(

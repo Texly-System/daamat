@@ -33,7 +33,10 @@ function runHandler(
   options: ShutdownRunOptions,
 ): Promise<void> {
   const task = Promise.resolve().then(registration.handler);
-  if (registration.phase !== "drain" || options.graceMs === undefined) {
+  if (
+    (registration.phase !== "drain" && registration.phase !== "http") ||
+    options.graceMs === undefined
+  ) {
     return task;
   }
   return withTimeout(task, options.graceMs);
