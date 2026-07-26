@@ -1,5 +1,16 @@
 # @damatjs/orm-processor
 
+## 1.0.4
+
+### Patch Changes
+
+- Harden intent idempotency, migration integrity, sensitive logging, HTTP and CLI contracts, module lifecycle behavior, exact numeric codegen, and install-plan observability.
+- Updated dependencies
+  - @damatjs/orm-model@1.0.4
+  - @damatjs/orm-type@1.0.4
+  - @damatjs/deps@1.0.4
+  - @damatjs/types@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes

@@ -22,14 +22,14 @@ your target version.
 All active Damat packages are released **in lockstep** — a release moves every
 published package to the same version, whether or not its own code changed.
 
-**Current source version: `1.0.3`** for every active public package.
+**Current source version: `1.0.4`** for every active public package.
 `@damatjs/codegen` is archived at its last npm release, `2.1.0`, and is not part
 of the workspace or active publication set.
 
-Version 1.0.3 is the coordinated corrective release for 1.0.2. It regenerates
-and verifies the Bun workspace lock before packing, validates every packed
-internal runtime dependency, and installs the tarballs into a clean consumer as
-part of the release gate.
+Version 1.0.4 is a coordinated integrity release. It adds canonical intent
+fingerprints for durable work, strengthens migration tracking and schema SQL,
+redacts sensitive logs by default, and tightens HTTP, CLI, harness, and shutdown
+contracts.
 
 A package's folder only carries a `<version>.md` (and a detailed index row) for
 versions where _its own_ code changed; for a lockstep bump with no change of its
@@ -124,6 +124,7 @@ snake_case tables ([`orm-pg`](./orm-pg/0.4.1.md),
 - [`types`](./types/) — `@damatjs/types`
 - [`cli`](./cli/) — `@damatjs/cli`
 - [`deps`](./deps/) — `@damatjs/deps`
+- [`registry-client`](./registry-client/) — `@damatjs/registry-client`
 - [`typescript-config`](./typescript-config/) — `@damatjs/typescript-config`
 
 ### Providers

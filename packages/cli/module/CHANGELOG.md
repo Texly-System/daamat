@@ -1,5 +1,19 @@
 # @damatjs/cli-module
 
+## 1.0.4
+
+### Patch Changes
+
+- Harden intent idempotency, migration integrity, sensitive logging, HTTP and CLI contracts, module lifecycle behavior, exact numeric codegen, and install-plan observability.
+- Updated dependencies
+  - @damatjs/cli@1.0.4
+  - @damatjs/framework@1.0.4
+  - @damatjs/installer@1.0.4
+  - @damatjs/module@1.0.4
+  - @damatjs/orm-cli@1.0.4
+  - @damatjs/cli-support@1.0.4
+  - @damatjs/load-env@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes

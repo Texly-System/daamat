@@ -1,5 +1,16 @@
 # @damatjs/module-generator
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @damatjs/orm-migration@1.0.4
+  - @damatjs/orm-model@1.0.4
+  - @damatjs/orm-type@1.0.4
+  - @damatjs/schema-codegen@1.0.4
+  - @damatjs/logger@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes

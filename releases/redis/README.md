@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                                                                             | Upgrade notes         |
 | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4         | Lockstep maintenance and dependency synchronization                                                                                                                 | —                     |
 | 1.0.0         | Redis ACL channel contract for durability acceleration                                                                                                              | [next →](./1.0.0.md)  |
 | 0.6.0         | `SCAN`-based pattern deletion, atomic Lua rate-limit/dequeue scripts, TTL only on first counter increment, capped queue terminal sets (`RedisQueueOptions`)         | [0.6.0 →](./0.6.0.md) |
 | 0.1.4 – 0.5.0 | Lockstep bumps — no change to this package's own behavior                                                                                                           | —                     |

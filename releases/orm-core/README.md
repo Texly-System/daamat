@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version | Summary                                                                                                                                         | Upgrade notes         |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4   | Query logging redacts parameters by default and exposes explicit opt-in logging                                                                  | [1.0.4 →](./1.0.4.md) |
 | 0.1.3   | Dependency / version-sync bump — picks up the cross-module links work in `@damatjs/link`; this package's own code is unchanged                  | —                     |
 | 0.1.2   | Dependency / version-sync bump — the table-name relation support landed in `@damatjs/orm-model`, not here; this package's own code is unchanged | —                     |
 | 0.1.1   | Maintenance — CI and test cleanup, dependency bumps                                                                                             | —                     |

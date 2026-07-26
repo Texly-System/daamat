@@ -6,4 +6,5 @@ Change history for this package. For how it works **now**, read the
 
 | Version | Summary                                  | Upgrade notes        |
 | ------- | ---------------------------------------- | -------------------- |
+| 1.0.4   | Lockstep maintenance bump                | —                    |
 | 1.0.0   | Damat module generation package baseline | [next →](./1.0.0.md) |

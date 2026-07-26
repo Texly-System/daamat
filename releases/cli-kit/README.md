@@ -5,4 +5,5 @@ Current behavior is documented in the
 
 | Version | Summary                            | Upgrade notes           |
 | ------- | ---------------------------------- | ----------------------- |
+| 1.0.4   | Lockstep maintenance bump          | —                       |
 | 1.0.0   | Independent generic kit capability | [Details →](./1.0.0.md) |

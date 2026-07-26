@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                                                                                                                   | Upgrade notes         |
 | ------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4         | Lockstep maintenance and dependency synchronization                                                                                                                                                       | —                     |
 | 1.0.2         | Bare refs resolve one unique namespaced registry entry and report ambiguity                                                                                                                               | [1.0.2 →](./1.0.2.md) |
 | 1.0.0         | MCP tools read `damat.lock.json` and expose the current transactional install/update/remove contract                                                                                                      | [next →](./1.0.0.md)  |
 | 0.6.0         | `add_module` exposes the CLI security gates (`allowUnverified`, `allowScripts`); flags forwarded only when explicitly true                                                                                | [0.6.0 →](./0.6.0.md) |

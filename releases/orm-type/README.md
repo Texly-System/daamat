@@ -11,6 +11,7 @@ are marked inline below with no link.
 
 | Version | Summary                                                                                                                                                                                    | Upgrade notes         |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| 1.0.4   | Schema contracts carry exact numeric representation, table schemas, and integrity constraints                                                                                              | [1.0.4 →](./1.0.4.md) |
 | 1.0.0   | Optional resolved runtime paths, package metadata, and active pool stats                                                                                                                   | [next →](./1.0.0.md)  |
 | 0.1.3   | `OrmModule` gains an optional `kind?: "module" \| "link"` field so the toolchain can tell a cross-module link directory from an ordinary module (cross-module links work); dependency bump | [0.1.3 →](./0.1.3.md) |
 | 0.1.2   | Dependency bump (`@damatjs/deps`) — picks up table-name `hasOne`/`belongsTo` relation work in higher packages; no change to this package's type surface                                    | —                     |

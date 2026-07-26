@@ -2,5 +2,6 @@
 
 | Version | Summary                                                                                             | Upgrade notes       |
 | ------- | --------------------------------------------------------------------------------------------------- | ------------------- |
+| 1.0.4   | Module plans report deterministic capability source-to-destination mappings                          | [1.0.4 →](./1.0.4.md) |
 | 1.0.2   | Observable module dev, PTY-safe shutdown, global verbose diagnostics, and local build type-checking | [1.0.2](./1.0.2.md) |
 | 1.0.0   | Module capabilities and standalone PostgreSQL bootstrap                                             | [next](./1.0.0.md)  |

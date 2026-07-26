@@ -6,5 +6,6 @@ Change history for this package. For current behavior, read the
 
 | Version | Summary                                                     | Upgrade notes         |
 | ------- | ----------------------------------------------------------- | --------------------- |
+| 1.0.4   | Job deduplication verifies canonical enqueue intent         | [1.0.4 →](./1.0.4.md) |
 | 1.0.2   | Database-time-relative job enqueue scheduling               | [1.0.2 →](./1.0.2.md) |
 | 1.0.0   | Durable job storage, fenced workers, and hardened lifecycle | [next →](./1.0.0.md)  |

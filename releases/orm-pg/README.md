@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                                                                                                         | Upgrade notes         |
 | ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4         | Lockstep maintenance and dependency synchronization                                                                                                                                             | —                     |
 | 0.6.0         | `ORDER BY` direction and nulls placement validated against whitelists before SQL interpolation                                                                                                  | [0.6.0 →](./0.6.0.md) |
 | 0.5.0         | Lockstep bump with the 0.5.0 codebase audit — no change to this package's own API                                                                                                               | —                     |
 | 0.4.1         | `getRepository` falls back to table-name lookup — cascade deletes work on snake_case tables                                                                                                     | [0.4.1 →](./0.4.1.md) |

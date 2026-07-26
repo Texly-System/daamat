@@ -6,4 +6,5 @@ Change history for this package. For current behavior, read the
 
 | Version | Summary                                                | Upgrade notes           |
 | ------- | ------------------------------------------------------ | ----------------------- |
+| 1.0.4   | Install plans expose deterministic capability mappings | [1.0.4 →](./1.0.4.md)   |
 | 1.0.0   | Transactional installer plus module runtime resolution | [Details →](./1.0.0.md) |

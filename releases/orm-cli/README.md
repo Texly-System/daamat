@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                    | Upgrade notes         |
 | ------------- | ---------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4         | Adds audited `migrate:adopt` recovery for committed non-transactional migrations                           | [1.0.4 →](./1.0.4.md) |
 | 1.0.2         | Config bundling preserves optional `pg-cloudflare` dependency semantics                                    | [1.0.2 →](./1.0.2.md) |
 | 1.0.0         | PostgreSQL creation plus durability, jobs, events, and pipeline migrations                                 | [next →](./1.0.0.md)  |
 | 0.6.0         | `migrate:status` passes full module descriptors — status tracked by module name, discovery by resolve path | [0.6.0 →](./0.6.0.md) |

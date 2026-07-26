@@ -1,5 +1,15 @@
 # @damatjs/cli-app
 
+## 1.0.4
+
+### Patch Changes
+
+- Updated dependencies
+  - @damatjs/cli@1.0.4
+  - @damatjs/framework@1.0.4
+  - @damatjs/cli-support@1.0.4
+  - @damatjs/load-env@1.0.4
+
 ## 1.0.3
 
 ### Patch Changes

@@ -12,6 +12,7 @@ own code or behavior.
 
 | Version | Summary                                                                                              | Upgrade notes         |
 | ------- | ---------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4   | Lockstep maintenance and dependency synchronization                                                  | —                     |
 | 0.1.3   | Version sync with the cross-module links release (`@damatjs/link`); no change to this package's code | —                     |
 | 0.1.2   | Version sync with relation-by-table-name work in the ORM; no change to this package's code           | —                     |
 | 0.1.1   | Maintenance — CI/test cleanup, version bump                                                          | —                     |

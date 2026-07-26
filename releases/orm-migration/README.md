@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                                                                                            | Upgrade notes         |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4         | Same-session transactional tracking, source checksums, and audited adoption for untracked commits                                                                                  | [1.0.4 →](./1.0.4.md) |
 | 1.0.0         | Resolved package migrations plus ordered inline system migrations                                                                                                                  | [next →](./1.0.0.md)  |
 | 0.6.0         | Advisory-lock serialization of concurrent runs, non-transactional execution for `CONCURRENTLY`/`ADD VALUE` statements, status API keyed by module name                             | [0.6.0 →](./0.6.0.md) |
 | 0.5.0         | Per-module discovery sorts numerically by timestamp (matches all-module discovery) — consistent migration order across entry points                                                | [0.5.0 →](./0.5.0.md) |

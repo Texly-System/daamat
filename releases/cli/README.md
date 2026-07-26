@@ -10,6 +10,7 @@ and `@damatjs/orm-cli` are built on — it is not the `damat` command itself.
 
 | Version | Summary                                                                                                                                         | Upgrade notes         |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4   | Strict nested help and option parsing, including literal arguments after `--`                                                                    | [1.0.4 →](./1.0.4.md) |
 | 1.0.3   | Verbose handled errors contain one summary followed by one stack                                                                                | [1.0.3 →](./1.0.3.md) |
 | 1.0.2   | Global verbose options are consumed before leaf, default, and parent/child dispatch                                                             | [1.0.2 →](./1.0.2.md) |
 | 1.0.0   | Framework-neutral runtime injection, invocation-local state, returned results, and opt-in presentation                                          | [1.0.0 →](./1.0.0.md) |

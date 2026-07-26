@@ -14,6 +14,7 @@ with no link.
 
 | Version | Summary                                                                                                                                             | Upgrade notes         |
 | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.4   | Umbrella exports include exact numeric metadata and integrity-safe migration behavior                                                               | [1.0.4 →](./1.0.4.md) |
 | 0.1.3   | Dependency bump — re-exports the cross-module links work (`@damatjs/link`) landing in the ORM sub-packages; no change to the umbrella's own surface | —                     |
 | 0.1.2   | Dependency bump — re-exports table-name `hasOne`/`belongsTo` relations; no umbrella surface change                                                  | —                     |
 | 0.1.1   | Maintenance — CI / test cleanup, dependency bumps                                                                                                   | —                     |
