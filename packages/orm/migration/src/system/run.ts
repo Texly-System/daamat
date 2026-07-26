@@ -2,6 +2,7 @@ import type { Pool } from "@damatjs/deps/pg";
 import type { SystemMigration } from "@damatjs/durability";
 import type { ModuleMigrationResult } from "../types";
 import type { MigrationTracker } from "../tracker";
+import { migrationChecksum } from "../executor/checksum";
 
 export interface MigrationRunOptions {
   systemMigrations?: readonly SystemMigration[];
@@ -22,6 +23,7 @@ async function executeSystemMigration(
       migration.id,
       Date.now() - started,
       client,
+      migrationChecksum(migration.sql),
     );
     await client.query("COMMIT");
   } catch (cause) {

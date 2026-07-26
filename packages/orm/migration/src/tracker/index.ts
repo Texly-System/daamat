@@ -5,42 +5,21 @@ import type { AppliedMigration } from "./types";
 
 export type { AppliedMigration } from "./types";
 
-/**
- * Migration tracking table operations.
- *
- * Manages a `_damat_migration_logs` table to track which migrations
- * have been applied and reverted for each module.
- *
- * @example
- * ```typescript
- * const tracker = new MigrationTracker(pool);
- * await tracker.ensureTable();
- *
- * const applied = await tracker.getApplied('user');
- * await tracker.recordApplied('user', 'Migration20260316_Initial', 150);
- * await tracker.recordReverted('user', 'Migration20260316_Initial');
- * ```
- */
+/** Migration tracking table operations. */
 export class MigrationTracker {
   constructor(private executor: DurabilityExecutor) {}
 
-  /**
-   * Ensure the migration tracking table exists.
-   * Creates the table and indexes if they don't exist.
-   */
+  /** Ensure the migration tracking table exists. */
   async ensureTable(): Promise<void> {
     await this.executor.query(MIGRATION_TRACKER_SCHEMA);
   }
 
-  /**
-   * Get applied migrations for a module (or all modules).
-   *
-   * @param moduleName - Optional module name to filter by
-   */
+  /** Get applied migrations for a module, or for all modules. */
   async getApplied(moduleName?: string): Promise<AppliedMigration[]> {
     if (moduleName) {
       const res = await this.executor.query<AppliedMigration>(
-        `SELECT module, name, applied_at
+        `SELECT module, name, applied_at, checksum, adopted_at,
+                        adoption_actor, adoption_reason
                  FROM "${MIGRATION_TRACKER_TABLE}"
                  WHERE status = 'applied' AND module = $1
                  ORDER BY applied_at ASC`,
@@ -50,7 +29,8 @@ export class MigrationTracker {
     }
 
     const res = await this.executor.query<AppliedMigration>(
-      `SELECT module, name, applied_at
+      `SELECT module, name, applied_at, checksum, adopted_at,
+                      adoption_actor, adoption_reason
              FROM "${MIGRATION_TRACKER_TABLE}"
              WHERE status = 'applied'
              ORDER BY applied_at ASC`,
@@ -66,19 +46,41 @@ export class MigrationTracker {
     name: string,
     executionTimeMs: number,
     executor: DurabilityExecutor = this.executor,
+    checksum?: string,
   ): Promise<void> {
     // Conflict resolution targets UNIQUE(module, name), never the `id` PK, so
     // an id collision between two distinct (module, name) pairs can't clobber.
     await executor.query(
-      `INSERT INTO "_damat_migration_logs" (id, module, name, execution_time_ms, status)
-             VALUES ($1, $2, $3, $4, 'applied')
+      `INSERT INTO "_damat_migration_logs"
+               (id, module, name, execution_time_ms, status, checksum)
+             VALUES ($1, $2, $3, $4, 'applied', $5)
              ON CONFLICT (module, name) DO UPDATE SET
                  applied_at         = NOW(),
                  reverted_at        = NULL,
                  execution_time_ms  = $4,
-                 status             = 'applied'`,
-      [migrationId(module, name), module, name, executionTimeMs],
+                 status             = 'applied',
+                 checksum           = $5`,
+      [migrationId(module, name), module, name, executionTimeMs, checksum],
     );
+  }
+
+  async recordAdopted(
+    module: string,
+    name: string,
+    checksum: string,
+    actor: string,
+    reason: string,
+    executor: DurabilityExecutor = this.executor,
+  ): Promise<boolean> {
+    const result = await executor.query(
+      `INSERT INTO "_damat_migration_logs"
+         (id, module, name, status, checksum, adopted_at,
+          adoption_actor, adoption_reason)
+       VALUES ($1, $2, $3, 'applied', $4, NOW(), $5, $6)
+       ON CONFLICT (module, name) DO NOTHING`,
+      [migrationId(module, name), module, name, checksum, actor, reason],
+    );
+    return (result.rowCount ?? 0) === 1;
   }
 
   /**

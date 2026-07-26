@@ -29,25 +29,26 @@ interface Row {
 
 function makeStatefulPool() {
   const rows: Row[] = [];
+  const query = async (sql: string, params?: unknown[]) => {
+    if (/INSERT INTO "_damat_migration_logs"/.test(sql)) {
+      rows.push({
+        module: params![1] as string,
+        name: params![2] as string,
+        applied_at: new Date(),
+      });
+      return { rows: [], rowCount: 1 };
+    }
+    if (/status = 'applied'/.test(sql)) {
+      const module = params?.[0] as string | undefined;
+      const matched = module ? rows.filter((r) => r.module === module) : rows;
+      return { rows: matched, rowCount: matched.length };
+    }
+    return { rows: [], rowCount: 0 };
+  };
   const pool = {
-    query: async (sql: string, params?: unknown[]) => {
-      if (/INSERT INTO "_damat_migration_logs"/.test(sql)) {
-        rows.push({
-          module: params![1] as string,
-          name: params![2] as string,
-          applied_at: new Date(),
-        });
-        return { rows: [], rowCount: 1 };
-      }
-      if (/status = 'applied'/.test(sql)) {
-        const module = params?.[0] as string | undefined;
-        const matched = module ? rows.filter((r) => r.module === module) : rows;
-        return { rows: matched, rowCount: matched.length };
-      }
-      return { rows: [], rowCount: 0 };
-    },
+    query,
     connect: async () => ({
-      query: async () => ({ rows: [], rowCount: 0 }),
+      query,
       release: () => {},
     }),
   };

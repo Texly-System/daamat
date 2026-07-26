@@ -190,7 +190,7 @@ describe("executeMigration", () => {
     expect(fake.releaseCount).toBe(1);
 
     // Recorded as applied via the tracker (pool-level INSERT).
-    const insert = fake.poolQueries.find((q) =>
+    const insert = fake.clientQueries.find((q) =>
       /INSERT INTO "_damat_migration_logs"/.test(q.sql),
     );
     expect(insert).toBeDefined();
@@ -294,7 +294,7 @@ describe("runMigrations", () => {
     expect(beginCount).toBe(1);
     // The pending migration's body ran; the already-applied one did not get
     // re-recorded with a fresh INSERT for the *Initial* migration this run.
-    const inserts = fake.poolQueries.filter((q) =>
+    const inserts = fake.clientQueries.filter((q) =>
       /INSERT INTO "_damat_migration_logs"/.test(q.sql),
     );
     expect(inserts).toHaveLength(1);

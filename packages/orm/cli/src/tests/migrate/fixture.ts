@@ -44,5 +44,7 @@ export const loadList = async () =>
   (await import("../../cli/commands/migrate/list")).default;
 export const loadCreate = async () =>
   (await import("../../cli/commands/migrate/create")).default;
+export const loadAdopt = async () =>
+  (await import("../../cli/commands/migrate/adopt")).default;
 export const loadDatabaseSetup = async () =>
   (await import("../../cli/commands/database/setup")).default;

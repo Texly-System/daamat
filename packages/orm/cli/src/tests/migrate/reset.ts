@@ -23,6 +23,8 @@ export function setupState(): void {
     state.initialArgs = null;
     state.initialError = null;
     state.diffArgs = null;
+    state.adoptArgs = null;
+    state.adoptError = null;
     state.diffResult = {
       hasChanges: true,
       filePath: "/fake/diff.ts",

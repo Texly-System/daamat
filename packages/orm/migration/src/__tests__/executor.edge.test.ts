@@ -4,6 +4,7 @@ import os from "node:os";
 import path from "node:path";
 
 import { executeMigration } from "../executor/migration";
+import { CommittedMigrationUntrackedError } from "../executor/errors";
 import { MigrationTracker } from "../tracker";
 import type { MigrationInfo } from "../types";
 
@@ -129,7 +130,7 @@ describe("executeMigration — empty / whitespace migration file", () => {
     expect(sqls).not.toContain("ROLLBACK");
     // Still recorded as applied (no body to fail on).
     expect(
-      fake.poolQueries.some((q) =>
+      fake.clientQueries.some((q) =>
         /INSERT INTO "_damat_migration_logs"/.test(q.sql),
       ),
     ).toBe(true);
@@ -181,7 +182,7 @@ describe("executeMigration — invalid SQL / rollback path", () => {
     expect(result.error!.message).toContain("boom");
     // Nothing recorded as applied on failure.
     expect(
-      fake.poolQueries.some((q) =>
+      fake.clientQueries.some((q) =>
         /INSERT INTO "_damat_migration_logs"/.test(q.sql),
       ),
     ).toBe(false);
@@ -246,7 +247,7 @@ describe("executeMigration — file-not-found", () => {
     expect(fake.clientQueries).toHaveLength(0);
     expect(fake.releaseCount).toBe(0);
     expect(
-      fake.poolQueries.some((q) =>
+      fake.clientQueries.some((q) =>
         /INSERT INTO "_damat_migration_logs"/.test(q.sql),
       ),
     ).toBe(false);
@@ -283,7 +284,7 @@ describe("executeMigration — statements that can't run in a transaction", () =
     );
     expect(fake.releaseCount).toBe(1);
     expect(
-      fake.poolQueries.some((q) =>
+      fake.clientQueries.some((q) =>
         /INSERT INTO "_damat_migration_logs"/.test(q.sql),
       ),
     ).toBe(true);
@@ -308,7 +309,8 @@ describe("executeMigration — statements that can't run in a transaction", () =
 
     expect(result.success).toBe(true);
     const sqls = fake.clientQueries.map((q) => q.sql);
-    expect(sqls).toEqual(["ALTER TYPE mood ADD VALUE 'excited';"]);
+    expect(sqls[0]).toBe("ALTER TYPE mood ADD VALUE 'excited';");
+    expect(sqls[1]).toContain('INSERT INTO "_damat_migration_logs"');
   });
 
   it("does NOT issue ROLLBACK when a non-transactional migration fails", async () => {
@@ -345,13 +347,36 @@ describe("executeMigration — statements that can't run in a transaction", () =
   });
 });
 
-describe("executeMigration — tracker failure after a successful COMMIT", () => {
-  it("surfaces a recordApplied failure as a failed result even though COMMIT ran", async () => {
+describe("executeMigration — non-transactional tracker failure", () => {
+  it("reports committed SQL that could not be tracked", async () => {
+    const dir = makeModule([
+      { name: "Migration1_Index", sql: "CREATE INDEX CONCURRENTLY idx ON t(id);" },
+    ]);
+    const fake = makeFakePool({
+      failOn: (sql) => /INSERT INTO "_damat_migration_logs"/.test(sql),
+    });
+    const result = await executeMigration(
+      fake.pool,
+      makeMigrationInfo(dir, "Migration1_Index"),
+      "user",
+      new MigrationTracker(fake.pool),
+    );
+    expect(result.success).toBe(false);
+    expect(result.error).toBeInstanceOf(CommittedMigrationUntrackedError);
+    expect((result.error as CommittedMigrationUntrackedError).code).toBe(
+      "MIGRATION_COMMITTED_UNTRACKED",
+    );
+    expect(fake.clientQueries.map((query) => query.sql)).not.toContain("ROLLBACK");
+  });
+});
+
+describe("executeMigration — transactional tracker failure", () => {
+  it("rolls back migration SQL and its tracker row together", async () => {
     const dir = makeModule([
       { name: "Migration1_Ok", sql: "CREATE TABLE t (id text);" },
     ]);
     const fake = makeFakePool({
-      poolFailOn: (sql) => /INSERT INTO "_damat_migration_logs"/.test(sql),
+      failOn: (sql) => /INSERT INTO "_damat_migration_logs"/.test(sql),
     });
     const tracker = new MigrationTracker(fake.pool);
 
@@ -362,13 +387,11 @@ describe("executeMigration — tracker failure after a successful COMMIT", () =>
       tracker,
     );
 
-    // The SQL transaction itself committed...
     const sqls = fake.clientQueries.map((q) => q.sql);
-    expect(sqls).toContain("COMMIT");
-    expect(sqls).not.toContain("ROLLBACK");
-    // ...but the tracker INSERT threw, so the overall result is a failure.
+    expect(sqls).not.toContain("COMMIT");
+    expect(sqls).toContain("ROLLBACK");
     expect(result.success).toBe(false);
     expect(result.error).toBeInstanceOf(Error);
-    expect(result.error!.message).toContain("pool-boom");
+    expect(result.error!.message).toContain("boom");
   });
 });

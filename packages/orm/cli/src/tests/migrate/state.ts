@@ -21,12 +21,10 @@ export const state = {
   initialResult: "/fake/initial.ts",
   initialArgs: null as any,
   initialError: null as Error | null,
-  diffResult: {
-    hasChanges: true,
-    filePath: "/fake/diff.ts",
-    warnings: undefined as string[] | undefined,
-  },
+  diffResult: { hasChanges: true, filePath: "/fake/diff.ts", warnings: undefined as string[] | undefined },
   diffArgs: null as any,
+  adoptArgs: null as any,
+  adoptError: null as Error | null,
 };
 
 class FakePool {
@@ -57,6 +55,10 @@ class FakeClient {
 
 mock.module("@damatjs/deps/pg", () => ({ Client: FakeClient, Pool: FakePool }));
 mock.module("@damatjs/orm-migration", () => ({
+  adoptMigration: async (...args: unknown[]) => {
+    state.adoptArgs = args;
+    if (state.adoptError) throw state.adoptError;
+  },
   runMigrations: async (pool: unknown, modules: unknown, options: unknown) => {
     state.runArgs = { pool, modules, options };
     return state.runResult;

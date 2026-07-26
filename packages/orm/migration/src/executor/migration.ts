@@ -9,6 +9,8 @@ import type { Pool } from "@damatjs/deps/pg";
 import { log } from "../logger";
 import { MigrationTracker } from "../tracker";
 import type { MigrationInfo } from "../types";
+import { migrationChecksum, nonTransactionalConstruct } from "./checksum";
+import { CommittedMigrationUntrackedError } from "./errors";
 
 /**
  * Statements Postgres forbids inside a transaction block. A migration body
@@ -16,22 +18,6 @@ import type { MigrationInfo } from "../types";
  * then autocommits), otherwise pg raises an opaque "cannot run inside a
  * transaction block" error at runtime.
  */
-const NON_TRANSACTIONAL = [
-  /\bCREATE\s+INDEX\s+CONCURRENTLY\b/i,
-  /\bDROP\s+INDEX\s+CONCURRENTLY\b/i,
-  /\bREINDEX\b[\s\S]*?\bCONCURRENTLY\b/i,
-  /\bALTER\s+TYPE\b[\s\S]*?\bADD\s+VALUE\b/i,
-];
-
-/** Return the offending construct if the SQL can't run in a transaction. */
-function nonTransactionalConstruct(sql: string): string | undefined {
-  for (const re of NON_TRANSACTIONAL) {
-    const match = re.exec(sql);
-    if (match) return match[0].replace(/\s+/g, " ");
-  }
-  return undefined;
-}
-
 /**
  * Execute a single .sql migration file.
  */
@@ -46,6 +32,7 @@ export async function executeMigration(
   try {
     // Read the raw SQL from the migration file
     const sql = fs.readFileSync(migration.path, "utf-8");
+    const checksum = migrationChecksum(sql);
     const offending = nonTransactionalConstruct(sql);
 
     const client = await pool.connect();
@@ -58,9 +45,31 @@ export async function executeMigration(
           `(${offending})`,
         );
         await client.query(sql);
+        try {
+          await tracker.recordApplied(
+            moduleName,
+            migration.name,
+            Date.now() - startTime,
+            client,
+            checksum,
+          );
+        } catch (cause) {
+          throw new CommittedMigrationUntrackedError(
+            moduleName,
+            migration.name,
+            { cause },
+          );
+        }
       } else {
         await client.query("BEGIN");
         await client.query(sql);
+        await tracker.recordApplied(
+          moduleName,
+          migration.name,
+          Date.now() - startTime,
+          client,
+          checksum,
+        );
         await client.query("COMMIT");
       }
     } catch (err) {
@@ -78,9 +87,7 @@ export async function executeMigration(
       client.release();
     }
 
-    // Track result
     const executionTime = Date.now() - startTime;
-    await tracker.recordApplied(moduleName, migration.name, executionTime);
     log("success", `Applied: ${migration.name}`, `(${executionTime}ms)`);
 
     return { success: true };

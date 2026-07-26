@@ -36,9 +36,10 @@ describe("command aggregation (src/cli/commands/index.ts)", () => {
 });
 
 describe("command tree structure", () => {
-  it("migrate exposes up/status/list/create subcommands", () => {
+  it("migrate exposes its migration subcommands", () => {
     const subs = migrateCommand.subcommands ?? [];
     expect(subs.map((s) => s.name).sort()).toEqual([
+      "migrate:adopt",
       "migrate:create",
       "migrate:list",
       "migrate:status",
