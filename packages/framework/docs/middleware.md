@@ -162,6 +162,11 @@ interface AuthMiddlewareOptions {
 
 `validate(schema, data)` is a standalone helper: `schema.parse(data)`, converting a `ZodError` into a `ValidationError` (from `@damatjs/types`). Use it inside handlers for ad-hoc validation.
 
+The route validator reads JSON only when `body` or `json` is declared, on any
+HTTP method. Both aliases share one parse. Zero-byte and malformed JSON have
+distinct stable 400 responses; falsy JSON values are present. Params/query-only
+validation does not touch the raw body stream.
+
 ## Index exports (`middleware/index.ts`)
 
 Re-exports `corsConfig`, `error`, `notFound`, `requestSetup`, `setup`, `rateLimit`, `auth`. (`validator` is exported via the router barrel / used internally by the builder.)

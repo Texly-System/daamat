@@ -3,6 +3,11 @@ import { ValidationError } from "@damatjs/types";
 import type { MiddlewareHandler } from "@damatjs/deps/hono";
 import type { RouteValidator, ValidatedData } from "../router/types";
 import { VALIDATED_CONTEXT_KEY } from "../router/types";
+import {
+  jsonSyntaxError,
+  requiredTarget,
+  validationResponse,
+} from "./validationResponse";
 
 export function validate<T>(
   schema: { parse: (data: unknown) => T },
@@ -22,108 +27,50 @@ export function createValidatorMiddleware(
   handler: RouteValidator,
 ): MiddlewareHandler {
   return async (c, next) => {
-    let data: {
-      body?: unknown;
-      query?: unknown;
-      params?: unknown;
-      json?: unknown;
-    } = {};
-
-    if (c.req.method === "GET" || c.req.method === "DELETE") {
-      data = {
-        query: c.req.query(),
-        params: c.req.param(),
-      };
-    } else {
+    const wantsJson = handler.body !== undefined || handler.json !== undefined;
+    let parsedBody: unknown;
+    if (wantsJson) {
+      const text =
+        typeof c.req.text === "function"
+          ? await c.req.text()
+          : JSON.stringify(await c.req.json());
+      if (text === undefined || text.length === 0) {
+        const target = handler.body ? "Body" : "Json";
+        return validationResponse(c, requiredTarget(target));
+      }
       try {
-        const body = await c.req.json();
-        data = {
-          body,
-          json: body,
-          query: c.req.query(),
-          params: c.req.param(),
-        };
+        parsedBody = JSON.parse(text);
       } catch {
-        data = {
-          query: c.req.query(),
-          params: c.req.param(),
-        };
+        return validationResponse(c, jsonSyntaxError("Malformed JSON body"));
       }
     }
-
     const validated: ValidatedData = {};
-
     try {
       if (handler.body) {
-        if (!data || (data && !data.body))
-          throw new ZodError([
-            {
-              code: "custom",
-              message: "Body is required",
-              path: ["body"],
-            },
-          ]);
-        validated.body = handler.body.parse(data.body);
+        validated.body = handler.body.parse(parsedBody);
       }
       if (handler.query) {
-        if (!data || (data && !data.query))
-          throw new ZodError([
-            {
-              code: "custom",
-              message: "Query is required",
-              path: ["query"],
-            },
-          ]);
-        validated.query = handler.query.parse(data.query);
+        const query = c.req.query();
+        if (query === undefined) throw requiredTarget("Query");
+        validated.query = handler.query.parse(query);
       }
       if (handler.params) {
-        if (!data || (data && !data.params))
-          throw new ZodError([
-            {
-              code: "custom",
-              message: "Params is required",
-              path: ["params"],
-            },
-          ]);
-        validated.params = handler.params.parse(data.params);
+        const params = c.req.param();
+        if (params === undefined) throw requiredTarget("Params");
+        validated.params = handler.params.parse(params);
       }
       if (handler.json) {
-        if (!data || (data && !data.json))
-          throw new ZodError([
-            {
-              code: "custom",
-              message: "Json is required",
-              path: ["json"],
-            },
-          ]);
-        const parsed = handler.json.parse(data.json);
+        const parsed = handler.json.parse(parsedBody);
         validated.json = parsed;
         c.req.addValidatedData("json", parsed as object);
       }
     } catch (error) {
       if (error instanceof ZodError) {
-        return c.json(
-          {
-            success: false,
-            error: {
-              code: "VALIDATION_ERROR",
-              message: "Request validation failed",
-              details: error.issues.map((e) => ({
-                path: e.path.join("."),
-                message: e.message,
-              })),
-            },
-          },
-          400,
-        );
+        return validationResponse(c, error);
       }
       throw error;
     }
-
-    // Expose the parsed + coerced data to the handler via `getValidated`,
-    // so routes don't re-parse or re-check what was just validated.
     c.set(VALIDATED_CONTEXT_KEY, validated);
-
     return next();
   };
 }

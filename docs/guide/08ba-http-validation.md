@@ -21,6 +21,12 @@ export const validators: RouteValidator[] = [
 ];
 ```
 
+JSON is parsed exactly once only when `body` or `json` is declared, regardless
+of method, so declared DELETE bodies work. Zero-byte and malformed bodies return
+distinct stable 400 validation errors, while `false`, `0`, `""`, and `null` are
+present values. Params/query-only validation never reads the body and leaves the
+raw request stream available to the handler.
+
 Handlers read validated values through `getValidated`.
 
 ```ts

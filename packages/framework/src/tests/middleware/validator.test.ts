@@ -174,6 +174,68 @@ describe("createValidatorMiddleware", () => {
     expect(body.error.details[0]!.message).toBe("Json is required");
   });
 
+  it("distinguishes malformed JSON from an absent body", async () => {
+    const app = new Hono();
+    app.post(
+      "/items",
+      createValidatorMiddleware({ body: z.unknown() } as never),
+      (c) => c.json({ ok: true }),
+    );
+    const res = await app.request("/items", { method: "POST", body: "{" });
+    const body = (await res.json()) as ErrBody;
+    expect(res.status).toBe(400);
+    expect(body.error.details[0]!.message).toBe("Malformed JSON body");
+  });
+
+  it.each([false, 0, "", null])(
+    "accepts present falsy JSON: %p",
+    async (value) => {
+      const app = new Hono();
+      app.post(
+        "/value",
+        createValidatorMiddleware({ body: z.literal(value) } as never),
+        (c) => c.json({ ok: true }),
+      );
+      const res = await app.request("/value", {
+        method: "POST",
+        body: JSON.stringify(value),
+      });
+      expect(res.status).toBe(200);
+    },
+  );
+
+  it("validates a declared DELETE JSON body", async () => {
+    const app = new Hono();
+    app.delete(
+      "/items",
+      createValidatorMiddleware({
+        body: z.object({ id: z.string() }),
+      } as never),
+      (c) => c.json({ ok: true }),
+    );
+    const res = await app.request("/items", {
+      method: "DELETE",
+      body: JSON.stringify({ id: "item_1" }),
+    });
+    expect(res.status).toBe(200);
+  });
+
+  it("leaves a params-only PUT body stream untouched", async () => {
+    const app = new Hono();
+    app.put(
+      "/items/:id",
+      createValidatorMiddleware({
+        params: z.object({ id: z.string() }),
+      } as never),
+      async (c) => c.json({ body: await c.req.text() }),
+    );
+    const res = await app.request("/items/item_1", {
+      method: "PUT",
+      body: "raw-body",
+    });
+    expect(await res.json()).toEqual({ body: "raw-body" });
+  });
+
   it("validates and exposes route params via the 'params' target", async () => {
     const app = new Hono();
     app.get(
