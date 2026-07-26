@@ -40,7 +40,6 @@ export async function executeWorkflowInternal<I, O>(
   };
   const logger = createContextLogger({ workflow: name });
   logger.info("Starting workflow execution", { executionId });
-  logger.debug("Workflow input", { executionId, input: JSON.stringify(input) });
   await emitWorkflowExecutionEvent(options.observer, {
     type: "workflow.started",
     workflow: name,

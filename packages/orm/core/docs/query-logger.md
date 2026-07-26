@@ -15,6 +15,7 @@ export interface QueryLoggerOptions {
   logSlowQueries?: boolean; // log slow queries     (default: true)
   slowQueryThreshold?: number; // ms threshold         (default: 1000)
   logTransaction?: boolean; // log txn boundaries   (default: true)
+  logParameters?: boolean; // include bound values (default: false)
 }
 ```
 
@@ -40,21 +41,23 @@ Every method short-circuits when disabled — the guard is always
 logQuery(sql: string, params?: unknown[]): void
 ```
 
-Debug-logs `"Query executed"` with `{ sql }` (and `params` when non-empty).
+Debug-logs `"Query executed"` with `{ sql }`. Bound values are included only
+when `logParameters: true` and non-empty.
 
 ```ts
 logQueryError(error: Error, sql: string, params?: unknown[]): void
 ```
 
-Error-logs `"Query error"` with the `Error` and `{ sql, params? }`.
+Error-logs `"Query error"` with the `Error` and SQL context. Parameters remain
+omitted unless explicitly enabled.
 
 ```ts
 logSlowQuery(sql: string, duration: number, params?: unknown[]): void
 ```
 
 Warns `"Slow query (<duration>ms)"` **only if** `duration > slowQueryThreshold`.
-Context includes `sql`, `duration`, `threshold`, and `params` when present. Safe
-to call on every query — it self-filters by threshold.
+Context includes `sql`, `duration`, and `threshold`; explicitly enabled,
+non-empty parameters are added. Safe to call on every query.
 
 ```ts
 logTransaction(action: "begin" | "commit" | "rollback"): void
@@ -112,8 +115,9 @@ try {
 
 ## Edge cases & gotchas
 
-- `params` is only attached to log context when `params?.length` is truthy —
-  empty/undefined params are omitted to keep logs clean.
+- SQL and timing remain observable by default, but bound values are omitted to
+  avoid leaking credentials and domain data. Set `logParameters: true` only in a
+  controlled environment; empty parameters are always omitted.
 - The singleton is module-level state. In tests that assert on logging, reset it
   with `setQueryLogger(new QueryLogger(...))` to avoid leakage between cases.
 - `slowQueryThreshold` is compared with strict `>` — a query exactly at the

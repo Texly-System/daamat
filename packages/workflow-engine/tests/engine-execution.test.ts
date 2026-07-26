@@ -44,4 +44,21 @@ describe("workflow execution", () => {
       expect(result.compensationsFailed).toBe(0);
     }
   });
+
+  test("hostile input serialization cannot prevent execution", async () => {
+    const cyclic: Record<string, unknown> = { value: 1n };
+    cyclic.self = cyclic;
+    cyclic.toJSON = () => {
+      throw new Error("must not serialize");
+    };
+    const input = new Proxy(cyclic, {
+      ownKeys() {
+        throw new Error("must not inspect");
+      },
+    });
+    const workflow = createWorkflow("hostile", () => Effect.succeed("ok"));
+    const result = await workflow.execute(input);
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.result).toBe("ok");
+  });
 });

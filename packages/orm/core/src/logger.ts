@@ -7,6 +7,7 @@ export interface QueryLoggerOptions {
   logSlowQueries?: boolean;
   slowQueryThreshold?: number;
   logTransaction?: boolean;
+  logParameters?: boolean;
 }
 
 export class QueryLogger {
@@ -21,6 +22,7 @@ export class QueryLogger {
       logSlowQueries: options.logSlowQueries ?? true,
       slowQueryThreshold: options.slowQueryThreshold ?? 1000,
       logTransaction: options.logTransaction ?? true,
+      logParameters: options.logParameters ?? false,
     };
 
     this.logger = logger ?? new Logger({ prefix: "ORM", timestamp: true });
@@ -30,7 +32,7 @@ export class QueryLogger {
     if (!this.options.enabled || !this.options.logQueries) return;
 
     const context: LogContext = { sql };
-    if (params?.length) context.params = params;
+    if (this.options.logParameters && params?.length) context.params = params;
     this.logger.debug("Query executed", context);
   }
 
@@ -38,7 +40,7 @@ export class QueryLogger {
     if (!this.options.enabled || !this.options.logErrors) return;
 
     const context: LogContext = { sql };
-    if (params?.length) context.params = params;
+    if (this.options.logParameters && params?.length) context.params = params;
     this.logger.error("Query error", error, context);
   }
 
@@ -51,7 +53,7 @@ export class QueryLogger {
         duration,
         threshold: this.options.slowQueryThreshold,
       };
-      if (params?.length) context.params = params;
+      if (this.options.logParameters && params?.length) context.params = params;
       this.logger.warn(`Slow query (${duration}ms)`, context);
     }
   }

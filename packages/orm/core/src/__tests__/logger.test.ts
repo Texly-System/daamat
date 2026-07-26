@@ -15,7 +15,7 @@ beforeEach(() => {
 
 describe("QueryLogger › logQuery", () => {
   it("logs a debug entry with the sql in context", () => {
-    const ql = new QueryLogger({}, fake);
+    const ql = new QueryLogger({ logParameters: true }, fake);
     ql.logQuery("SELECT 1");
 
     const calls = fake.callsTo("debug");
@@ -25,7 +25,7 @@ describe("QueryLogger › logQuery", () => {
   });
 
   it("includes params in context only when non-empty", () => {
-    const ql = new QueryLogger({}, fake);
+    const ql = new QueryLogger({ logParameters: true }, fake);
     ql.logQuery("SELECT $1", [42]);
     expect(fake.callsTo("debug")[0]!.args[1]).toEqual({
       sql: "SELECT $1",
@@ -34,7 +34,7 @@ describe("QueryLogger › logQuery", () => {
   });
 
   it("omits params when the array is empty", () => {
-    const ql = new QueryLogger({}, fake);
+    const ql = new QueryLogger({ logParameters: true }, fake);
     ql.logQuery("SELECT 1", []);
     expect(fake.callsTo("debug")[0]!.args[1]).toEqual({ sql: "SELECT 1" });
   });
@@ -54,7 +54,7 @@ describe("QueryLogger › logQuery", () => {
 
 describe("QueryLogger › logQueryError", () => {
   it("logs an error entry with the error object and sql context", () => {
-    const ql = new QueryLogger({}, fake);
+    const ql = new QueryLogger({ logParameters: true }, fake);
     const err = new Error("boom");
     ql.logQueryError(err, "SELECT 1", ["a"]);
 
@@ -69,6 +69,12 @@ describe("QueryLogger › logQueryError", () => {
     const ql = new QueryLogger({}, fake);
     ql.logQueryError(new Error("x"), "SELECT 1");
     expect(fake.callsTo("error")[0]!.args[2]).toEqual({ sql: "SELECT 1" });
+  });
+
+  it("omits bound values by default", () => {
+    const ql = new QueryLogger({}, fake);
+    ql.logQueryError(new Error("x"), "SELECT $1", ["secret"]);
+    expect(fake.callsTo("error")[0]!.args[2]).toEqual({ sql: "SELECT $1" });
   });
 
   it("respects logErrors=false", () => {
@@ -86,7 +92,10 @@ describe("QueryLogger › logQueryError", () => {
 
 describe("QueryLogger › logSlowQuery", () => {
   it("warns when duration strictly exceeds the threshold", () => {
-    const ql = new QueryLogger({ slowQueryThreshold: 100 }, fake);
+    const ql = new QueryLogger(
+      { slowQueryThreshold: 100, logParameters: true },
+      fake,
+    );
     ql.logSlowQuery("SELECT 1", 150, ["p"]);
 
     const calls = fake.callsTo("warn");
