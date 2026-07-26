@@ -22,7 +22,7 @@ export default function PackageReferencePage() {
   const groups = getPackageCatalog();
 
   return (
-    <main className="mx-auto max-w-4xl py-12">
+    <div className="mx-auto max-w-4xl py-12">
       <header>
         <p className="eyebrow">Package docs</p>
         <h1 className="mt-3 text-4xl font-semibold tracking-tight text-ink">
@@ -85,6 +85,6 @@ export default function PackageReferencePage() {
           directly in this app when possible.
         </p>
       </section>
-    </main>
+    </div>
   );
 }
