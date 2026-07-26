@@ -12,34 +12,12 @@ import {
   assertModuleDatabaseConfigured,
   resolveModuleRuntimePlan,
 } from "./plan";
-import { closeServer, resolveServerPort, startHttpServer } from "./server";
+import { resolveServerPort, startHttpServer } from "./server";
+import { moduleStop } from "./stop";
 import type {
-  ModuleServerHandle,
   RunningModuleApp,
   StartModuleAppOptions,
 } from "./types";
-
-function moduleStop(
-  server: ModuleServerHandle,
-  services: ServiceInstances,
-  graceMs?: number,
-): () => Promise<void> {
-  let stopping: Promise<void> | undefined;
-  return () => {
-    stopping ??= (async () => {
-      try {
-        await closeServer(server);
-      } finally {
-        await runServiceShutdownHandlers(
-          services.shutdownHandlers,
-          getLogger(),
-          graceMs === undefined ? {} : { graceMs },
-        );
-      }
-    })();
-    return stopping;
-  };
-}
 
 export async function startModuleApp(
   options: StartModuleAppOptions = {},

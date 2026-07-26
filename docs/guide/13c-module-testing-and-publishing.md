@@ -17,7 +17,10 @@ await withModule(inventory, { moduleDir }, async ({ service }) => {
 ```
 
 The harness creates one pool, applies migrations, initializes the service, and
-guarantees teardown even when an assertion fails.
+guarantees teardown even when an assertion fails. Declared jobs, durable events,
+and pipelines receive a durability client automatically; pipeline definitions
+are synchronized after module initialization. Sequential harness lifecycles
+restore any prior process-global durability client during teardown.
 
 ## Run the module gates
 

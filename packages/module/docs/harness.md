@@ -30,12 +30,17 @@ Step by step (`boot.ts`):
 5. **Manifest + migrations** — only if `options.moduleDir` is set:
    `readModuleManifest(moduleDir)` then
    `applyModuleMigrations(pool, moduleDir, manifest, logger, options.migrate)`.
-6. **Init** — `module.init()`.
-7. **Return** `BootedModule`: `{ service, pool, connection, manifest, teardown }`.
+6. **Durability** — when jobs, durable events, or pipelines are declared,
+   install a client backed by the harness pool.
+7. **Init + pipelines** — await `module.init()`, then synchronize declared
+   pipeline definitions.
+8. **Return** `BootedModule`: `{ service, pool, connection, manifest, teardown }`.
 
 `teardown` calls `PoolManager.reset()` and `connection.disconnect()`. A manifest,
 migration, or module-init failure performs the same cleanup before rejecting.
 **Always call teardown** after successful boot (use `withModule` to guarantee it).
+The previous process-global durability client is restored on failure or teardown;
+when none existed, the harness clears its client.
 
 ## `withModule`
 

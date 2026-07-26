@@ -6,6 +6,21 @@ import type { ModuleManifest } from "../manifest/types";
 import { resolveDatabaseConfig } from "./database";
 import { applyModuleMigrations } from "./migrate";
 import type { BootableModule, BootModuleOptions, BootedModule } from "./types";
+import {
+  clearDurabilityClient,
+  createDurabilityClient,
+  getDurabilityClientOrUndefined,
+  setDurabilityClient,
+} from "@damatjs/durability";
+import { syncPipelineDefinitions } from "@damatjs/pipelines";
+import { detectModuleCapabilities } from "../runtime/capabilities";
+
+function restoreDurability(
+  previous: ReturnType<typeof getDurabilityClientOrUndefined>,
+) {
+  if (previous) setDurabilityClient(previous);
+  else clearDurabilityClient();
+}
 
 /**
  * Boot a module standalone — no backend app required.
@@ -16,17 +31,6 @@ import type { BootableModule, BootModuleOptions, BootedModule } from "./types";
  * developable and testable in its own repository before it's ever added
  * to a backend.
  *
- * @example
- * ```ts
- * import { bootModule } from "@damatjs/module";
- * import userModule from "./index";
- *
- * const booted = await bootModule(userModule, {
- *   moduleDir: import.meta.dir,
- * });
- * const user = await booted.service.user.create({ data: { email } });
- * await booted.teardown();
- * ```
  */
 export async function bootModule<TService extends object>(
   module: BootableModule<TService>,
@@ -44,6 +48,8 @@ export async function bootModule<TService extends object>(
   PoolManager.setup({ pool, logger, connectionManager: connection });
 
   let manifest: ModuleManifest | null = null;
+  const previousDurability = getDurabilityClientOrUndefined();
+  let ownsDurability = false;
   try {
     if (options.moduleDir) {
       manifest = readModuleManifest(options.moduleDir);
@@ -54,22 +60,37 @@ export async function bootModule<TService extends object>(
         logger,
         options.migrate,
       );
+      const capabilities = detectModuleCapabilities(
+        options.moduleDir,
+        manifest,
+      );
+      if (capabilities.durable) {
+        setDurabilityClient(createDurabilityClient({ pool }));
+        ownsDurability = true;
+      }
+      await module.init();
+      if (capabilities.pipelines) await syncPipelineDefinitions();
+    } else {
+      await module.init();
     }
-    module.init();
   } catch (error) {
+    if (ownsDurability) restoreDurability(previousDurability);
     PoolManager.reset();
     await connection.disconnect();
     throw error;
   }
 
+  let teardown: Promise<void> | undefined;
   return {
     service: module.service,
     pool,
     connection,
     manifest,
-    teardown: async () => {
-      PoolManager.reset();
-      await connection.disconnect();
-    },
+    teardown: () =>
+      (teardown ??= (async () => {
+        if (ownsDurability) restoreDurability(previousDurability);
+        PoolManager.reset();
+        await connection.disconnect();
+      })()),
   };
 }

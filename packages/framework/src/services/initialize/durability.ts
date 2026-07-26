@@ -7,6 +7,7 @@ import {
   DurableInfrastructureNotMigratedError,
   durabilitySystemMigrations,
   setDurabilityClient,
+  getDurabilityClientOrUndefined,
   type SystemMigrationCatalog,
   type DurabilityCoordinator,
 } from "@damatjs/durability";
@@ -47,6 +48,7 @@ export async function initializeDurability(
     );
   }
   const client = createDurabilityClient({ pool: PoolManager.getPool() });
+  const previousClient = getDurabilityClientOrUndefined();
   try {
     await assertSystemMigrationsApplied(
       client,
@@ -63,7 +65,10 @@ export async function initializeDurability(
   instances?.shutdownHandlers.push({
     name: "durability-globals",
     phase: "durability",
-    handler: () => clearDurabilityClient(),
+    handler: () => {
+      if (previousClient) setDurabilityClient(previousClient);
+      else clearDurabilityClient();
+    },
   });
   const acceleration = config.services?.durability?.acceleration;
   const enabled = acceleration?.enabled ?? config.services?.durability?.wakeups;

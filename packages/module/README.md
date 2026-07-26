@@ -109,6 +109,11 @@ declared durable capabilities, initializes the module, and guarantees teardown.
 Migration failure rejects boot and closes both shared pool state and the
 connection.
 
+For declared jobs, durable events, or pipelines, the harness installs a
+pool-backed durability client before initialization. It synchronizes pipeline
+definitions after initialization and restores the previous process-global
+client on boot failure or idempotent teardown.
+
 ## Portable capabilities
 
 A module manifest may describe models, migrations, routes, workflows, jobs,
