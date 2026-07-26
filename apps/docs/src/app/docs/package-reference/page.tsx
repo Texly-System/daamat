@@ -29,9 +29,9 @@ export default function PackageReferencePage() {
           Package reference
         </h1>
         <p className="mt-4 text-lg leading-relaxed text-muted">
-          Every package's in-repo documentation is indexed here first, then linked
-          directly into the same docs site so you can read it without leaving the
-          Damat app.
+          Every package's in-repo documentation is indexed here first, then
+          linked directly into the same docs site so you can read it without
+          leaving the Damat app.
         </p>
       </header>
 
@@ -43,7 +43,10 @@ export default function PackageReferencePage() {
             </h2>
             <div className="mt-4 space-y-4 rounded-xl border border-line bg-surface p-5">
               {group.packages.map((pkg) => (
-                <article key={`${group.group}-${pkg.name}`} className="space-y-3">
+                <article
+                  key={`${group.group}-${pkg.name}`}
+                  className="space-y-3"
+                >
                   <p className="font-medium text-ink">{pkg.name}</p>
                   <p className="text-sm text-muted">{pkg.description}</p>
                   <ul className="ml-4 list-disc space-y-1 text-sm text-faint">
@@ -74,12 +77,12 @@ export default function PackageReferencePage() {
       <section className="mt-10 rounded-xl border border-line bg-subtle/70 p-5">
         <p className="font-medium text-ink">Need a quick path?</p>
         <p className="mt-2 text-sm text-muted">
-          Jump to package details with search, open the guide chapter on any package,
-          or use the top nav link to return here.
+          Jump to package details with search, open the guide chapter on any
+          package, or use the top nav link to return here.
         </p>
         <p className="mt-2 text-sm text-muted">
-          Tip: relative links from package docs are preserved and rendered directly in
-          this app when possible.
+          Tip: relative links from package docs are preserved and rendered
+          directly in this app when possible.
         </p>
       </section>
     </main>

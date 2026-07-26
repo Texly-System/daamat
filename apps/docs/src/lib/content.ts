@@ -112,7 +112,8 @@ function normalizeSourcePath(candidate: string): string | null {
   const normalized = path.posix
     .normalize(toPosix(candidate))
     .replace(/^\.\/+/, "");
-  if (normalized.startsWith("../") || path.posix.isAbsolute(normalized)) return null;
+  if (normalized.startsWith("../") || path.posix.isAbsolute(normalized))
+    return null;
   if (path.posix.relative("/", `/${normalized}`).startsWith("..")) {
     return null;
   }
@@ -123,7 +124,9 @@ function normalizeSourcePath(candidate: string): string | null {
 function isPackageDocPath(candidate: string) {
   const normalized = normalizeSourcePath(candidate);
   return Boolean(
-    normalized && normalized.startsWith("packages/") && !normalized.includes("../"),
+    normalized &&
+      normalized.startsWith("packages/") &&
+      !normalized.includes("../"),
   );
 }
 
@@ -163,7 +166,11 @@ function collectPackageDocs(guide: GuideJson): PackageDocMeta[] {
     for (const pkg of group.packages) {
       for (const sourcePath of pkg.docs) {
         const normalized = normalizeSourcePath(sourcePath);
-        if (!normalized || !isPackageDocPath(normalized) || seen.has(normalized)) {
+        if (
+          !normalized ||
+          !isPackageDocPath(normalized) ||
+          seen.has(normalized)
+        ) {
           continue;
         }
 
@@ -191,7 +198,9 @@ function buildPackageCatalog(
   guide: GuideJson,
   packageDocs: PackageDocMeta[],
 ): PackageCatalog[] {
-  const byPath = new Map(packageDocs.map((doc) => [doc.sourcePath, doc] as const));
+  const byPath = new Map(
+    packageDocs.map((doc) => [doc.sourcePath, doc] as const),
+  );
 
   return guide.packages.map((group) => ({
     group: group.group,
@@ -353,8 +362,9 @@ export function getAllPackageRouteSlugs(): string[] {
 function resolvePackageSourcePath(
   input: string | readonly string[],
 ): string | null {
-  const sourcePath =
-    Array.isArray(input) ? path.posix.join(...input) : input.toString();
+  const sourcePath = Array.isArray(input)
+    ? path.posix.join(...input)
+    : input.toString();
   const normalized = normalizeSourcePath(sourcePath);
   if (!normalized) return null;
   return normalized;

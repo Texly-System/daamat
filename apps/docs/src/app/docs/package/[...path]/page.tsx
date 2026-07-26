@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { stripChapterTitle } from "@/lib/chapterHtml";
-import { getPackageCatalog, getPackageDoc, getPackageDocs } from "@/lib/content";
+import {
+  getPackageCatalog,
+  getPackageDoc,
+  getPackageDocs,
+} from "@/lib/content";
 import { ogImageUrl, SITE } from "@/lib/site";
 
 export async function generateStaticParams() {
@@ -14,7 +18,12 @@ function getPackageForDoc(sourcePath: string) {
     for (const pkg of group.packages) {
       const match = pkg.docs.find((doc) => doc.sourcePath === sourcePath);
       if (match) {
-        return { group: group.group, pkg: pkg.name, title: match.title, slug: match.slug };
+        return {
+          group: group.group,
+          pkg: pkg.name,
+          title: match.title,
+          slug: match.slug,
+        };
       }
     }
   }
