@@ -16,6 +16,12 @@ The installer owns only files it adds. It never edits `damat.config.ts`,
 the user or AI. Module scaffolds write root `damat.json` and rely on
 conventional `src/index.ts` discovery.
 
+Source capability mappings are split into backend-owned roots. Routes install
+under `src/api/routes/<id>`, workflows under `src/workflows/<id>`, jobs under
+`src/jobs/<id>`, events under `src/events/<id>`, pipelines under
+`src/pipelines/<id>`, and links under `src/links/<id>`. The remaining module
+implementation stays under `src/modules/<id>`.
+
 Provider modules use these same commands and remain `kind: "module"`. Their
 installation instructions tell the backend owner which top-level provider role
 to bind after registering the installed module.

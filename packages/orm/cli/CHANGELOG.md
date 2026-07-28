@@ -1,5 +1,25 @@
 # @damatjs/orm-cli
 
+## 1.0.5
+
+### Patch Changes
+
+- Updated dependencies
+  - @damatjs/installer@1.0.5
+  - @damatjs/cli@1.0.5
+  - @damatjs/deps@1.0.5
+  - @damatjs/durability@1.0.5
+  - @damatjs/events@1.0.5
+  - @damatjs/jobs@1.0.5
+  - @damatjs/link@1.0.5
+  - @damatjs/logger@1.0.5
+  - @damatjs/orm-migration@1.0.5
+  - @damatjs/orm-model@1.0.5
+  - @damatjs/orm-processor@1.0.5
+  - @damatjs/orm-type@1.0.5
+  - @damatjs/pipelines@1.0.5
+  - @damatjs/schema-codegen@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

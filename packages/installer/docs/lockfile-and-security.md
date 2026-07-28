@@ -6,6 +6,12 @@ integrity, verification status, installed timestamp, owned file checksums,
 owned package references, and usage hints. Package ownership counts are derived
 across records.
 
+It is the transactional installer's ownership and provenance ledger. Planning
+uses it to detect target collisions and locally modified managed files; update
+and removal use it to identify exactly which files and packages belong to an
+installation. It is not `bun.lock`, does not resolve application dependencies,
+and does not register modules, routes, workers, aliases, or environment values.
+
 Writes validate the complete value, serialize keys deterministically, create a
 unique sibling temporary file, and atomically rename it.
 

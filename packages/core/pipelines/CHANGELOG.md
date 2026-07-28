@@ -1,5 +1,16 @@
 # @damatjs/pipelines
 
+## 1.0.5
+
+### Patch Changes
+
+- @damatjs/deps@1.0.5
+- @damatjs/durability@1.0.5
+- @damatjs/events@1.0.5
+- @damatjs/jobs@1.0.5
+- @damatjs/logger@1.0.5
+- @damatjs/workflow-engine@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

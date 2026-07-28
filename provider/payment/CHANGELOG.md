@@ -1,5 +1,13 @@
 # @damatjs/provider-payment
 
+## 1.0.5
+
+### Patch Changes
+
+- @damatjs/deps@1.0.5
+- @damatjs/provider@1.0.5
+- @damatjs/services@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

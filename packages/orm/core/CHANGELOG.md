@@ -1,5 +1,13 @@
 # @damatjs/orm-core
 
+## 1.0.5
+
+### Patch Changes
+
+- @damatjs/logger@1.0.5
+- @damatjs/orm-model@1.0.5
+- @damatjs/orm-type@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

@@ -1,5 +1,24 @@
 # @damatjs/cli-module
 
+## 1.0.5
+
+### Patch Changes
+
+- Fix local module installation from normal Bun development workspaces. Source
+  planning now prunes dependency, repository, ignored, and unmapped subtrees
+  before symlink validation while continuing to reject selected artifact
+  symlinks. Capability mappings are ordered most-specific-first, and module
+  routes, workflows, jobs, events, pipelines, links, and tests again install into
+  their backend-owned roots.
+- Updated dependencies
+  - @damatjs/installer@1.0.5
+  - @damatjs/cli-support@1.0.5
+  - @damatjs/framework@1.0.5
+  - @damatjs/module@1.0.5
+  - @damatjs/orm-cli@1.0.5
+  - @damatjs/cli@1.0.5
+  - @damatjs/load-env@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

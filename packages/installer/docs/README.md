@@ -77,10 +77,13 @@ excluded. Archive-byte integrity is distinct from this canonical tree identity.
 Finalization verifies expected tree integrity before returning and cleans
 temporary artifacts when identity resolution fails.
 
-Recipe mappings use first-match semantics. Ignore rules run first, unmatched
-files are omitted when mappings are present, output is sorted by target, and
-symbolic links are rejected. With no mappings, source files retain their
-artifact-relative paths.
+Recipe mappings use first-match semantics. Manifest profile mappings place
+longer fixed source prefixes before broad patterns. Ignore rules run before
+symlink selection, and directories that are wholly ignored or cannot contain a
+mapping are pruned. A selected symlink is rejected; an excluded symlink is
+skipped; no symlink is followed. Traversal never enters `.git` or
+`node_modules`. With no mappings, source files retain their artifact-relative
+paths.
 
 Lockfile writes validate the complete next value before creating a uniquely
 named sibling temporary file and atomically renaming it. Journal entries are

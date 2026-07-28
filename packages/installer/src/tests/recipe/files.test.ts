@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { mkdirSync, mkdtempSync, symlinkSync, writeFileSync } from "node:fs";
+import {
+  lstatSync,
+  mkdirSync,
+  mkdtempSync,
+  symlinkSync,
+  writeFileSync,
+} from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { mapArtifactFiles } from "../../index";
@@ -45,5 +51,26 @@ describe("mapArtifactFiles", () => {
     expect(() =>
       mapArtifactFiles(root, { schemaVersion: 1, id: "blade", kind: "module" }),
     ).toThrow("symbolic link");
+  });
+
+  test("does not traverse or map VCS and dependency directories", () => {
+    const root = artifact();
+    mkdirSync(join(root, ".git"));
+    mkdirSync(join(root, "node_modules"));
+    writeFileSync(join(root, ".git/config"), "private");
+    const dependency = join(root, "node_modules/dependency");
+    symlinkSync(join(root, "src"), dependency, "dir");
+    const files = mapArtifactFiles(root, {
+      schemaVersion: 1,
+      id: "blade",
+      kind: "module",
+      mappings: [{ from: "**", to: "target" }],
+    });
+    expect(files.map(({ relativeSource }) => relativeSource)).toEqual([
+      "README.md",
+      "src/a.ts",
+      "src/nested/b.ts",
+    ]);
+    expect(lstatSync(dependency).isSymbolicLink()).toBe(true);
   });
 });

@@ -22,14 +22,13 @@ your target version.
 All active Damat packages are released **in lockstep** — a release moves every
 published package to the same version, whether or not its own code changed.
 
-**Current source version: `1.0.4`** for every active public package.
+**Current source version: `1.0.5`** for every active public package.
 `@damatjs/codegen` is archived at its last npm release, `2.1.0`, and is not part
 of the workspace or active publication set.
 
-Version 1.0.4 is a coordinated integrity release. It adds canonical intent
-fingerprints for durable work, strengthens migration tracking and schema SQL,
-redacts sensitive logs by default, and tightens HTTP, CLI, harness, and shutdown
-contracts.
+Version 1.0.5 fixes local module installation from Bun workspaces and restores
+capability-specific backend destinations for routes, workflows, jobs, events,
+pipelines, links, and tests.
 
 A package's folder only carries a `<version>.md` (and a detailed index row) for
 versions where _its own_ code changed; for a lockstep bump with no change of its

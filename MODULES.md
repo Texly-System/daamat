@@ -109,6 +109,9 @@ Applications normally declare `install.accepts`:
 Destination precedence is an explicit CLI `--target`, receiver `accepts`,
 provider `fallbackTo`, then a planning error. `{id}` is replaced by the
 installation identity.
+When source patterns overlap, generated recipes order the longer fixed source
+prefix first. A capability such as `src/api/routes/**` therefore reaches its
+route destination before the broad `src/**` module mapping is considered.
 
 ## Module metadata
 
@@ -177,6 +180,10 @@ Example:
 A source module may provide models, migrations, routes, workflows, jobs,
 events, pipelines, links, tests, and types. Installation copies owned files and
 records checksums/provenance in `damat.lock.json`.
+
+`damat.lock.json` is the installer's ownership and provenance ledger. It powers
+collision checks, modification detection, updates, and removal. It is not a
+dependency lockfile or runtime configuration file.
 
 The installer deliberately does not edit shared application policy:
 

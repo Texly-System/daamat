@@ -104,9 +104,14 @@ overrides first, then receiver paths, then provider fallbacks.
 `createInstallPlan` applies mode precedence in this order: caller override,
 recipe default, then `source`. An unsupported explicit mode fails instead of
 falling back. Source plans map artifact files through declarative glob rules and
-carry a checksum for every write. Package plans carry immutable package
-references plus declared supporting packages. Plans are serializable and do not
-mutate the project.
+carry a checksum for every write. Source traversal excludes `.git` and
+`node_modules`; those directories remain untouched in the artifact and are
+never copied into the receiver. Ignored and provably unmapped subtrees are
+pruned before their children are read. Symlinks selected by a mapping are
+rejected, while excluded symlinks are skipped; no symlink is followed. Profile
+mappings with longer fixed source prefixes run before broad mappings such as
+`src/**`. Package plans carry immutable package references plus declared
+supporting packages. Plans are serializable and do not mutate the project.
 
 `InstallerPlan.capabilityMappings` is sorted by capability and records the
 provider source, resolved override/receiver/fallback destination, destination
@@ -163,9 +168,12 @@ unapproved dependency scripts deny installation.
 
 `parseInstallerLock` validates `damat.lock.json` data. Each installation record
 contains immutable origin identity, artifact and recipe integrity, verification
-status, install mode, optional package backend, owned file checksums, owned packages, and advisory usage
-hints. Shared package ownership is represented by each owning installation
-recording the same package reference.
+status, install mode, optional package backend, owned file checksums, owned
+packages, and advisory usage hints. Shared package ownership is represented by
+each owning installation recording the same package reference. This is installer
+state, not a dependency lockfile or runtime module registry: it enables safe
+collision checks, updates, removal, modification detection, and provenance, but
+does not configure `damat.config.ts`, imports, workers, or environment values.
 
 Detailed references: [internals](./docs/README.md),
 [origins](./docs/origins.md), [recipes](./docs/recipes.md),

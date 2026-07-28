@@ -30,7 +30,7 @@ describe("module install profiles", () => {
     );
   });
 
-  test("maps the provider into default and custom receiver layouts", () => {
+  test("maps narrow capabilities into backend-owned top-level layouts", () => {
     const provider: DamatManifest = {
       schemaVersion: 1,
       kind: "module",
@@ -45,9 +45,19 @@ describe("module install profiles", () => {
       install: { accepts: { routes: { to: "src/http/{id}" } } },
     };
     const custom = createProfileRecipe({ provider, receiver });
+    expect(nested.mappings?.at(-1)).toEqual({
+      from: "src/**",
+      to: "src/modules/billing",
+    });
     expect(
       nested.mappings?.find((item) => item.from.includes("routes"))?.to,
-    ).toBe("src/modules/billing/api/routes");
+    ).toBe("src/api/routes/billing");
+    expect(
+      nested.mappings?.find((item) => item.from.includes("workflows"))?.to,
+    ).toBe("src/workflows/billing");
+    expect(
+      nested.mappings?.find((item) => item.from.includes("pipelines"))?.to,
+    ).toBe("src/pipelines/billing");
     expect(
       custom.mappings?.find((item) => item.from.includes("routes"))?.to,
     ).toBe("src/http/billing");

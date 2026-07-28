@@ -1,5 +1,16 @@
 # @damatjs/orm
 
+## 1.0.5
+
+### Patch Changes
+
+- @damatjs/deps@1.0.5
+- @damatjs/orm-connector@1.0.5
+- @damatjs/orm-migration@1.0.5
+- @damatjs/orm-model@1.0.5
+- @damatjs/orm-pg@1.0.5
+- @damatjs/orm-processor@1.0.5
+
 ## 1.0.4
 
 ### Patch Changes

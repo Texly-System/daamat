@@ -6,7 +6,11 @@ hooks, scripts, commands, callbacks, or functions are rejected.
 Mode selection uses caller override, recipe default, then `source`. An explicit
 unsupported mode fails. Source mappings use `*`, `**`, and `?`, apply ignore
 rules first, use the first matching mapping, omit unmatched files when mappings
-exist, and reject target traversal and symbolic links.
+exist, and reject target traversal. Manifest-derived mappings are ordered by
+fixed-prefix specificity so a narrow capability wins over a broad source
+mapping. Artifact `.git` and `node_modules` directories are always left
+untouched. Ignored and provably unmapped subtrees are pruned. Selected symlinks
+are rejected, excluded symlinks are skipped, and no symlink is followed.
 
 Package mode requires an immutable primary package reference. Additional
 packages are name/reference data and become separate typed operations. Usage

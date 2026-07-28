@@ -13,6 +13,10 @@ A module declares `install.provides`; the application declares
 4. A planning error when none exists.
 
 `{id}` in a destination is replaced by the installation identity.
+For conventional modules, routes, workflows, jobs, events, pipelines, and links
+land in their matching top-level backend roots under an `<id>` directory. The
+remaining implementation lands in `src/modules/<id>`. Narrow capability source
+patterns take precedence over a broad `src/**` module pattern.
 
 ## Plan before writing
 
@@ -26,6 +30,23 @@ revoked artifacts. Direct paths and Git origins may require an explicit
 unverified-source decision because no registry verification is available.
 Plan output lists each capability in stable order with its provider source,
 resolved override/receiver/fallback destination, and operation count.
+For local paths, the source module's `.git` and `node_modules` directories stay
+untouched and are not scanned or copied into the backend. Ignored or unmapped
+symlinks do not block the plan, while a symlink selected for installation is
+rejected and no symlink is followed.
+
+## Understand `damat.lock.json`
+
+The installer writes `damat.lock.json` last after a successful transaction. It
+records where each artifact came from, its integrity and verification state,
+and the checksums of every file and package the installer owns. Later plan,
+update, and remove commands use it to detect collisions, local modifications,
+and exact ownership.
+
+It is not Bun's dependency lockfile and does not make a module executable. It
+does not edit runtime registration, aliases, environment values, capability
+imports, workers, or database state; those remain explicit backend integration
+work.
 
 ## Complete host-owned wiring
 

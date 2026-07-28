@@ -13,6 +13,10 @@ Module installation uses three small layers:
 
 Installation commands use the transactional installer and keep shared config,
 TypeScript aliases, environment, barrels, and call sites user-owned.
+Overlapping source capabilities are ordered narrowest-first, so the module's
+broad source mapping cannot absorb routes, workflows, jobs, events, pipelines,
+or links. Default fallbacks use the same top-level roots as a generated backend
+receiver.
 
 Module and auth scaffolds omit redundant entry metadata. Standard
 `src/index.ts` or sibling `index.ts` entries are discovered by

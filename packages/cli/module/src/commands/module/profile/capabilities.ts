@@ -8,20 +8,20 @@ export function moduleCapabilities(
     module: { from: path("**"), fallbackTo: "src/modules/{id}" },
     routes: {
       from: path("api/routes/**"),
-      fallbackTo: "src/modules/{id}/api/routes",
+      fallbackTo: "src/api/routes/{id}",
     },
     workflows: {
       from: path("workflows/**"),
-      fallbackTo: "src/modules/{id}/workflows",
+      fallbackTo: "src/workflows/{id}",
     },
-    jobs: { from: path("jobs/**"), fallbackTo: "src/modules/{id}/jobs" },
-    events: { from: path("events/**"), fallbackTo: "src/modules/{id}/events" },
+    jobs: { from: path("jobs/**"), fallbackTo: "src/jobs/{id}" },
+    events: { from: path("events/**"), fallbackTo: "src/events/{id}" },
     pipelines: {
       from: path("pipelines/**"),
-      fallbackTo: "src/modules/{id}/pipelines",
+      fallbackTo: "src/pipelines/{id}",
     },
-    links: { from: path("links/**"), fallbackTo: "src/modules/{id}/links" },
-    tests: { from: "tests/**", fallbackTo: "src/tests/modules/{id}" },
+    links: { from: path("links/**"), fallbackTo: "src/links/{id}" },
+    tests: { from: "tests/**", fallbackTo: "tests/modules/{id}" },
     migrations: {
       from: path("migrations/**"),
       fallbackTo: "src/modules/{id}/migrations",
