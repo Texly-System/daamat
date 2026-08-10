@@ -133,6 +133,10 @@ Promise<void>` function type; `bus.ts` imports nothing from `@damatjs/redis`. An
 
 ## Durable event architecture
 
+Durable event relations live in the framework-owned `damat` PostgreSQL schema.
+Migration `007` relocates the five event tables in place, and every runtime
+query uses their qualified names.
+
 `defineDurableEvent` stores a resolved event policy in the process-wide registry.
 `defineDurableEventHandler` stores a unique consumer name per event and only allows
 retry overrides. A handler registered first creates an implicit default event; one

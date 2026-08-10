@@ -14,11 +14,11 @@ export async function readScheduleHistory(
 }> {
   if (!scheduleId) return { scheduleActivity: [] };
   const schedule = await executor.query<JobScheduleRow>(
-    `SELECT * FROM "_damat_job_schedules" WHERE "id"=$1`,
+    `SELECT * FROM "damat"."_damat_job_schedules" WHERE "id"=$1`,
     [scheduleId],
   );
   const activity = await executor.query<ScheduleActivityRow>(
-    `SELECT * FROM "_damat_job_schedule_activity"
+    `SELECT * FROM "damat"."_damat_job_schedule_activity"
      WHERE "schedule_id"=$1 ORDER BY "occurred_at","id"`,
     [scheduleId],
   );

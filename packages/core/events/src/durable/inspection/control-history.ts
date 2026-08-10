@@ -27,7 +27,7 @@ export async function queryEventControlHistory(
   );
   const result = await executor.query<ControlActivityRow>(
     `SELECT "id","scope","action","reason","actor","created_at"
-     FROM "_damat_work_control_activity"
+     FROM "damat"."_damat_work_control_activity"
      WHERE "work_kind"='event' AND "scope"=ANY($1::text[])
      ORDER BY "id" ASC LIMIT $2`,
     [scopes, CONTROL_HISTORY_LIMIT + 1],

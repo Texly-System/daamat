@@ -50,11 +50,14 @@ test("failed nodes without downstream work can be retried", async () => {
   });
   const node = (await listPipelineNodeExecutions(run.id))[0]!;
   await pool.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "status"='failed',"error"='{"name":"Boom"}',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_node_executions"
+     SET "status"='failed',"error"='{"name":"Boom"}',"completed_at"=NOW()
+     WHERE "id"=$1`,
     [node.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_runs"
+     SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
     [run.id],
   );
   await client().retryNode(run.id, node.id, control("retry"));

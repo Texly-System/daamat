@@ -32,7 +32,7 @@ export async function handleCreate(
   const version = (ctx.options.pin as string) || CLI_VERSION;
   writeScaffold(targetDir, name, version, database.url);
   ctx.logger.success(`App created at ${targetDir}`);
-  if (ctx.options.git) initializeGit(targetDir, ctx.logger);
+  if (ctx.options.git !== false) initializeGit(targetDir, ctx.logger);
   const installed = ctx.options.install
     ? installDependencies(targetDir, name, ctx.logger)
     : false;

@@ -29,7 +29,9 @@ schema objects (`@damatjs/orm-type` shapes). No SQL is executed here.
 | `src/types/schema.ts`                         | `PropertyValue` / `ModelProperties` unions.                                                           |
 | `src/types/index.ts`                          | Re-exports `@damatjs/orm-type` + local `schema.ts`.                                                   |
 | `src/properties/index.ts`                     | Barrel for all property builders.                                                                     |
-| `src/properties/columns.ts`                   | The `columns` factory object (the public DSL surface).                                                |
+| `src/properties/columns.ts`                   | Public `columns` factory assembled from primitive and relation factories.                              |
+| `src/properties/columnFactories.ts`           | Primitive column factory methods, including native vector builders.                                   |
+| `src/properties/relationFactories.ts`         | Relation, index, and constraint factory methods.                                                       |
 | `src/properties/column/base.ts`               | `ColumnBuilder` — base fluent column + `toSchema()` / `toTsType()`.                                   |
 | `src/properties/column/*.ts`                  | Concrete column builders (boolean, number, text, time, json, uuid, bytea, enum, id, vector).          |
 | `src/properties/enum/base.ts`                 | `EnumBuilder`.                                                                                        |
@@ -46,6 +48,7 @@ schema objects (`@damatjs/orm-type` shapes). No SQL is executed here.
 | `src/utils/stringConvertor.ts`                | `toPascalCase` / `toCamelCase` / `toEnumTypeName`.                                                    |
 | `src/utils/target.ts`                         | `ModelTarget` type + `resolveModuleTarget` + `removeLastS`.                                           |
 | `src/utils/registry.ts`                       | Global table-name → `ModelDefinition` registry.                                                       |
+| `src/utils/vectorValue.ts`                    | Shared native vector runtime validation (finite numbers and exact dimensions).                         |
 | `src/errors/*.ts`                             | `OrmError` hierarchy + `transformPgError`. **Not exported from `src/index.ts`** (see note below).     |
 | `src/tests/`                                  | Bun tests + e-commerce fixtures + committed snapshot/generated types.                                 |
 | `scripts/`                                    | Internal fixture snapshot and type-generation scripts.                                                |

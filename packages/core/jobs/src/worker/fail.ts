@@ -12,7 +12,7 @@ export async function completeJobFailure(
   const status = await getDurabilityClient().transaction(async (executor) => {
     const current = await executor.query<{ cancelled: boolean }>(
       `SELECT "cancellation_requested_at" IS NOT NULL AS "cancelled"
-       FROM "_damat_job_runs" WHERE "id"=$1 AND "lease_owner"=$2
+       FROM "damat"."_damat_job_runs" WHERE "id"=$1 AND "lease_owner"=$2
          AND "lease_token"=$3 FOR UPDATE`,
       [claim.id, claim.workerId, claim.leaseToken],
     );

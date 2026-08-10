@@ -23,7 +23,7 @@ try {
     const result = await pool.query<WorkerRow>(`
       SELECT "id", "capabilities",
         EXTRACT(EPOCH FROM (NOW()-"last_heartbeat_at"))*1000 AS "heartbeatAgeMs"
-      FROM "_damat_workers"
+      FROM "damat"."_damat_workers"
       WHERE "stopped_at" IS NULL AND "stopping_at" IS NULL`);
     workers = result.rows;
     const capabilities = workers.flatMap((worker) => worker.capabilities);
@@ -48,6 +48,7 @@ const missing = expected.filter(
 const stale = workers.filter((worker) => worker.heartbeatAgeMs > maxAge);
 if (missing.length || stale.length)
   throw new Error(
-    `worker health failed: missing=${missing.join(",")} stale=${stale.map((row) => row.id).join(",")}`,
+    `worker health failed: missing=${missing.join(",")} ` +
+      `stale=${stale.map((row) => row.id).join(",")}`,
   );
 console.log(JSON.stringify({ workers, expected }, null, 2));

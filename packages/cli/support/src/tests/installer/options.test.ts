@@ -17,6 +17,12 @@ const context = (options: Record<string, unknown>) => ({
 });
 
 describe("installerOptions", () => {
+  test("keeps one target occurrence as a scalar before mapping", () => {
+    expect(installerOptions(context({ target: "routes=src/http" }))).toEqual({
+      targets: { routes: "src/http" },
+    });
+  });
+
   test("parses independent mode, backend, and target overrides", () => {
     expect(
       installerOptions(
@@ -31,6 +37,14 @@ describe("installerOptions", () => {
       packageBackend: "damat",
       targets: { routes: "src/http", jobs: "src/workers" },
     });
+  });
+
+  test("uses the last path for duplicate capabilities deterministically", () => {
+    expect(
+      installerOptions(
+        context({ target: ["routes=src/old", "routes=src/new"] }),
+      ).targets,
+    ).toEqual({ routes: "src/new" });
   });
 
   test("rejects malformed target values", () => {

@@ -22,6 +22,7 @@ interface SchemaDiff {
 | `type`             | extra fields                                                     | priority constant        |
 | ------------------ | ---------------------------------------------------------------- | ------------------------ |
 | `create_table`     | `tableName`, `table: Omit<TableSchema, "relations">`             | `CREATE_TABLE` (20)      |
+| `create_extension` | `extension`                                                      | `CREATE_EXTENSION` (5)   |
 | `drop_table`       | `tableName`, `cascade`                                           | `DROP_TABLE` (130)       |
 | `rename_table`     | `fromName`, `toName`                                             | `RENAME_TABLE` (80)      |
 | `add_column`       | `tableName`, `column: ColumnSchema`                              | `ADD_COLUMN` (30)        |
@@ -29,7 +30,7 @@ interface SchemaDiff {
 | `rename_column`    | `tableName`, `fromName`, `toName`                                | `RENAME_COLUMN` (75)     |
 | `alter_column`     | `tableName`, `columnName`, `changes` (per-attribute `{from,to}`) | `ALTER_COLUMN` (70)      |
 | `add_index`        | `tableName`, `index: IndexSchema`                                | `ADD_INDEX` (40)         |
-| `drop_index`       | `tableName`, `indexName`                                         | `DROP_INDEX` (110)       |
+| `drop_index`       | `tableName`, `indexName`, `concurrently?`                        | `DROP_INDEX` (110)       |
 | `add_foreign_key`  | `tableName`, `foreignKey: ForeignKeySchema`                      | `ADD_FOREIGN_KEY` (50)   |
 | `drop_foreign_key` | `tableName`, `constraintName`                                    | `DROP_FOREIGN_KEY` (100) |
 | `create_enum`      | `enumDef: EnumSchema`                                            | `CREATE_ENUM` (10)       |
@@ -42,7 +43,7 @@ interface SchemaDiff {
 
 ```ts
 // src/diff/priority.ts  (lower = executed first)
-CREATE_ENUM: 10,  CREATE_TABLE: 20,  ADD_COLUMN: 30,  ADD_INDEX: 40,  ADD_FOREIGN_KEY: 50,
+CREATE_EXTENSION: 5, CREATE_ENUM: 10, CREATE_TABLE: 20, ADD_COLUMN: 30, ADD_INDEX: 40, ADD_FOREIGN_KEY: 50,
 ALTER_ENUM: 60,   ALTER_COLUMN: 70,  RENAME_COLUMN: 75, RENAME_TABLE: 80,
 DROP_FOREIGN_KEY: 100, READD_FOREIGN_KEY: 105, DROP_INDEX: 110, READD_INDEX: 115,
 DROP_COLUMN: 120, DROP_TABLE: 130, DROP_ENUM: 140
@@ -62,11 +63,17 @@ export function diffSchemas(
 
 Algorithm:
 
-1. Diff enums first via `diffEnums(previous.enums ?? [], current.enums ?? [])`.
-2. Build name→table maps for both sides (`createNameMap`).
-3. For the union of all table names, call `diffTable(old?, new?)` and collect changes + warnings.
-4. Sort all changes by `priority`.
-5. Return `{ hasChanges, changes, warnings }`.
+1. Diff required extensions additively (missing/empty lists are equivalent).
+2. Diff enums via `diffEnums(previous.enums ?? [], current.enums ?? [])`.
+3. Build name→table maps for both sides (`createNameMap`).
+4. For the union of all table names, call `diffTable(old?, new?)` and collect changes + warnings.
+5. Sort all changes by `priority`.
+6. Return `{ hasChanges, changes, warnings }`.
+
+Extension requirements are inferred from `vector` and `halfvec` columns as well
+as `ModuleSchema.extensions`. A new requirement emits `create_extension` before
+any enum/table change. Requirements are additive: dropping the last vector
+column never emits `DROP EXTENSION`.
 
 ## Per-concern diffing
 
@@ -84,13 +91,17 @@ Algorithm:
 
 - Added (in new, not old) → `add_column`.
 - Removed (in old, not new) → `drop_column`.
-- Present in both but `!columnsEqual` → `alter_column` with a `changes` object holding only the attributes that differ: `type`, `nullable`, `default`, `length`, `scale`, `unique`, `array` — each as `{ from, to }`. If, after building, no sub-changes remain, no `alter_column` is emitted.
+- Present in both but `!columnsEqual` → `alter_column` with a `changes` object holding only the attributes that differ: `type`, `nullable`, `default`, `length`, `dimensions`, `scale`, `unique`, `array` — each as `{ from, to }`. If a native vector type or dimension changes, the change also carries `manualReview` and the diff warning names the table, column, and old/new shapes. If, after building, no sub-changes remain, no `alter_column` is emitted.
 
-`columnsEqual` (`diff/utils.ts`) compares `type`, `nullable`, `primaryKey`, `unique`, `length`, `scale`, `default`, `array`, `enum`.
+`columnsEqual` (`diff/utils.ts`) compares `type`, `nullable`, `primaryKey`, `unique`, `length` (ordinary types), `dimensions` (native vectors), `scale`, `default`, `array`, `enum`.
+
+Native vector type/dimension changes are intentionally not cast automatically;
+the SQL generator emits a manual-review comment. Nullability/default changes on
+the same column remain executable.
 
 ### Indexes — `diff/indexes.ts`
 
-Indexes are keyed by name; when an index has no explicit `name`, a synthetic one is derived: `${tableName}_${col1_col2}_idx`. `indexesEqual` compares `unique`, `type`, `where`, and `JSON.stringify(columns)`. A **changed** index becomes `drop_index` (priority `DROP_INDEX` 110) + `add_index` at the higher `READD_INDEX` priority (115), so the re-add sorts after the drop (PostgreSQL cannot alter an index in place). A purely _added_ index uses the normal `ADD_INDEX` priority (40). Added indexes carry the resolved `name` so the generator and a later drop agree on it.
+Indexes are keyed by name; when an index has no explicit `name`, a synthetic one is derived: `${tableName}_${col1_col2}_idx`. Expression indexes must provide an explicit name. `indexesEqual` compares `unique`, `type`, `where`, `concurrently`, storage parameters, and column metadata. A **changed** index becomes `drop_index` (priority `DROP_INDEX` 110, preserving the old `concurrently` flag) + `add_index` at the higher `READD_INDEX` priority (115), so the re-add sorts after the drop. A purely _added_ index uses the normal `ADD_INDEX` priority (40).
 
 ### Foreign keys — `diff/foreignKeys.ts`
 
@@ -113,6 +124,7 @@ export function reverseDiff(diff: SchemaDiff): SchemaDiff;
 Produces the inverse of a forward diff for `down` migrations:
 
 - `create_table` → `drop_table`; `add_column` → `drop_column`; `add_index` → `drop_index`; `add_foreign_key` → `drop_foreign_key`; `create_enum` → `drop_enum`.
+- `create_extension` is skipped: extension requirements are never reversed.
 - `alter_column` → an `alter_column` with every `{from,to}` swapped.
 - `alter_enum` → an `alter_enum` with `addValues`/`removeValues` swapped.
 - `drop_*`, `rename_table`, `rename_column` → **skipped** (cannot be reconstructed without the original definition).

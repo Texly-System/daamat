@@ -22,8 +22,9 @@ test("loads workflow, job, event, and pipeline providers in order", async () => 
   for (const name of ["workflows", "jobs", "events", "pipelines"]) {
     const dir = join(root, name);
     mkdirSync(dir, { recursive: true });
+    const entry = name === "pipelines" ? "index.js" : "index.ts";
     writeFileSync(
-      join(dir, "index.ts"),
+      join(dir, entry),
       `
       globalThis.__damatProviders ??= [];
       globalThis.__damatProviders.push("${name}");

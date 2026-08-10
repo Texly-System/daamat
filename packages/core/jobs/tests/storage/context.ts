@@ -35,7 +35,7 @@ async function migrate(): Promise<void> {
       await client.query(migration.sql);
       await ensureTracker(client);
       await client.query(
-        `INSERT INTO "_damat_system_migrations" ("owner", "migration_id")
+        `INSERT INTO "damat"."_damat_system_migrations" ("owner", "migration_id")
          VALUES ($1, $2) ON CONFLICT DO NOTHING`,
         [migration.owner, migration.id],
       );
@@ -58,7 +58,7 @@ async function migrationApplied(
 ) {
   const current = await client
     .query(
-      `SELECT 1 FROM "_damat_migration_logs"
+      `SELECT 1 FROM "damat"."_damat_migration_logs"
      WHERE "module"=$1 AND "name"=$2 AND "status"='applied'`,
       [owner, id],
     )
@@ -66,7 +66,7 @@ async function migrationApplied(
   if (current.rowCount) return current;
   return client
     .query(
-      `SELECT 1 FROM "_damat_system_migrations"
+      `SELECT 1 FROM "damat"."_damat_system_migrations"
      WHERE "owner"=$1 AND "migration_id"=$2`,
       [owner, id],
     )
@@ -74,8 +74,9 @@ async function migrationApplied(
 }
 
 async function ensureTracker(client: { query(sql: string): Promise<unknown> }) {
+  await client.query('CREATE SCHEMA IF NOT EXISTS "damat"');
   await client.query(`
-    CREATE TABLE IF NOT EXISTS "_damat_system_migrations" (
+    CREATE TABLE IF NOT EXISTS "damat"."_damat_system_migrations" (
       "owner" TEXT NOT NULL, "migration_id" TEXT NOT NULL,
       PRIMARY KEY ("owner", "migration_id")
     )

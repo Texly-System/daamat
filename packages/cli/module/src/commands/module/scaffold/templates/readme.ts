@@ -49,6 +49,10 @@ bun run build              # type-check + contract validate — the release gate
 bun run validate           # resolve every manifest readiness warning
 \`\`\`
 
+\`damat module init\` initializes a Git repository on \`main\` and commits this
+scaffold by default. Use \`damat module init <name> --no-git\` to skip Git;
+missing Git or setup failures leave the generated package intact.
+
 \`bun run dev\` prints the bound URL and \`/api\` mount after the server is ready,
 even with \`LOG_LEVEL=fatal\`. A fixed-port collision fails before the watcher or
 database starts; use \`damat module dev --port 0\` for an ephemeral port. Source

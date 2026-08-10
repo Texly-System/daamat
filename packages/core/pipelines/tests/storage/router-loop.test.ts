@@ -71,11 +71,11 @@ test("loop nodes project a failed child", async () => {
   await routePipelineCycle(100);
   const execution = (await listPipelineNodeExecutions(run.id))[0]!;
   const childRun = await pool.query(
-    `SELECT "id" FROM "_damat_pipeline_runs" WHERE "parent_node_execution_id"=$1`,
+    `SELECT "id" FROM "damat"."_damat_pipeline_runs" WHERE "parent_node_execution_id"=$1`,
     [execution.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='failed',"completed_at"=NOW(),
+    `UPDATE "damat"."_damat_pipeline_runs" SET "status"='failed',"completed_at"=NOW(),
      "retention_at"=NOW()+INTERVAL '1 day' WHERE "id"=$1`,
     [childRun.rows[0]!.id],
   );

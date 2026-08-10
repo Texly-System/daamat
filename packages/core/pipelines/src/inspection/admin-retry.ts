@@ -18,7 +18,7 @@ export async function retryPipelineNode(
     },
     async (executor) => {
       const result = await executor.query<NodeExecutionRow>(
-        `SELECT * FROM "_damat_pipeline_node_executions"
+        `SELECT * FROM "damat"."_damat_pipeline_node_executions"
          WHERE "id"=$1 AND "run_id"=$2 FOR UPDATE`,
         [nodeExecutionId, runId],
       );
@@ -32,7 +32,7 @@ export async function retryPipelineNode(
         );
       }
       const downstream = await executor.query(
-        `SELECT 1 FROM "_damat_pipeline_transitions" WHERE "from_execution_id"=$1 LIMIT 1`,
+        `SELECT 1 FROM "damat"."_damat_pipeline_transitions" WHERE "from_execution_id"=$1 LIMIT 1`,
         [node.id],
       );
       if (downstream.rowCount)
@@ -43,14 +43,14 @@ export async function retryPipelineNode(
         ? await retryJobRun(node.job_run_id, { executor, actor: options.actor })
         : undefined;
       await executor.query(
-        `UPDATE "_damat_pipeline_node_executions" SET "status"=$2,"error"=NULL,
+        `UPDATE "damat"."_damat_pipeline_node_executions" SET "status"=$2,"error"=NULL,
            "output"=NULL,"completed_at"=NULL,"updated_at"=NOW(),
            "job_run_id"=CASE WHEN $3 THEN "job_run_id" ELSE NULL END
          WHERE "id"=$1`,
         [node.id, retried ? "queued" : "ready", Boolean(retried)],
       );
       await executor.query(
-        `UPDATE "_damat_pipeline_runs" SET "status"=$2,"error"=NULL,
+        `UPDATE "damat"."_damat_pipeline_runs" SET "status"=$2,"error"=NULL,
          "completed_at"=NULL,"retention_at"=NULL,"updated_at"=NOW() WHERE "id"=$1`,
         [runId, node.phase === "compensation" ? "compensating" : "running"],
       );

@@ -5,6 +5,9 @@ export function coerceOptionValue(
   type: CommandOption["type"],
 ): unknown {
   if (value === undefined || value === null) return value;
+  if (Array.isArray(value)) {
+    return value.map((item) => coerceOptionValue(item, type));
+  }
 
   switch (type) {
     case "number": {

@@ -13,10 +13,12 @@ test("ModuleService emits an exported subclass through the framework", async () 
     ),
   );
   const compiler = Bun.resolveSync("typescript/bin/tsc", import.meta.dir);
-  const build = Bun.spawnSync([process.execPath, "run", "build"], {
-    cwd: packageRoot,
-  });
-  assertSuccess(build);
+  const declaration = Bun.file(`${packageRoot}/dist/index.d.ts`);
+  if (!(await declaration.exists())) {
+    throw new Error(
+      "@damatjs/services is not built; run `bun run build` before this test",
+    );
+  }
   const result = Bun.spawnSync([
     process.execPath,
     compiler,
@@ -24,7 +26,11 @@ test("ModuleService emits an exported subclass through the framework", async () 
     project,
     "--outDir",
     output,
-  ]);
+  ], {
+    stdin: "ignore",
+    stdout: "pipe",
+    stderr: "pipe",
+  });
 
   try {
     assertSuccess(result);

@@ -8,11 +8,11 @@ export async function resetInspectionStorage(): Promise<void> {
   events.clearDurableEventDefinitions();
   events.clearEventWakeupPublisher();
   await pool.query(
-    `TRUNCATE "_damat_event_activity", "_damat_event_logs",
-      "_damat_event_delivery_attempts", "_damat_event_deliveries",
-      "_damat_event_outbox", "_damat_work_control_activity",
-      "_damat_work_controls", "_damat_maintenance_activity",
-      "_damat_workers" CASCADE`,
+    `TRUNCATE "damat"."_damat_event_activity", "damat"."_damat_event_logs",
+      "damat"."_damat_event_delivery_attempts", "damat"."_damat_event_deliveries",
+      "damat"."_damat_event_outbox", "damat"."_damat_work_control_activity",
+      "damat"."_damat_work_controls", "damat"."_damat_maintenance_activity",
+      "damat"."_damat_workers" CASCADE`,
   );
 }
 
@@ -32,7 +32,7 @@ export async function seedEvent(consumers = ["alpha"]) {
   );
   await events.routeDurableEvents();
   const deliveries = await pool.query<{ id: string; consumer: string }>(
-    `SELECT "id","consumer" FROM "_damat_event_deliveries"
+    `SELECT "id","consumer" FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1 ORDER BY "consumer"`,
     [event.id],
   );

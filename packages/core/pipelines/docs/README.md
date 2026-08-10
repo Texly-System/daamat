@@ -19,7 +19,8 @@ public contract.
 ## Core invariants
 
 1. PostgreSQL is canonical. Every runnable or observable change and its
-   acceleration outbox row share a transaction.
+   acceleration outbox row share a transaction. Pipeline relations are stored
+   in the qualified `"damat"` schema; runtime SQL never relies on `search_path`.
 2. A run stores `version_id`; the router always reads that immutable manifest.
 3. Redis contains no payload, result, attempt, log, or control history.
 4. A job terminal transition writes the pipeline wake-up outbox row before the
@@ -52,6 +53,13 @@ Router claims lock both the execution and its owning run, which serializes graph
 advancement with pause, cancellation, and retry controls across processes.
 Successful compensation preserves the originating run failure; a compensation
 error is added only when the compensating task itself fails.
+
+Event-wait execution records also define the event-history boundary: matching
+durable events must be created at or after the wait execution is created. A
+correlation match cannot select an earlier fact. Signals use a separate buffered
+store and may arrive before their wait node is active. To await work completion,
+pre-arm the event wait in a forked branch and converge it with the work branch
+at an `all` join.
 
 ## Inspection snapshot
 

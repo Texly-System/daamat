@@ -1,5 +1,6 @@
 import { describe, it, expect } from "bun:test";
 import { indexBuilder } from "@/properties/indexes";
+import { columns } from "@/properties";
 
 describe("indexBuilder factory", () => {
   it("creates an IndexBuilder seeded with the given name", () => {
@@ -19,13 +20,33 @@ describe("IndexBuilder fluent options", () => {
     expect(schema.where).toBe("deleted_at IS NULL");
   });
 
-  it("concurrently() is chainable but cleanupIndexSchema does not surface it", () => {
-    // NOTE: builder records `_concurrently`, but cleanupIndexSchema only copies
-    // name/columns/unique/type/where, so `concurrently` is intentionally dropped
-    // from the emitted IndexSchema. Locking in the current behavior.
-    const builder = indexBuilder("u_idx").columns(["email"]);
+  it("preserves concurrently and storage parameters", () => {
+    const builder = indexBuilder("u_idx")
+      .columns(["email"])
+      .with({ fillfactor: 80 })
+      .concurrently();
     expect(builder.concurrently()).toBe(builder);
     const schema = builder.toSchema("user");
-    expect(schema.concurrently).toBeUndefined();
+    expect(schema.concurrently).toBe(true);
+    expect(schema.with).toEqual({ fillfactor: 80 });
+  });
+
+  it("preserves expression columns and operator classes", () => {
+    const schema = indexBuilder("embedding_hnsw")
+      .columns([
+        { expression: "(embedding::halfvec(2048))", operatorClass: "halfvec_cosine_ops" },
+      ])
+      .type("hnsw")
+      .toSchema("asset");
+    expect(schema.columns).toEqual([
+      { expression: "(embedding::halfvec(2048))", operatorClass: "halfvec_cosine_ops" },
+    ]);
+    expect(schema.type).toBe("hnsw");
+  });
+
+  it("requires a name for expression indexes", () => {
+    expect(() =>
+      columns.indexes().columns([{ expression: "lower(email)" }]).toSchema("user"),
+    ).toThrow(/explicit name/);
   });
 });

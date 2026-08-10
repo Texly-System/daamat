@@ -11,8 +11,8 @@ export async function validatePipelineComposition(
   executor: DurabilityExecutor,
 ): Promise<void> {
   const result = await executor.query<ActiveManifestRow>(
-    `SELECT d."name",v."manifest" FROM "_damat_pipeline_definitions" d
-     JOIN "_damat_pipeline_versions" v ON v."id"=d."active_version_id"`,
+    `SELECT d."name",v."manifest" FROM "damat"."_damat_pipeline_definitions" d
+     JOIN "damat"."_damat_pipeline_versions" v ON v."id"=d."active_version_id"`,
   );
   const graph = new Map(
     result.rows.map((row) => [row.name, children(row.manifest)]),

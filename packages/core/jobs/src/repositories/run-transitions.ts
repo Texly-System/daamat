@@ -9,7 +9,7 @@ export async function transitionJobRun(
   to: JobRunStatus,
 ): Promise<JobRun | undefined> {
   const result = await executor.query<JobRunRow>(
-    `UPDATE "_damat_job_runs"
+    `UPDATE "damat"."_damat_job_runs"
      SET "status" = $3, "updated_at" = NOW(),
        "cancellation_requested_at" = CASE WHEN $3 = 'cancelled'
          THEN COALESCE("cancellation_requested_at",NOW())
@@ -29,7 +29,7 @@ export async function requestJobCancellation(
   id: string,
 ): Promise<JobRun | undefined> {
   const result = await executor.query<JobRunRow>(
-    `UPDATE "_damat_job_runs"
+    `UPDATE "damat"."_damat_job_runs"
      SET "cancellation_requested_at" = NOW(), "updated_at" = NOW()
      WHERE "id" = $1 AND "status" = 'running'
        AND "cancellation_requested_at" IS NULL

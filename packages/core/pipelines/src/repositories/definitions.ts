@@ -9,19 +9,19 @@ export async function syncCodeDefinition(
   actor: WorkActor,
 ): Promise<string> {
   await executor.query(
-    `INSERT INTO "_damat_pipeline_definitions" ("id","name","source")
+    `INSERT INTO "damat"."_damat_pipeline_definitions" ("id","name","source")
      VALUES ($1,$2,'code') ON CONFLICT ("name") DO NOTHING`,
     [crypto.randomUUID(), definition.name],
   );
   const stored = await executor.query<DefinitionRow>(
-    `SELECT * FROM "_damat_pipeline_definitions" WHERE "name"=$1 FOR UPDATE`,
+    `SELECT * FROM "damat"."_damat_pipeline_definitions" WHERE "name"=$1 FOR UPDATE`,
     [definition.name],
   );
   const owner = stored.rows[0]!;
   if (owner.source !== "code")
     throw new Error(`Pipeline "${definition.name}" is web-owned`);
   const existing = await executor.query<VersionRow>(
-    `SELECT * FROM "_damat_pipeline_versions"
+    `SELECT * FROM "damat"."_damat_pipeline_versions"
      WHERE "definition_id"=$1 AND "source_version"=$2`,
     [owner.id, definition.version],
   );
@@ -37,7 +37,7 @@ export async function syncCodeDefinition(
     existing.rows[0]?.id ??
     (await insertVersion(executor, owner.id, definition, actor));
   await executor.query(
-    `UPDATE "_damat_pipeline_definitions" SET "active_version_id"=$2,"updated_at"=NOW()
+    `UPDATE "damat"."_damat_pipeline_definitions" SET "active_version_id"=$2,"updated_at"=NOW()
      WHERE "id"=$1`,
     [owner.id, versionId],
   );
@@ -53,7 +53,7 @@ async function insertVersion(
 ): Promise<string> {
   const id = crypto.randomUUID();
   await executor.query(
-    `INSERT INTO "_damat_pipeline_versions"
+    `INSERT INTO "damat"."_damat_pipeline_versions"
       ("id","definition_id","source_version","checksum","manifest","actor","reason")
      VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7)`,
     [

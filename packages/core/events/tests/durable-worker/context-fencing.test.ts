@@ -32,11 +32,11 @@ test("progress sampling updates snapshot without duplicate history", async () =>
   await current.context.progress({ percent: 10 });
   await current.context.progress({ percent: 20 });
   const row = await pool.query(
-    `SELECT "progress" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT "progress" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [current.item.id],
   );
   const activity = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM "_damat_event_activity"
+    `SELECT COUNT(*)::int AS count FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type"='progress'`,
     [current.item.id],
   );
@@ -61,7 +61,7 @@ test("log limits append one truncation activity", async () => {
   await current.context.log("info", "one");
   await current.context.log("info", "two");
   const activity = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM "_damat_event_activity"
+    `SELECT COUNT(*)::int AS count FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type"='logs_truncated'`,
     [current.item.id],
   );

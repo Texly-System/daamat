@@ -8,7 +8,7 @@ export async function loadEvaluationContext(
   extra: Partial<PipelineEvaluationContext> = {},
 ): Promise<PipelineEvaluationContext> {
   const result = await executor.query<NodeExecutionRow>(
-    `SELECT * FROM "_damat_pipeline_node_executions"
+    `SELECT * FROM "damat"."_damat_pipeline_node_executions"
      WHERE "run_id"=$1 AND "phase"='forward'`,
     [run.id],
   );

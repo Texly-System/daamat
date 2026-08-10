@@ -19,16 +19,16 @@ export async function recordJobProgress(
       last_recorded_at: Date | null;
     }>(
       `SELECT r."progress", (
-         SELECT MAX(a."occurred_at") FROM "_damat_job_activity" a
+         SELECT MAX(a."occurred_at") FROM "damat"."_damat_job_activity" a
          WHERE a."run_id" = r."id" AND a."type" = 'progress'
        ) AS "last_recorded_at"
-       FROM "_damat_job_runs" r WHERE r."id" = $1`,
+       FROM "damat"."_damat_job_runs" r WHERE r."id" = $1`,
       [claim.id],
     );
     const row = current.rows[0]!;
     const changed = JSON.stringify(row.progress) !== JSON.stringify(value);
     await executor.query(
-      `UPDATE "_damat_job_runs" SET "progress" = $2::jsonb,
+      `UPDATE "damat"."_damat_job_runs" SET "progress" = $2::jsonb,
        "updated_at" = NOW() WHERE "id" = $1`,
       [claim.id, JSON.stringify(value)],
     );

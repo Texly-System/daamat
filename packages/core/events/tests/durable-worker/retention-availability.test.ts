@@ -27,7 +27,7 @@ test("retry availability extends delivery retention", async () => {
 test("expired lease recovery extends pending delivery retention", async () => {
   const claim = await seedShortRetention("recovery");
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
     [claim.id],
   );
@@ -57,7 +57,7 @@ async function seedShortRetention(suffix: string) {
 async function expectRetentionCoversAvailability(id: string) {
   const row = await pool.query(
     `SELECT "status","available_at","retention_at"
-     FROM "_damat_event_deliveries" WHERE "id"=$1`,
+     FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [id],
   );
   expect(row.rows[0].retention_at.getTime()).toBeGreaterThanOrEqual(

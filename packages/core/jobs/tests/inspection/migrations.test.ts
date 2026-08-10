@@ -7,6 +7,7 @@ test("jobs inspection indexes are migration 003", () => {
     "002",
     "003",
     "004",
+    "005",
   ]);
   const sql = jobsSystemMigrations.migrations[2]!.sql;
   expect(sql).toContain(

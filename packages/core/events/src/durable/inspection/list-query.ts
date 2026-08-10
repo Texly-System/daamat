@@ -33,13 +33,13 @@ export async function queryEventSummaryRows(
          'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"') AS "sort_timestamp",
        COALESCE(c."delivery_counts",'{}'::jsonb) AS "delivery_counts",
        ARRAY_REMOVE(ARRAY[${viewFlags}],NULL) AS "view_flags",
-       EXISTS (SELECT 1 FROM "_damat_event_activity" r
+       EXISTS (SELECT 1 FROM "damat"."_damat_event_activity" r
          WHERE r."event_id"=o."id" AND r."type"='lease_recovered') AS "recovered"
-     FROM "_damat_event_outbox" o
+     FROM "damat"."_damat_event_outbox" o
      LEFT JOIN LATERAL (
        SELECT jsonb_object_agg(s."status",s."total") AS "delivery_counts"
        FROM (SELECT d."status",COUNT(*)::int AS "total"
-         FROM "_damat_event_deliveries" d WHERE d."event_id"=o."id"
+         FROM "damat"."_damat_event_deliveries" d WHERE d."event_id"=o."id"
          GROUP BY d."status") s
      ) c ON TRUE ${predicate.sql}
      ORDER BY date_trunc('milliseconds',o."created_at" AT TIME ZONE 'UTC') DESC,

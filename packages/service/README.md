@@ -168,6 +168,10 @@ than intended:
   `updated_at`/`updatedAt` column with the current time unless you set it
   explicitly. Auto-timestamps are `timestamp with time zone` (sub-second),
   not `date`.
+- **Native vector writes.** `vector` and `halfvec` model columns are checked
+  before SQL for finite numeric arrays with exactly their declared dimensions.
+  `null` and omitted values keep the model's nullable/default semantics;
+  ordinary `real[]` and `double precision[]` columns are unchanged.
 
 ## Read caching (opt-in, Redis-backed)
 

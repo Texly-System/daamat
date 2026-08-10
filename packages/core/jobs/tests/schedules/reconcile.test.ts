@@ -19,7 +19,7 @@ describe("job schedules", () => {
     expect(created.enabled).toBe(false);
     await reconcileJobSchedules({ limit: 10 });
     const dormant = await pool.query(
-      `SELECT 1 FROM "_damat_job_runs" WHERE "schedule_id"=$1`,
+      `SELECT 1 FROM "damat"."_damat_job_runs" WHERE "schedule_id"=$1`,
       [created.id],
     );
     expect(dormant.rowCount).toBe(0);
@@ -46,7 +46,7 @@ describe("job schedules", () => {
     ]);
     expect(counts[0]! + counts[1]!).toBeGreaterThanOrEqual(1);
     const runs = await pool.query(
-      `SELECT "scheduled_for" FROM "_damat_job_runs" WHERE "schedule_id"=$1`,
+      `SELECT "scheduled_for" FROM "damat"."_damat_job_runs" WHERE "schedule_id"=$1`,
       [created.id],
     );
     expect(runs.rowCount).toBe(1);
@@ -55,7 +55,7 @@ describe("job schedules", () => {
     expect(current).toBeDefined();
     const refreshed = await pool.query(
       `SELECT "last_occurrence_at","next_occurrence_at"
-       FROM "_damat_job_schedules" WHERE "id"=$1`,
+       FROM "damat"."_damat_job_schedules" WHERE "id"=$1`,
       [created.id],
     );
     expect(refreshed.rows[0]!.last_occurrence_at).toEqual(scheduledFor);
@@ -82,7 +82,7 @@ describe("job schedules", () => {
     const occurrence = created.nextOccurrenceAt!;
     await reconcileJobSchedules({ limit: 100 });
     await pool.query(
-      `UPDATE "_damat_job_schedules" SET "next_occurrence_at"=$2
+      `UPDATE "damat"."_damat_job_schedules" SET "next_occurrence_at"=$2
        WHERE "id"=$1`,
       [created.id, occurrence],
     );
@@ -90,7 +90,7 @@ describe("job schedules", () => {
       reconcileJobSchedules({ limit: 100 }),
     ).resolves.toBeGreaterThanOrEqual(0);
     const runs = await pool.query(
-      `SELECT 1 FROM "_damat_job_runs" WHERE "schedule_id"=$1
+      `SELECT 1 FROM "damat"."_damat_job_runs" WHERE "schedule_id"=$1
        AND "scheduled_for"=$2`,
       [created.id, occurrence],
     );

@@ -11,7 +11,7 @@ export async function auditAccelerationRebuild(
   executor: DurabilityExecutor = getDurabilityClient(),
 ): Promise<void> {
   await executor.query(
-    `INSERT INTO "_damat_maintenance_activity"
+    `INSERT INTO "damat"."_damat_maintenance_activity"
       ("operation","status","actor","details","completed_at")
      VALUES ('acceleration_projection_rebuild',$1,$2::jsonb,$3::jsonb,
        CASE WHEN $1='requested' THEN NULL ELSE NOW() END)`,

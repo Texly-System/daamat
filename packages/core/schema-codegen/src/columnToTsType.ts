@@ -1,6 +1,7 @@
 import type { ColumnSchema, ColumnType } from "@damatjs/orm-type";
 import { toEnumTypeName } from "./render/naming";
 import { pgTypeToTsBase } from "./type-mapping/ts";
+import { isVectorType, vectorDimensions } from "./vector";
 
 /**
  * Resolve the TypeScript type string for a single `ColumnSchema`.
@@ -9,6 +10,7 @@ import { pgTypeToTsBase } from "./type-mapping/ts";
  * serialized `ColumnSchema` rather than a live builder instance.
  */
 export const columnToTsType = (col: ColumnSchema): string => {
+  if (isVectorType(col.type)) vectorDimensions(col);
   // Named enum — convert the raw enum name to the generated alias name.
   const base: string =
     ["numeric", "decimal"].includes(col.type) &&

@@ -27,23 +27,26 @@ export function getInspectedPipelineRun(
     if (!row) return null;
     const visibility = inspectionOptionsForManifest(options, row.manifest);
     const nodes = await executor.query<NodeExecutionRow>(
-      `SELECT * FROM "_damat_pipeline_node_executions" WHERE "run_id"=$1 ORDER BY "created_at","id"`,
+      `SELECT * FROM "damat"."_damat_pipeline_node_executions"
+       WHERE "run_id"=$1 ORDER BY "created_at","id"`,
       [id],
     );
     const transitions = await executor.query<TransitionRow>(
-      `SELECT * FROM "_damat_pipeline_transitions" WHERE "run_id"=$1 ORDER BY "id"`,
+      `SELECT * FROM "damat"."_damat_pipeline_transitions" WHERE "run_id"=$1 ORDER BY "id"`,
       [id],
     );
     const signals = await executor.query<SignalRow>(
-      `SELECT * FROM "_damat_pipeline_signals" WHERE "run_id"=$1 ORDER BY "created_at","id"`,
+      `SELECT * FROM "damat"."_damat_pipeline_signals"
+       WHERE "run_id"=$1 ORDER BY "created_at","id"`,
       [id],
     );
     const activity = await executor.query<ActivityRow>(
-      `SELECT * FROM "_damat_pipeline_activity" WHERE "run_id"=$1 ORDER BY "created_at","id"`,
+      `SELECT * FROM "damat"."_damat_pipeline_activity"
+       WHERE "run_id"=$1 ORDER BY "created_at","id"`,
       [id],
     );
     const layout = await executor.query<LayoutRow>(
-      `SELECT "layout" FROM "_damat_pipeline_layouts" WHERE "version_id"=$1
+      `SELECT "layout" FROM "damat"."_damat_pipeline_layouts" WHERE "version_id"=$1
        ORDER BY "revision" DESC LIMIT 1`,
       [row.version_id],
     );

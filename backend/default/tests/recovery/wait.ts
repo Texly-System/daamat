@@ -22,13 +22,16 @@ export async function waitForLeaseExpiry(
   kind: WorkKind,
   id: string,
 ): Promise<void> {
-  const table = kind === "job" ? "_damat_job_runs" : "_damat_event_deliveries";
+  const table =
+    kind === "job"
+      ? '"damat"."_damat_job_runs"'
+      : '"damat"."_damat_event_deliveries"';
   await waitFor(
     `${kind} database-clock lease expiry`,
     async () => {
       const result = await pool.query<{ expired: boolean }>(
         `SELECT "lease_expires_at"<=clock_timestamp() AS "expired"
-         FROM "${table}" WHERE "id"=$1`,
+         FROM ${table} WHERE "id"=$1`,
         [id],
       );
       return result.rows[0]?.expired ?? false;

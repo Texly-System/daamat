@@ -4,8 +4,9 @@ import { ensureEventStorage, pool } from "./storage-context";
 test("event schema scopes idempotency and consumer uniqueness", async () => {
   await ensureEventStorage();
   const result = await pool.query<{ name: string; definition: string }>(
-    `SELECT conname AS name, pg_get_constraintdef(oid) AS definition
-     FROM pg_constraint WHERE conname IN
+    `SELECT conname AS name, pg_get_constraintdef(c.oid) AS definition
+     FROM pg_constraint c JOIN pg_namespace n ON n.oid=c.connamespace
+     WHERE n.nspname='damat' AND conname IN
        ('_damat_event_outbox_idempotency_uidx',
         '_damat_event_deliveries_consumer_uidx') ORDER BY conname`,
   );
@@ -24,8 +25,9 @@ test("event schema scopes idempotency and consumer uniqueness", async () => {
 test("attempt-scoped activity and logs require a real attempt", async () => {
   await ensureEventStorage();
   const result = await pool.query<{ name: string; definition: string }>(
-    `SELECT conname AS name, pg_get_constraintdef(oid) AS definition
-     FROM pg_constraint WHERE conname IN
+    `SELECT conname AS name, pg_get_constraintdef(c.oid) AS definition
+     FROM pg_constraint c JOIN pg_namespace n ON n.oid=c.connamespace
+     WHERE n.nspname='damat' AND conname IN
        ('_damat_event_activity_attempt_fkey',
         '_damat_event_logs_attempt_fkey') ORDER BY conname`,
   );
@@ -39,12 +41,15 @@ test("attempt-scoped activity and logs require a real attempt", async () => {
 test("delivery lifecycle checks and due indexes are present", async () => {
   await ensureEventStorage();
   const checks = await pool.query<{ conname: string }>(
-    `SELECT conname FROM pg_constraint WHERE conname IN
+    `SELECT conname FROM pg_constraint c
+     JOIN pg_namespace n ON n.oid=c.connamespace
+     WHERE n.nspname='damat' AND conname IN
       ('_damat_event_deliveries_status_check',
        '_damat_event_activity_status_check') ORDER BY conname`,
   );
   const indexes = await pool.query<{ indexname: string }>(
-    `SELECT indexname FROM pg_indexes WHERE indexname IN
+    `SELECT indexname FROM pg_indexes WHERE schemaname='damat'
+     AND indexname IN
       ('_damat_event_outbox_due_idx','_damat_event_deliveries_due_idx')
      ORDER BY indexname`,
   );

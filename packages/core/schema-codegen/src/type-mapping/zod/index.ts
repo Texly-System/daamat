@@ -7,6 +7,7 @@ import { rangeZodTypes } from "./range";
 import { scalarZodTypes } from "./scalars";
 import { searchZodTypes } from "./search";
 import { temporalZodTypes } from "./temporal";
+import { isVectorType, vectorDimensions } from "../../vector";
 
 const groups = [
   scalarZodTypes,
@@ -20,6 +21,10 @@ const groups = [
 ];
 
 export function getZodBaseType(type: ColumnType, column: ColumnSchema): string {
+  if (isVectorType(type)) {
+    const dimensions = vectorDimensions(column);
+    return `z.array(z.number().finite()).length(${dimensions})`;
+  }
   if (
     ["numeric", "decimal"].includes(type) &&
     column.numericRepresentation === "string"

@@ -25,7 +25,7 @@ export async function insertRun(input: {
   const queue = input.queue ?? uniqueName("inspection-queue");
   const name = input.name ?? uniqueName("inspection-job");
   await pool.query(
-    `INSERT INTO "_damat_job_runs"
+    `INSERT INTO "damat"."_damat_job_runs"
       ("id","name","queue","status","payload","metadata","created_at")
      VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7)`,
     [

@@ -41,7 +41,7 @@
         "@types/node": "^20",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
-        "postcss": "^8.5.10",
+        "postcss": "^8.5.23",
         "tailwindcss": "^4",
         "typescript": "^5.7.0",
       },
@@ -60,7 +60,7 @@
         "@types/node": "^20",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
-        "postcss": "^8.5.10",
+        "postcss": "^8.5.23",
         "tailwindcss": "^4",
         "typescript": "^5.7.0",
       },
@@ -84,7 +84,7 @@
         "@types/node": "^20",
         "@types/react": "^19.0.0",
         "@types/react-dom": "^19.0.0",
-        "postcss": "^8.5.10",
+        "postcss": "^8.5.23",
         "tailwindcss": "^4.0.0",
         "typescript": "^5.7.0",
       },
@@ -93,25 +93,25 @@
       "name": "@damatjs/default",
       "version": "0.0.0",
       "dependencies": {
-        "@damatjs/damat-cli": "1.0.0",
-        "@damatjs/deps": "1.0.0",
-        "@damatjs/events": "1.0.0",
-        "@damatjs/framework": "1.0.0",
-        "@damatjs/jobs": "1.0.0",
-        "@damatjs/logger": "1.0.0",
-        "@damatjs/orm-cli": "1.0.0",
-        "@damatjs/orm-model": "1.0.0",
-        "@damatjs/orm-pg": "1.0.0",
-        "@damatjs/orm-processor": "1.0.0",
-        "@damatjs/pipelines": "1.0.0",
-        "@damatjs/services": "1.0.0",
-        "@damatjs/types": "1.0.0",
-        "@damatjs/workflow-engine": "1.0.0",
+        "@damatjs/damat-cli": "1.0.6",
+        "@damatjs/deps": "1.0.6",
+        "@damatjs/events": "1.0.6",
+        "@damatjs/framework": "1.0.6",
+        "@damatjs/jobs": "1.0.6",
+        "@damatjs/logger": "1.0.6",
+        "@damatjs/orm-cli": "1.0.6",
+        "@damatjs/orm-model": "1.0.6",
+        "@damatjs/orm-pg": "1.0.6",
+        "@damatjs/orm-processor": "1.0.6",
+        "@damatjs/pipelines": "1.0.6",
+        "@damatjs/services": "1.0.6",
+        "@damatjs/types": "1.0.6",
+        "@damatjs/workflow-engine": "1.0.6",
       },
       "devDependencies": {
-        "@damatjs/provider-auth": "1.0.0",
-        "@damatjs/provider-payment": "1.0.0",
-        "@damatjs/provider-subscription": "1.0.0",
+        "@damatjs/provider-auth": "1.0.6",
+        "@damatjs/provider-payment": "1.0.6",
+        "@damatjs/provider-subscription": "1.0.6",
         "@damatjs/typescript-config": "*",
         "@types/bun": "1.3.9",
         "@types/node": "^22.10.2",
@@ -122,7 +122,7 @@
     },
     "packages/cli/app": {
       "name": "@damatjs/cli-app",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/cli": "workspace:*",
         "@damatjs/cli-support": "workspace:*",
@@ -137,7 +137,7 @@
     },
     "packages/cli/codegen": {
       "name": "@damatjs/cli-codegen",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/cli": "workspace:*",
         "@damatjs/link": "workspace:*",
@@ -153,7 +153,7 @@
     },
     "packages/cli/damat": {
       "name": "@damatjs/damat-cli",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "bin": {
         "damat": "./dist/cli.js",
       },
@@ -174,7 +174,7 @@
     },
     "packages/cli/kit": {
       "name": "@damatjs/cli-kit",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/cli": "workspace:*",
         "@damatjs/cli-support": "workspace:*",
@@ -188,7 +188,7 @@
     },
     "packages/cli/module": {
       "name": "@damatjs/cli-module",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/cli": "workspace:*",
         "@damatjs/cli-support": "workspace:*",
@@ -206,7 +206,7 @@
     },
     "packages/cli/support": {
       "name": "@damatjs/cli-support",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/cli": "workspace:*",
         "@damatjs/installer": "workspace:*",
@@ -219,7 +219,7 @@
     },
     "packages/core/cli": {
       "name": "@damatjs/cli",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "cac": "^6.7.14",
       },
@@ -231,7 +231,7 @@
     },
     "packages/core/durability": {
       "name": "@damatjs/durability",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
       },
@@ -243,7 +243,7 @@
     },
     "packages/core/env": {
       "name": "@damatjs/load-env",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -253,7 +253,7 @@
     },
     "packages/core/events": {
       "name": "@damatjs/events",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -268,7 +268,7 @@
     },
     "packages/core/jobs": {
       "name": "@damatjs/jobs",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -282,7 +282,7 @@
     },
     "packages/core/logger": {
       "name": "@damatjs/logger",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -291,7 +291,7 @@
     },
     "packages/core/pipelines": {
       "name": "@damatjs/pipelines",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -308,7 +308,7 @@
     },
     "packages/core/redis": {
       "name": "@damatjs/redis",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/logger": "workspace:*",
@@ -322,7 +322,7 @@
     },
     "packages/core/schema-codegen": {
       "name": "@damatjs/schema-codegen",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/orm-type": "workspace:*",
       },
@@ -335,7 +335,7 @@
     },
     "packages/core/types": {
       "name": "@damatjs/types",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -344,14 +344,15 @@
     },
     "packages/deps": {
       "name": "@damatjs/deps",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@hono/node-server": "^2.0.10",
         "effect": "^3.19.18",
-        "hono": "^4.12.0",
+        "hono": "^4.12.34",
         "ioredis": "^5.9.3",
         "nanoid": "^5.1.6",
         "pg": "^8.21.0",
+        "pgvector": "0.3.0",
         "uuid": "^13.0.0",
         "zod": "4.3.6",
       },
@@ -364,7 +365,7 @@
     },
     "packages/framework": {
       "name": "@damatjs/framework",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -386,13 +387,13 @@
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
-        "hono": "^4.12.0",
+        "hono": "^4.12.34",
         "typescript": "^5.9.3",
       },
     },
     "packages/installer": {
       "name": "@damatjs/installer",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -401,7 +402,7 @@
     },
     "packages/link": {
       "name": "@damatjs/link",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/logger": "workspace:*",
@@ -423,7 +424,7 @@
     },
     "packages/mcp": {
       "name": "@damatjs/mcp",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "bin": {
         "damat-mcp": "./bin/damat-mcp.ts",
       },
@@ -434,7 +435,7 @@
     },
     "packages/module": {
       "name": "@damatjs/module",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -460,7 +461,7 @@
     },
     "packages/module-generator": {
       "name": "@damatjs/module-generator",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/logger": "workspace:*",
         "@damatjs/orm-migration": "workspace:*",
@@ -477,7 +478,7 @@
     },
     "packages/orm/cli": {
       "name": "@damatjs/orm-cli",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "bin": {
         "damat-orm": "./dist/bin.js",
       },
@@ -506,7 +507,7 @@
     },
     "packages/orm/connector": {
       "name": "@damatjs/orm-connector",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/logger": "workspace:*",
@@ -521,7 +522,7 @@
     },
     "packages/orm/core": {
       "name": "@damatjs/orm-core",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/logger": "workspace:*",
         "@damatjs/orm-model": "workspace:*",
@@ -535,7 +536,7 @@
     },
     "packages/orm/main": {
       "name": "@damatjs/orm",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/orm-connector": "workspace:*",
@@ -552,7 +553,7 @@
     },
     "packages/orm/migration": {
       "name": "@damatjs/orm-migration",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -571,7 +572,7 @@
     },
     "packages/orm/model": {
       "name": "@damatjs/orm-model",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/orm-type": "workspace:*",
@@ -585,8 +586,9 @@
     },
     "packages/orm/pg": {
       "name": "@damatjs/orm-pg",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
+        "@damatjs/deps": "workspace:*",
         "@damatjs/logger": "workspace:*",
         "@damatjs/orm-core": "workspace:*",
         "@damatjs/orm-model": "workspace:*",
@@ -594,7 +596,6 @@
         "@damatjs/types": "workspace:*",
       },
       "devDependencies": {
-        "@damatjs/deps": "workspace:*",
         "@damatjs/orm-processor": "workspace:*",
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -604,7 +605,7 @@
     },
     "packages/orm/processor": {
       "name": "@damatjs/orm-processor",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/orm-model": "workspace:*",
@@ -620,7 +621,7 @@
     },
     "packages/orm/type": {
       "name": "@damatjs/orm-type",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
       },
@@ -632,7 +633,7 @@
     },
     "packages/provider": {
       "name": "@damatjs/provider",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/services": "workspace:*",
@@ -645,7 +646,7 @@
     },
     "packages/registry-client": {
       "name": "@damatjs/registry-client",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "devDependencies": {
         "@damatjs/typescript-config": "workspace:*",
         "@types/bun": "1.3.9",
@@ -654,7 +655,7 @@
     },
     "packages/service": {
       "name": "@damatjs/services",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/durability": "workspace:*",
@@ -680,7 +681,7 @@
     },
     "packages/workflow-engine": {
       "name": "@damatjs/workflow-engine",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/logger": "workspace:*",
@@ -694,7 +695,7 @@
     },
     "provider/auth": {
       "name": "@damatjs/provider-auth",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/provider": "workspace:*",
@@ -708,7 +709,7 @@
     },
     "provider/payment": {
       "name": "@damatjs/provider-payment",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/provider": "workspace:*",
@@ -722,7 +723,7 @@
     },
     "provider/subscription": {
       "name": "@damatjs/provider-subscription",
-      "version": "1.0.5",
+      "version": "1.0.6",
       "dependencies": {
         "@damatjs/deps": "workspace:*",
         "@damatjs/provider": "workspace:*",
@@ -736,7 +737,9 @@
     },
   },
   "overrides": {
-    "postcss": "8.5.19",
+    "js-yaml": "4.3.1",
+    "postcss": "8.5.26",
+    "read-yaml-file": "2.1.0",
     "sharp": "0.35.3",
   },
   "packages": {
@@ -1250,8 +1253,6 @@
 
     "escape-string-regexp": ["escape-string-regexp@5.0.0", "", {}, "sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw=="],
 
-    "esprima": ["esprima@4.0.1", "", { "bin": { "esparse": "./bin/esparse.js", "esvalidate": "./bin/esvalidate.js" } }, "sha512-eGuFFw7Upda+g4p+QHvnW0RyTX/SVeJBDM/gCtMARO0cLuT2HcEKnTPvhjV6aGeqrCB/sbNop0Kszm0jsaWU4A=="],
-
     "extend": ["extend@3.0.2", "", {}, "sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g=="],
 
     "extendable-error": ["extendable-error@0.1.7", "", {}, "sha512-UOiS2in6/Q0FK0R0q6UY9vYpQ21mr/Qn1KOnte7vsACuNJf514WvCCUHSRCPcgjPT2bAhNIJdlE6bVap1GKmeg=="],
@@ -1300,7 +1301,7 @@
 
     "hastscript": ["hastscript@9.0.1", "", { "dependencies": { "@types/hast": "^3.0.0", "comma-separated-tokens": "^2.0.0", "hast-util-parse-selector": "^4.0.0", "property-information": "^7.0.0", "space-separated-tokens": "^2.0.0" } }, "sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w=="],
 
-    "hono": ["hono@4.12.30", "", {}, "sha512-emn+JoJjrN9YTpRDS5it/UI2SO9BAE37T6I3d963RxcZ81G9A4pr2SZTEiiaiKbzx+NKRg5BZ89fCL7gCJCUog=="],
+    "hono": ["hono@4.13.1", "", {}, "sha512-kdJoFVv2xmayw6cY09H7AbMJMt8Jn5jdlEdXsP7AGBdF2DIptVlKlOLKXP41yPip4/a3yQPv9gVcJYI8YY04dw=="],
 
     "html-void-elements": ["html-void-elements@3.0.0", "", {}, "sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg=="],
 
@@ -1330,7 +1331,7 @@
 
     "jiti": ["jiti@2.7.0", "", { "bin": { "jiti": "lib/jiti-cli.mjs" } }, "sha512-AC/7JofJvZGrrneWNaEnJeOLUx+JlGt7tNa0wZiRPT4MY1wmfKjt2+6O2p2uz2+skll8OZZmJMNqeke7kKbNgQ=="],
 
-    "js-yaml": ["js-yaml@4.3.0", "", { "dependencies": { "argparse": "^2.0.1" }, "bin": { "js-yaml": "bin/js-yaml.js" } }, "sha512-1td788aAnnZ5qs7V2QIRl1owjtYpbKt749Y3xauqQgwIIGF/xXWz1wMTEBx5O3LK3lXLVuqXPdPxj2BoFHaW9Q=="],
+    "js-yaml": ["js-yaml@4.3.1", "", { "dependencies": { "argparse": "^2.0.1" }, "bin": { "js-yaml": "bin/js-yaml.js" } }, "sha512-CY6crGq313MX8GkwvB7tzgp99vjQxY1++5y10/BKN/GUfHqWaOGQMNZkBvqSzsZKWk/ijwHlWzzkLulsGHhjWQ=="],
 
     "jsonfile": ["jsonfile@4.0.0", "", { "optionalDependencies": { "graceful-fs": "^4.1.6" } }, "sha512-m6F1R3z8jjlf2imQHS2Qez5sjKWQzbuuhuJ/FKYFRZvPE3PuHcSMVZzfsLhGVOkfd20obL5SWEBew5ShlquNxg=="],
 
@@ -1506,11 +1507,11 @@
 
     "pgpass": ["pgpass@1.0.5", "", { "dependencies": { "split2": "^4.1.0" } }, "sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug=="],
 
+    "pgvector": ["pgvector@0.3.0", "", {}, "sha512-+t7qcQD2us8fO8YIq/3lA0gUrD+bVO70MG1MhcDcxJz/OlRGGIIHzFq/4x57Vn/LpzX5wFdfOTLQp9QMPd4ljQ=="],
+
     "picocolors": ["picocolors@1.1.1", "", {}, "sha512-xceH2snhtb5M9liqDsmEw56le376mTZkEX/jEb/RxNFyegNul7eNslCXP9FDj/Lcu0X8KEyMceP2ntpaHrDEVA=="],
 
     "picomatch": ["picomatch@2.3.2", "", {}, "sha512-V7+vQEJ06Z+c5tSye8S+nHUfI51xoXIXjHQ99cQtKUkQqqO1kO/KCJUfZXuB47h/YBlDhah2H3hdUGXn8ie0oA=="],
-
-    "pify": ["pify@4.0.1", "", {}, "sha512-uB80kBFb/tfd68bVleG9T5GGsGPjJrLAUpR5PZIrhBnIaRTQRjqdJSsIKkOP6OAIFbj7GOrcudc5pNjZ+geV2g=="],
 
     "playwright": ["playwright@1.61.1", "", { "dependencies": { "playwright-core": "1.61.1" }, "optionalDependencies": { "fsevents": "2.3.2" }, "bin": { "playwright": "cli.js" } }, "sha512-DWnY5o3YbLWK4GovuAVwpqL+1VwGNdUGrRr++8j8PtQQzvAVZUIMjKQ90fY689sEJZJBbZVw1rXaOKSTitkzPQ=="],
 
@@ -1518,7 +1519,7 @@
 
     "plimit-lit": ["plimit-lit@1.6.1", "", { "dependencies": { "queue-lit": "^1.5.1" } }, "sha512-B7+VDyb8Tl6oMJT9oSO2CW8XC/T4UcJGrwOVoNGwOQsQYhlpfajmrMj5xeejqaASq3V/EqThyOeATEOMuSEXiA=="],
 
-    "postcss": ["postcss@8.5.19", "", { "dependencies": { "nanoid": "^3.3.12", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-Mz8SaolMd8nB+G13WkORcxQKHZ/NE4xXevtkJHVuG+guo9/wYKlIMTKAqGdEmYOXR2ijPjTYNHssizdaVSUNdQ=="],
+    "postcss": ["postcss@8.5.26", "", { "dependencies": { "nanoid": "^3.3.17", "picocolors": "^1.1.1", "source-map-js": "^1.2.1" } }, "sha512-u82N74LFzG8ca+dD8puPnplTXoGH4fTPpVGuIbt36G3qvNlkvfD0lEAZSxaly3KX8TS/L1A1gsCEmvKmBcVbkQ=="],
 
     "postcss-selector-parser": ["postcss-selector-parser@6.0.10", "", { "dependencies": { "cssesc": "^3.0.0", "util-deprecate": "^1.0.2" } }, "sha512-IQ7TZdoaqbT+LCpShg46jnZVlhWD2w6iQYAcYXfHARZ7X1t/UGhhceQDs5X0cGqKvYlHNOuv7Oa1xmb0oQuA3w=="],
 
@@ -1546,7 +1547,7 @@
 
     "react-dom": ["react-dom@19.2.4", "", { "dependencies": { "scheduler": "^0.27.0" }, "peerDependencies": { "react": "^19.2.4" } }, "sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ=="],
 
-    "read-yaml-file": ["read-yaml-file@1.1.0", "", { "dependencies": { "graceful-fs": "^4.1.5", "js-yaml": "^3.6.1", "pify": "^4.0.1", "strip-bom": "^3.0.0" } }, "sha512-VIMnQi/Z4HT2Fxuwg5KrY174U1VdUIASQVWXXyqtNRtxSr9IYkn1rsI6Tb6HsrHCmB7gVpNwX6JxPTHcH6IoTA=="],
+    "read-yaml-file": ["read-yaml-file@2.1.0", "", { "dependencies": { "js-yaml": "^4.0.0", "strip-bom": "^4.0.0" } }, "sha512-UkRNRIwnhG+y7hpqnycCL/xbTk7+ia9VuVTC0S+zVbwd65DI9eUpRMfsWIGrCWxTU/mi+JW8cHQCrv+zfCbEPQ=="],
 
     "readdirp": ["readdirp@3.6.0", "", { "dependencies": { "picomatch": "^2.2.1" } }, "sha512-hOS089on8RduqdbhvQ5Z37A0ESjsqz6qnRcffsMU3495FuTdqSm+7bhJ29JvIOsBDEEnan5DPu9t3To9VRlMzA=="],
 
@@ -1610,15 +1611,13 @@
 
     "split2": ["split2@4.2.0", "", {}, "sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg=="],
 
-    "sprintf-js": ["sprintf-js@1.0.3", "", {}, "sha512-D9cPgkvLlV3t3IzL0D0YLvGA9Ahk4PcvVwUbN0dSGr1aP0Nrt4AEnTUbuGvquEC0mA64Gqt1fzirlRs5ibXx8g=="],
-
     "standard-as-callback": ["standard-as-callback@2.1.0", "", {}, "sha512-qoRRSyROncaz1z0mvYqIE4lCd9p2R90i6GxW3uZv5ucSu8tU7B5HXUP1gG8pVZsYNVaXjk8ClXHPttLyxAL48A=="],
 
     "stringify-entities": ["stringify-entities@4.0.4", "", { "dependencies": { "character-entities-html4": "^2.0.0", "character-entities-legacy": "^3.0.0" } }, "sha512-IwfBptatlO+QCJUo19AqvrPNqlVMpW9YEL2LIVY+Rpv2qsjCGxaDLNRgeGsQWJhfItebuJhsGSLjaBbNSQ+ieg=="],
 
     "strip-ansi": ["strip-ansi@6.0.1", "", { "dependencies": { "ansi-regex": "^5.0.1" } }, "sha512-Y38VPSHcqkFrCpFnQ9vuSXmquuv5oXOKpGeT6aGrr3o3Gc9AlVa6JBfUSOCnbxGGZF+/0ooI7KrPuUSztUdU5A=="],
 
-    "strip-bom": ["strip-bom@3.0.0", "", {}, "sha512-vavAMRXOgBVNF6nyEEmL3DBK19iRpDcoIwW+swQ+CbGiu7lju6t+JklA1MHweoWtadgt4ISVUsXLyDq34ddcwA=="],
+    "strip-bom": ["strip-bom@4.0.0", "", {}, "sha512-3xurFv5tEgii33Zi8Jtp55wEIILR9eh34FAW00PZf+JnSsTmV/ioewSgQl97JHvgjoRGwPShsWm+IdrxB35d0w=="],
 
     "styled-jsx": ["styled-jsx@5.1.6", "", { "dependencies": { "client-only": "0.0.1" }, "peerDependencies": { "react": ">= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0" } }, "sha512-qSVyDTeMotdvQYoHWLNGwRFJHC+i+ZvdBRYosOFgC+Wg1vx4frN2/RG/NA7SYqqvKNLf39P2LSRA2pu6n0XYZA=="],
 
@@ -1726,10 +1725,6 @@
 
     "playwright/fsevents": ["fsevents@2.3.2", "", { "os": "darwin" }, "sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA=="],
 
-    "postcss/nanoid": ["nanoid@3.3.16", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-bzlKTyNJ7+LdGIIwy8ijFpIqEQIvafahV7eYykJ8Cvh42EdJeODoJ6gUJXpQJvej1BddH8OqTXZNE/KfbWAu8Q=="],
-
-    "read-yaml-file/js-yaml": ["js-yaml@3.15.0", "", { "dependencies": { "argparse": "^1.0.7", "esprima": "^4.0.0" }, "bin": { "js-yaml": "bin/js-yaml.js" } }, "sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog=="],
-
-    "read-yaml-file/js-yaml/argparse": ["argparse@1.0.10", "", { "dependencies": { "sprintf-js": "~1.0.2" } }, "sha512-o5Roy6tNG4SL/FOkCAN6RzjiakZS25RLYFrcMttJqbdd8BWrnA+fGz57iN5Pb06pvBGvl5gQ0B48dJlslXvoTg=="],
+    "postcss/nanoid": ["nanoid@3.3.18", "", { "bin": { "nanoid": "bin/nanoid.cjs" } }, "sha512-DTg4MJbGMWkfi6VZFdNt2/caMbQy4Ou+Op/hJQvGEWcnVfoA1QA+xzRKAzw9jD6+GVOOeYr/mIcuDSdug6F6+w=="],
   }
 }

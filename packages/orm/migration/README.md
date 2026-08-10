@@ -2,7 +2,7 @@
 
 > Module-based PostgreSQL migration system: discover, generate, run, and track.
 
-`@damatjs/orm-migration` is the migration runtime for the Damat ORM. Each application module owns its own `migrations/` folder of timestamped `.sql` files; this package discovers those files, generates new ones from your models (via [`@damatjs/orm-processor`](../processor/README.md)), runs pending migrations transactionally against a `pg` pool, and records what has been applied in a `_damat_migration_logs` table. It sits between the pure schema engine (processor) and the database, and is driven by the ORM CLI and the framework's module system.
+`@damatjs/orm-migration` is the migration runtime for the Damat ORM. Each application module owns its own `migrations/` folder of timestamped `.sql` files; this package discovers those files, generates new ones from your models (via [`@damatjs/orm-processor`](../processor/README.md)), runs pending migrations transactionally against a `pg` pool, and records what has been applied in the qualified `damat._damat_migration_logs` table. It sits between the pure schema engine (processor) and the database, and is driven by the ORM CLI and the framework's module system.
 
 Part of the [Damat](../../../README.md) monorepo · [Full guide](../../../docs/GUIDE.md) · [Internals](./docs/README.md)
 
@@ -87,7 +87,7 @@ console.log(status.modules);
 | `runMigrations(pool, moduleContainer, options?)`                  | function     | Run optional system migrations first, then module migrations, under one advisory lock.                  |
 | `getMigrationStatus(pool, moduleContainer, options?)`             | function     | Applied/pending counts for system owners and modules.                                                   |
 | `getModuleMigrationStatus(pool, moduleDescriptor)`                | function     | Same, for one module (throws if it has no migrations).                                                  |
-| `MigrationTracker`                                                | class        | CRUD over `_damat_migration_logs` (`ensureTable`, `getApplied`, `recordApplied`, `recordReverted`).     |
+| `MigrationTracker`                                                | class        | CRUD over `damat._damat_migration_logs` (`ensureTable`, `getApplied`, `recordApplied`, `recordReverted`). |
 | `bootstrapDatabase(pool)`                                         | function     | Idempotent DB setup: `pgcrypto` + `generate_id(prefix)` function.                                       |
 | `log`, `separator`, `successBanner`, `errorBanner`                | functions    | Migration logging helpers (re-exported from `@damatjs/logger`).                                         |
 | `MigrationTracker`, `AppliedMigration`                            | class / type | The tracker and its applied-row type.                                                                   |
@@ -99,6 +99,12 @@ console.log(status.modules);
 not the parent modules directory. `createDiffMigration` additionally accepts
 `{ migrationsDir }` as its fourth argument when manifest-declared models and
 migrations live in separate directories.
+
+The migration role must own or inherit the owner of the `damat` schema and have
+`USAGE, CREATE`; runtime roles need `USAGE` plus the required table and sequence
+privileges. `ensureTable()` moves a legacy public tracker transactionally and
+reports incompatible schema contents or a conflict if both tracker locations
+exist.
 
 Migration SQL, its SHA-256 source checksum, and tracker insertion use one
 checked-out client. Transactional tracker failure rolls back the SQL. If
@@ -114,6 +120,12 @@ Generation carries each table's schema through snapshots, diffs, indexes,
 constraints, and foreign keys. An explicit generator schema overrides table
 schema, then module schema, then `public`. Unsupported or invalid schema changes
 fail before either migration SQL or `schema-snapshot.json` is written.
+
+Models with native `vector`/`halfvec` columns automatically persist a `vector`
+extension requirement and generate `CREATE EXTENSION IF NOT EXISTS vector` before
+dependent tables. Processor statement APIs omit terminators, but generated SQL
+files append one semicolon per statement. Native vector type or dimension changes
+produce a warning and manual-review comment while still advancing the snapshot.
 
 **Subpath exports:** none — everything is under `.`.
 

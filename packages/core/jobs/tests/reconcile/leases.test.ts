@@ -19,7 +19,7 @@ describe("expired job lease reconciliation", () => {
     expect(claimed).toBeDefined();
     const recovered = await durability.transaction(async (executor) => {
       await executor.query(
-        `UPDATE "_damat_job_runs"
+        `UPDATE "damat"."_damat_job_runs"
          SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
         [item.run.id],
       );
@@ -31,7 +31,7 @@ describe("expired job lease reconciliation", () => {
     });
     expect(recovered).toBe(1);
     const state = await pool.query(
-      `SELECT "status","lease_token" FROM "_damat_job_runs" WHERE "id"=$1`,
+      `SELECT "status","lease_token" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [item.run.id],
     );
     expect(state.rows[0]).toMatchObject({

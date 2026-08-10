@@ -26,7 +26,7 @@ export async function createJobSchedule(
         input.schedule.kind === "interval" ? input.schedule.everyMs : null;
       const runAt = input.schedule.kind === "once" ? input.schedule.at : null;
       const result = await executor.query<JobScheduleRow>(
-        `INSERT INTO "_damat_job_schedules" (
+        `INSERT INTO "damat"."_damat_job_schedules" (
         "id","name","job_name","kind","enabled","payload","metadata",
         "queue","priority","max_attempts","backoff_ms","backoff_multiplier",
         "run_at","interval_ms","next_occurrence_at","deduplication_key",

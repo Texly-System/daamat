@@ -23,7 +23,8 @@ export interface ColumnSchema {
   name: string;
   type: ColumnType;
   primaryKey?: boolean;
-  length?: number; // varchar/char length, numeric precision, vector dimensions
+  length?: number; // varchar/char length or numeric precision
+  dimensions?: number; // native VECTOR/HALFVEC dimensionality
   scale?: number; // numeric digits after the decimal point
   nullable: boolean; // required — always set by builders
   default?: any; // default value *expression* (already SQL-quoted)
@@ -37,8 +38,9 @@ export interface ColumnSchema {
 
 Notes / gotchas:
 
-- `length` is overloaded: it carries varchar/char length, numeric precision, _and_
-  the dimension count for vector columns. `scale` is numeric-only.
+- `length` is reserved for varchar/char length and numeric precision. Native
+  pgvector columns store their dimensionality in `dimensions`; `scale` is
+  numeric-only.
 - `default` is an expression string (e.g. `"now()"`, `"generate_id('usr')"`,
   `"'active'"`). String literal defaults arrive already single-quoted from the
   builder — do not re-quote when generating DDL.
@@ -72,6 +74,7 @@ export interface ModuleSchema {
   tables: Omit<TableSchema, "relations">[];
   enums?: EnumSchema[];
   relationships?: RelationSchema[]; // all relations hoisted from every table
+  extensions?: string[]; // required PostgreSQL extensions (for example vector)
 }
 ```
 
@@ -142,12 +145,16 @@ fields.
 ## Indexes (`indexType.ts`)
 
 ```ts
-export type IndexType = "btree" | "hash" | "gin" | "gist" | "brin";
+export type IndexType =
+  | "btree" | "hash" | "gin" | "gist" | "brin" | "hnsw" | "ivfflat";
 
-export interface IndexColumn {
-  name: string;
-  order?: "ASC" | "DESC";
-}
+export type VectorOperatorClass =
+  | "vector_l2_ops" | "vector_cosine_ops" | "vector_ip_ops" | "vector_l1_ops"
+  | "halfvec_l2_ops" | "halfvec_cosine_ops" | "halfvec_ip_ops" | "halfvec_l1_ops";
+
+export type IndexColumn =
+  | { name: string; expression?: never; operatorClass?: VectorOperatorClass; order?: "ASC" | "DESC" }
+  | { name?: never; expression: string; operatorClass?: VectorOperatorClass; order?: "ASC" | "DESC" };
 
 export interface IndexSchema {
   name?: string;
@@ -156,6 +163,7 @@ export interface IndexSchema {
   type?: IndexType;
   where?: string; // partial index
   concurrently?: boolean; // CREATE INDEX CONCURRENTLY
+  with?: Record<string, string | number | boolean>; // storage parameters
 }
 ```
 

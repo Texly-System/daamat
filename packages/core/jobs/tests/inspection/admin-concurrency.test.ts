@@ -18,7 +18,7 @@ test("concurrent first pause writes one transition", async () => {
   );
   expect(results.filter(({ status }) => status === "rejected")).toHaveLength(1);
   const activity = await pool.query(
-    `SELECT 1 FROM "_damat_work_control_activity"
+    `SELECT 1 FROM "damat"."_damat_work_control_activity"
      WHERE "work_kind"='job' AND "scope"=$1 AND "action"='paused'`,
     [queue],
   );
@@ -43,7 +43,7 @@ test("concurrent schedule enable writes one attributed transition", async () => 
   );
   expect(results.filter(({ status }) => status === "rejected")).toHaveLength(1);
   const activity = await pool.query(
-    `SELECT "actor" FROM "_damat_job_schedule_activity"
+    `SELECT "actor" FROM "damat"."_damat_job_schedule_activity"
      WHERE "schedule_id"=$1 AND "type"='enabled'`,
     [schedule.id],
   );

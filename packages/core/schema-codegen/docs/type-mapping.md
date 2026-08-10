@@ -68,6 +68,7 @@ driver materializes at runtime. Highlights:
 | `tsrange`, `tstzrange`, `daterange`                                        | same shape with `Date` bounds                                                                                                  |
 | `*multirange`                                                              | `Array<...>` of the corresponding range object                                                                                 |
 | `pg_lsn`, `pg_snapshot`                                                    | `string`                                                                                                                       |
+| `vector`, `halfvec`                                                        | `number[]`                                                                                                                     |
 
 `enumTypeToTsBase(values)` builds a string-literal union (`'a' | 'b'`) from values, falling back to `string` when none are given. It is a standalone helper for when you have raw enum values rather than a named alias.
 
@@ -98,6 +99,7 @@ generators add those based on column nullability/defaults. Notable mappings:
 | `enum`                                                                                                                | `z.string()` (the schema generators replace this with `z.enum([...])` when values are known) |
 | `point`/`lseg`/`box`/`circle`, ranges, multiranges                                                                    | structured `z.object(...)` / `z.array(z.object(...))` mirroring the TS shapes                |
 | `oid`                                                                                                                 | `z.number().int()`                                                                           |
+| `vector`, `halfvec`                                                                                                   | `z.array(z.number().finite()).length(dimensions)`                                               |
 
 ## Edge cases & gotchas
 
@@ -105,6 +107,11 @@ generators add those based on column nullability/defaults. Notable mappings:
 - **TS and Zod disagree by design for some types.** TS uses what pg returns (`Buffer`, `Date`, object literals); Zod sometimes uses `z.unknown()` (bytea/json) or `z.coerce.date()` for ergonomic parsing. Don't assume one is derived from the other.
 - **`length` only narrows `string` types in Zod** (`.max(length)`), and only character types in TS (via the SQL side, not here). Numeric `length`/`scale` don't affect the generated number type.
 - **Unresolved enum columns** (`type: "enum"` without `col.enum`) yield `string`/`z.string()`, not an alias.
+- **Native vector columns** require a positive integer `dimensions` field and
+  always use `array: false`. Generation throws when dimensions are missing or
+  invalid instead of emitting an unbounded array validator. Ordinary
+  `real().array()` and `doublePrecision().array()` columns still use the
+  existing array wrapper.
 
 ## Safe extension
 

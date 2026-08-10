@@ -37,7 +37,7 @@ test("handler progress, redacted logs, and JSON result are durable", async () =>
     result: { accepted: true },
   });
   const logs = await pool.query(
-    `SELECT "context" FROM "_damat_event_logs" WHERE "delivery_id"=$1`,
+    `SELECT "context" FROM "damat"."_damat_event_logs" WHERE "delivery_id"=$1`,
     [item.id],
   );
   expect(logs.rows[0].context).toEqual({ token: "[REDACTED]", safe: true });

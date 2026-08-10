@@ -17,7 +17,7 @@ export async function beginCompensation(
   error: Record<string, unknown>,
 ): Promise<void> {
   await executor.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='compensating',"error"=$2::jsonb,
+    `UPDATE "damat"."_damat_pipeline_runs" SET "status"='compensating',"error"=$2::jsonb,
        "updated_at"=NOW() WHERE "id"=$1`,
     [run.id, JSON.stringify(error)],
   );

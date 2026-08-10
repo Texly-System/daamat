@@ -8,7 +8,7 @@ test("duration and schedule policy values cannot be negative", async () => {
   const run = await enqueueJob(uniqueName("policy-check"), {});
   await expect(
     pool.query(
-      `INSERT INTO "_damat_job_attempts"
+      `INSERT INTO "damat"."_damat_job_attempts"
        ("run_id","attempt_number","worker_id","lease_token","duration_ms")
        VALUES ($1,1,'worker',$2,-1)`,
       [run.id, crypto.randomUUID()],
@@ -16,7 +16,7 @@ test("duration and schedule policy values cannot be negative", async () => {
   ).rejects.toThrow();
   await expect(
     pool.query(
-      `INSERT INTO "_damat_job_activity" ("run_id","type","duration_ms")
+      `INSERT INTO "damat"."_damat_job_activity" ("run_id","type","duration_ms")
        VALUES ($1,'invalid_duration',-1)`,
       [run.id],
     ),
@@ -33,7 +33,7 @@ async function expectSchedulePolicyRejected(
   const scheduleId = await insertSchedule();
   await expect(
     pool.query(
-      `UPDATE "_damat_job_schedules" SET "${column}" = $1 WHERE "id" = $2`,
+      `UPDATE "damat"."_damat_job_schedules" SET "${column}" = $1 WHERE "id" = $2`,
       [value, scheduleId],
     ),
   ).rejects.toThrow();

@@ -38,7 +38,7 @@ export async function reconcileScheduleOccurrence(
       ...(ttl !== undefined ? { expiresAt: new Date(Date.now() + ttl) } : {}),
     });
     if (!claim.acquired) {
-      await executor.query(`DELETE FROM "_damat_job_runs" WHERE "id"=$1`, [
+      await executor.query(`DELETE FROM "damat"."_damat_job_runs" WHERE "id"=$1`, [
         run.id,
       ]);
       run = undefined;
@@ -56,7 +56,7 @@ export async function reconcileScheduleOccurrence(
       ? new Date(scheduledFor.getTime() + schedule.intervalMs!)
       : null;
   await executor.query(
-    `UPDATE "_damat_job_schedules" SET "last_occurrence_at"=$2::timestamptz,
+    `UPDATE "damat"."_damat_job_schedules" SET "last_occurrence_at"=$2::timestamptz,
        "next_occurrence_at"=$3::timestamptz,
        "enabled"=CASE WHEN $3::timestamptz IS NULL THEN FALSE ELSE "enabled" END,
        "updated_at"=NOW() WHERE "id"=$1`,

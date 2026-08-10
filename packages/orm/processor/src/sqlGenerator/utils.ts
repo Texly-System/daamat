@@ -38,6 +38,15 @@ export function columnTypeSql(col: ColumnSchema): string {
   let sql: string;
 
   switch (col.type) {
+    case "vector":
+    case "halfvec":
+      if (!Number.isInteger(col.dimensions) || (col.dimensions ?? 0) <= 0) {
+        throw new Error(
+          `Native ${col.type} column '${col.name}' requires positive integer dimensions`,
+        );
+      }
+      sql = `${col.type === "halfvec" ? "HALFVEC" : "VECTOR"}(${col.dimensions})`;
+      break;
     case "character varying":
     case "character":
       sql = col.length
@@ -57,7 +66,9 @@ export function columnTypeSql(col: ColumnSchema): string {
       sql = col.type.toUpperCase();
   }
 
-  return col.array ? `${sql}[]` : sql;
+  return col.array && col.type !== "vector" && col.type !== "halfvec"
+    ? `${sql}[]`
+    : sql;
 }
 
 /**

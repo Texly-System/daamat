@@ -1,6 +1,6 @@
 {
   "name": "@damatjs/deps",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Dependencies for damatjs",
   "type": "module",
   "main": "dist/index.js",
@@ -32,6 +32,10 @@
     "./pg": {
       "types": "./dist/pg.d.ts",
       "default": "./dist/pg.js"
+    },
+    "./pgvector": {
+      "types": "./dist/pgvector.d.ts",
+      "default": "./dist/pgvector.js"
     },
     "./hono": {
       "types": "./dist/hono.d.ts",
@@ -65,10 +69,11 @@
   "dependencies": {
     "@hono/node-server": "^2.0.10",
     "effect": "^3.19.18",
-    "hono": "^4.12.0",
+    "hono": "^4.12.34",
     "ioredis": "^5.9.3",
     "nanoid": "^5.1.6",
     "pg": "^8.21.0",
+    "pgvector": "0.3.0",
     "uuid": "^13.0.0",
     "zod": "4.3.6"
   },

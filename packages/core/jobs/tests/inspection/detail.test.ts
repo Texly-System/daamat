@@ -17,25 +17,25 @@ describe("job inspection detail", () => {
     });
     const workerId = `history-worker-${crypto.randomUUID()}`;
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"='running',"attempt_count"=1,
+      `UPDATE "damat"."_damat_job_runs" SET "status"='running',"attempt_count"=1,
        "lease_owner"=$2,"lease_token"=$3,"lease_expires_at"=NOW()+INTERVAL '1 minute'
        WHERE "id"=$1`,
       [run.id, workerId, token],
     );
     await pool.query(
-      `INSERT INTO "_damat_job_attempts"
+      `INSERT INTO "damat"."_damat_job_attempts"
        ("run_id","attempt_number","worker_id","lease_token","heartbeat_at")
        VALUES ($1,1,$2,$3,NOW())`,
       [run.id, workerId, token],
     );
     await pool.query(
-      `INSERT INTO "_damat_job_activity"
+      `INSERT INTO "damat"."_damat_job_activity"
        ("run_id","attempt_number","type","worker_id","lease_token")
        VALUES ($1,1,'claimed',$2,$3),($1,1,'logs_truncated',$2,$3)`,
       [run.id, workerId, token],
     );
     await pool.query(
-      `INSERT INTO "_damat_job_logs"
+      `INSERT INTO "damat"."_damat_job_logs"
        ("run_id","attempt_number","level","message","context","sequence")
        VALUES ($1,1,'info','hello','{"token":"secret"}',1)`,
       [run.id],

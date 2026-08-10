@@ -50,7 +50,7 @@ export const POST = defineRoute(async (context) => {
 
 export const GET = defineRoute(async (context) => {
   const result = await PoolManager.getPool().query(
-    `SELECT "id" FROM "_damat_workers"
+    `SELECT "id" FROM "damat"."_damat_workers"
      WHERE "stopping_at" IS NULL AND "stopped_at" IS NULL`,
   );
   return context.json({ active: result.rows.length });

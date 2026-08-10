@@ -7,7 +7,7 @@ export async function assertCurrentLease(
   claim: ClaimedJobRun,
 ): Promise<void> {
   const result = await executor.query(
-    `SELECT 1 FROM "_damat_job_runs"
+    `SELECT 1 FROM "damat"."_damat_job_runs"
      WHERE "id" = $1 AND "status" = 'running'
        AND "lease_owner" = $2 AND "lease_token" = $3
        AND "lease_expires_at" > NOW()

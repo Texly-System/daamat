@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version | Summary                                                                                                                                               | Upgrade notes         |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.6   | Lockstep maintenance and dependency synchronization                                                                                                   | —                     |
 | 1.0.4   | Lockstep maintenance and dependency synchronization                                                                                                   | —                     |
 | 1.0.0   | Aggregate active pool stats and physical-connection-only logging                                                                                      | [next →](./1.0.0.md)  |
 | 0.1.3   | Dependency bump (`@damatjs/orm-type`, `@damatjs/deps`, …) — picks up the cross-module links work in `@damatjs/link`; no change to this package's code | —                     |

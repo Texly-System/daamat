@@ -17,4 +17,6 @@ export const scalarTsTypes = new Map<ColumnType, string>([
   ["character varying", "string"],
   ["character", "string"],
   ["uuid", "string"],
+  ["vector", "number[]"],
+  ["halfvec", "number[]"],
 ]);

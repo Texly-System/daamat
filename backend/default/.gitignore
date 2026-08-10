@@ -5,5 +5,8 @@ dist/
 /logs
 .damat
 /ops
+!/ops/
+/ops/*
+!/ops/database-role-inspection.ts
 /postgres
 /redis

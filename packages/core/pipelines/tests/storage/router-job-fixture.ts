@@ -15,7 +15,7 @@ export async function settleQueuedPipelineJobs(
     (value) => value.jobRunId && value.status === "queued",
   )) {
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"=$2,"result"=$3::jsonb,
+      `UPDATE "damat"."_damat_job_runs" SET "status"=$2,"result"=$3::jsonb,
        "last_error"=NULL,"completed_at"=NOW(),"updated_at"=NOW() WHERE "id"=$1`,
       [node.jobRunId, status, JSON.stringify(result)],
     );

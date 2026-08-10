@@ -29,7 +29,7 @@ test("overlapping workers claim disjoint due deliveries", async () => {
   expect([...leftIds].filter((id) => rightIds.has(id))).toHaveLength(0);
   const attempts = await pool.query(
     `SELECT "delivery_id",COUNT(*)::int AS "count"
-     FROM "_damat_event_delivery_attempts"
+     FROM "damat"."_damat_event_delivery_attempts"
      WHERE "delivery_id"=ANY($1::uuid[]) GROUP BY "delivery_id"`,
     [[...leftIds, ...rightIds]],
   );

@@ -13,6 +13,7 @@
 
 export const PRIORITY = {
   // Create operations (low priority = first)
+  CREATE_EXTENSION: 5,
   CREATE_ENUM: 10,
   CREATE_TABLE: 20,
   ADD_COLUMN: 30,

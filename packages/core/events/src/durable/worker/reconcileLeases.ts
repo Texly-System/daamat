@@ -31,8 +31,8 @@ async function recover(
   const result = await executor.query<ExpiredEventDeliveryLease>(
     `SELECT d."id",d."event_id",d."consumer",d."attempt_count",
        d."max_attempts",d."cancellation_requested_at",d."lease_owner",
-       d."lease_token" FROM "_damat_event_deliveries" d
-     JOIN "_damat_event_outbox" o ON o."id"=d."event_id"
+       d."lease_token" FROM "damat"."_damat_event_deliveries" d
+     JOIN "damat"."_damat_event_outbox" o ON o."id"=d."event_id"
      WHERE d."status"='running' AND d."lease_expires_at"<=NOW()
        AND ($2::jsonb IS NULL OR EXISTS (SELECT 1
          FROM jsonb_to_recordset($2::jsonb) AS s(event text, consumer text)

@@ -11,7 +11,7 @@ export async function processSignalWait(
   node: PipelineSignalNode,
 ): Promise<void> {
   const result = await executor.query<{ id: string; payload: unknown }>(
-    `SELECT "id","payload" FROM "_damat_pipeline_signals"
+    `SELECT "id","payload" FROM "damat"."_damat_pipeline_signals"
      WHERE "run_id"=$1 AND "name"=$2 AND "consumed_at" IS NULL
      ORDER BY "created_at","id" FOR UPDATE SKIP LOCKED LIMIT 1`,
     [run.id, node.signal],
@@ -22,7 +22,7 @@ export async function processSignalWait(
     return;
   }
   await executor.query(
-    `UPDATE "_damat_pipeline_signals" SET "consumed_by"=$2,"consumed_at"=NOW()
+    `UPDATE "damat"."_damat_pipeline_signals" SET "consumed_by"=$2,"consumed_at"=NOW()
      WHERE "id"=$1`,
     [signal.id, execution.id],
   );

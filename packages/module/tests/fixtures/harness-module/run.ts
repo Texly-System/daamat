@@ -12,7 +12,7 @@ for (let run = 0; run < 2; run += 1) {
   const booted = await bootModule(module, { databaseUrl, moduleDir: valid });
   const result = await booted.pool.query(
     `SELECT to_regclass('harness_fixture_records') AS domain,
-            to_regclass('_damat_event_outbox') AS events`,
+            to_regclass('damat._damat_event_outbox') AS events`,
   );
   tables = result.rows[0];
   await booted.teardown();

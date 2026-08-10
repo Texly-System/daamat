@@ -12,6 +12,7 @@ function context(options: Record<string, unknown>) {
   return createContext(
     {
       databaseUrl: "postgres://postgres:postgres@localhost/my_module",
+      git: false,
       ...options,
     },
     { args: ["my-module"], cwd: "/m" },

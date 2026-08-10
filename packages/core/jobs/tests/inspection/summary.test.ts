@@ -8,11 +8,11 @@ describe("job operational summary", () => {
     const from = new Date("2040-01-01T00:00:00Z");
     const to = new Date("2040-01-01T01:00:00Z");
     await pool.query(
-      `DELETE FROM "_damat_job_runs" WHERE "created_at" BETWEEN $1 AND $2`,
+      `DELETE FROM "damat"."_damat_job_runs" WHERE "created_at" BETWEEN $1 AND $2`,
       [from, to],
     );
     const baseline = await pool.query<{ status: string; count: string }>(
-      `SELECT "status",COUNT(*)::text count FROM "_damat_job_runs"
+      `SELECT "status",COUNT(*)::text count FROM "damat"."_damat_job_runs"
        GROUP BY "status"`,
     );
     const counts = Object.fromEntries(
@@ -25,7 +25,7 @@ describe("job operational summary", () => {
       createdAt: from,
     });
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "available_at"=$2::timestamptz,
+      `UPDATE "damat"."_damat_job_runs" SET "available_at"=$2::timestamptz,
        "started_at"=$2::timestamptz+INTERVAL '1 second',"completed_at"=CASE
          WHEN "status" IN ('succeeded','dead_lettered')
          THEN $2::timestamptz+INTERVAL '2 seconds'
@@ -36,12 +36,12 @@ describe("job operational summary", () => {
       [[queued.id, succeeded.id, failed.id], from],
     );
     await pool.query(
-      `INSERT INTO "_damat_job_activity" ("run_id","type","occurred_at")
+      `INSERT INTO "damat"."_damat_job_activity" ("run_id","type","occurred_at")
        VALUES ($1,'succeeded',$3),($2,'dead_lettered',$3)`,
       [succeeded.id, failed.id, new Date(from.getTime() + 2_000)],
     );
     await pool.query(
-      `INSERT INTO "_damat_job_attempts"
+      `INSERT INTO "damat"."_damat_job_attempts"
        ("run_id","attempt_number","worker_id","lease_token","finished_at","duration_ms")
        VALUES ($1,1,'summary-worker',$2,$3,1000)`,
       [succeeded.id, crypto.randomUUID(), new Date(from.getTime() + 2_000)],
@@ -75,7 +75,7 @@ describe("job operational summary", () => {
     const to = new Date("2041-01-01T00:01:00Z");
     const run = await insertRun({ status: "succeeded", createdAt: from });
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "completed_at"=$2 WHERE "id"=$1`,
+      `UPDATE "damat"."_damat_job_runs" SET "completed_at"=$2 WHERE "id"=$1`,
       [run.id, to],
     );
     const result = await inspection().getSummary({

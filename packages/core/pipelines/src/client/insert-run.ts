@@ -35,7 +35,7 @@ export async function insertPipelineRun(
     actor: options.actor ?? null,
   });
   const result = await executor.query<{ id: string }>(
-    `INSERT INTO "_damat_pipeline_runs"
+    `INSERT INTO "damat"."_damat_pipeline_runs"
       ("id","definition_id","version_id","status","input","metadata","trigger",
         "correlation_id","idempotency_key","parent_run_id","parent_node_execution_id",
         "retention_ms","intent_fingerprint")

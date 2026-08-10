@@ -10,7 +10,7 @@ test("retention correlates actor-attributed request and outcome", async () => {
   };
   const run = await insertRun({ status: "succeeded" });
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "completed_at"='2000-01-01' WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_job_runs" SET "completed_at"='2000-01-01' WHERE "id"=$1`,
     [run.id],
   );
   const result = await inspection().runRetention(
@@ -19,7 +19,7 @@ test("retention correlates actor-attributed request and outcome", async () => {
   );
   expect(result.deletedRuns).toBe(1);
   const activity = await pool.query(
-    `SELECT "status","details" FROM "_damat_maintenance_activity"
+    `SELECT "status","details" FROM "damat"."_damat_maintenance_activity"
      WHERE "actor"->>'id'=$1 ORDER BY "id"`,
     [actor.id],
   );

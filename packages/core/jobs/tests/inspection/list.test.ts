@@ -8,7 +8,7 @@ describe("job inspection list", () => {
     const queued = await insertRun({ status: "queued" });
     const recovered = await insertRun({ status: "succeeded" });
     await pool.query(
-      `INSERT INTO "_damat_job_activity" ("run_id","type")
+      `INSERT INTO "damat"."_damat_job_activity" ("run_id","type")
        VALUES ($1,'lease_recovered')`,
       [recovered.id],
     );

@@ -26,7 +26,7 @@ test("exhausted recovery dead-letters and closes the lost attempt identity", asy
   expect(await deliveryRow(item.id)).toMatchObject({ status: "dead_lettered" });
   const attempt = await pool.query(
     `SELECT "attempt_number","worker_id","lease_token","outcome","finished_at"
-     FROM "_damat_event_delivery_attempts" WHERE "delivery_id"=$1`,
+     FROM "damat"."_damat_event_delivery_attempts" WHERE "delivery_id"=$1`,
     [item.id],
   );
   expect(attempt.rows[0]).toMatchObject({
@@ -49,7 +49,7 @@ async function claimAndExpire(
     leaseMs: 30_000,
   });
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "lease_expires_at"=NOW()-INTERVAL '1 second',
+    `UPDATE "damat"."_damat_event_deliveries" SET "lease_expires_at"=NOW()-INTERVAL '1 second',
      "cancellation_requested_at"=CASE WHEN $2 THEN NOW() ELSE NULL END
      WHERE "id"=$1`,
     [item.id, cancel],

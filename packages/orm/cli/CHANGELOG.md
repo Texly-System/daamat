@@ -1,5 +1,29 @@
 # @damatjs/orm-cli
 
+## 1.0.6
+
+### Patch Changes
+
+- Move framework-owned PostgreSQL infrastructure into the dedicated `damat`
+  schema with data-preserving forward migrations and fully qualified runtime SQL.
+- Updated dependencies
+- Updated dependencies
+- Updated dependencies
+  - @damatjs/cli@1.0.6
+  - @damatjs/installer@1.0.6
+  - @damatjs/pipelines@1.0.6
+  - @damatjs/durability@1.0.6
+  - @damatjs/events@1.0.6
+  - @damatjs/jobs@1.0.6
+  - @damatjs/orm-migration@1.0.6
+  - @damatjs/deps@1.0.6
+  - @damatjs/orm-model@1.0.6
+  - @damatjs/orm-processor@1.0.6
+  - @damatjs/orm-type@1.0.6
+  - @damatjs/schema-codegen@1.0.6
+  - @damatjs/link@1.0.6
+  - @damatjs/logger@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

@@ -94,8 +94,12 @@ String locations are project-relative editable source. Node and Damat package
 locations resolve the artifact root, read `damat.json`, and load the same entry
 and optional capabilities without copying them into app source. Packaged routes
 mount below `/<module-id>` in the API router; workflow, job, event, and pipeline
-providers load before selected workers start. Damat paths stay in
-`.damat/packages`.
+providers load before selected workers start. Manifestless source modules use
+the same application-first provider conventions as the installer and skip
+empty directories; a provider is loadable only as a direct file or a directory
+with `index.ts`/`index.js`. Explicit manifest paths stay authoritative and an
+invalid entry fails startup with the provider kind and module id. Damat paths
+stay in `.damat/packages`.
 
 Each `providers` entry selects an already initialized module service for one
 standardized role. The framework never creates a second service or database
@@ -121,6 +125,11 @@ durable events, or pipelines:
 ```bash
 damat-orm migrate:up
 ```
+
+System relations are stored in PostgreSQL's dedicated `damat` schema. Run the
+system migrations before starting the framework. Runtime roles need `USAGE` on
+that schema and the table, sequence, and function privileges required by the
+enabled services; migration roles own and change those relations.
 
 Entry point that boots the selected runtime:
 

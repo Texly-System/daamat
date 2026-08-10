@@ -6,6 +6,15 @@ deliberately tiny: it is a re-export aggregator with no behaviour of its own.
 - [architecture.md](./architecture.md) — the re-export model, subpath wiring,
   and how to add or change an entry point.
 
+The re-exported model and PostgreSQL slices include native pgvector support:
+`columns.vector(n)` / `columns.halfVector(n)`, typed nearest-neighbor queries,
+and migration metadata for the `vector` extension and ANN indexes. The
+umbrella does not duplicate that implementation; consumers can use the
+[pgvector model guide](../../../../docs/guide/05aa-model-columns-and-types.md)
+and [index guide](../../../../docs/guide/05ab-model-relations-and-indexes.md)
+plus the [migration guide](../../../../docs/guide/06-migrations.md) for the
+public behavior.
+
 ## Module map
 
 | File                        | Responsibility                                                                                    |

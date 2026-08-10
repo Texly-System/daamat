@@ -7,10 +7,9 @@ import type {
 } from "../types/diff";
 import { PRIORITY } from "./priority";
 import { createNameMap, columnsEqual } from "./utils";
+import { columnAlteration } from "./columnChanges";
 
-/**
- * Diff columns between two versions of a table.
- */
+/** Diff columns between two versions of a table. */
 export function diffColumns(
   tableName: string,
   oldColumns: ColumnSchema[],
@@ -18,24 +17,20 @@ export function diffColumns(
   schema = "public",
 ): SchemaChange[] {
   const changes: SchemaChange[] = [];
-
   const oldMap = createNameMap(oldColumns);
   const newMap = createNameMap(newColumns);
 
-  // Added
-  for (const [name, newCol] of newMap) {
+  for (const [name, column] of newMap) {
     if (!oldMap.has(name)) {
       changes.push({
         type: "add_column",
         tableName,
-        column: newCol,
+        column,
         schema,
         priority: PRIORITY.ADD_COLUMN,
       } as AddColumnChange);
     }
   }
-
-  // Removed
   for (const [name] of oldMap) {
     if (!newMap.has(name)) {
       changes.push({
@@ -48,47 +43,21 @@ export function diffColumns(
     }
   }
 
-  // Altered
-  for (const [name, newCol] of newMap) {
-    const oldCol = oldMap.get(name);
-    if (!oldCol || columnsEqual(oldCol, newCol)) continue;
-
-    const columnChanges: AlterColumnChange["changes"] = {};
-
-    if (oldCol.type !== newCol.type)
-      columnChanges.type = { from: oldCol.type, to: newCol.type };
-    if (oldCol.nullable !== newCol.nullable)
-      columnChanges.nullable = { from: oldCol.nullable, to: newCol.nullable };
-    if (oldCol.default !== newCol.default)
-      columnChanges.default = { from: oldCol.default, to: newCol.default };
-    if (oldCol.length !== newCol.length)
-      columnChanges.length = { from: oldCol.length, to: newCol.length };
-    if (oldCol.scale !== newCol.scale)
-      columnChanges.scale = { from: oldCol.scale, to: newCol.scale };
-    if (oldCol.unique !== newCol.unique)
-      columnChanges.unique = {
-        from: oldCol.unique ?? false,
-        to: newCol.unique ?? false,
-      };
-    if (oldCol.primaryKey !== newCol.primaryKey)
-      columnChanges.primaryKey = {
-        from: oldCol.primaryKey ?? false,
-        to: newCol.primaryKey ?? false,
-      };
-    if (oldCol.array !== newCol.array)
-      columnChanges.array = { from: !!oldCol.array, to: !!newCol.array };
-
-    if (Object.keys(columnChanges).length > 0) {
-      changes.push({
-        type: "alter_column",
-        tableName,
-        columnName: name,
-        schema,
-        changes: columnChanges,
-        priority: PRIORITY.ALTER_COLUMN,
-      } as AlterColumnChange);
-    }
+  for (const [name, newColumn] of newMap) {
+    const oldColumn = oldMap.get(name);
+    if (!oldColumn || columnsEqual(oldColumn, newColumn)) continue;
+    const alteration = columnAlteration(tableName, name, oldColumn, newColumn);
+    changes.push({
+      type: "alter_column",
+      tableName,
+      columnName: name,
+      schema,
+      changes: alteration.changes,
+      ...(alteration.manualReview
+        ? { manualReview: alteration.manualReview }
+        : {}),
+      priority: PRIORITY.ALTER_COLUMN,
+    } as AlterColumnChange);
   }
-
   return changes;
 }

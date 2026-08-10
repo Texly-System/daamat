@@ -13,7 +13,7 @@ export async function insertPublishedVersion(
   const id = crypto.randomUUID();
   const sourceVersion = `web:${id}`;
   await executor.query(
-    `INSERT INTO "_damat_pipeline_versions"
+    `INSERT INTO "damat"."_damat_pipeline_versions"
       ("id","definition_id","source_version","checksum","manifest","actor","reason")
      VALUES ($1,$2,$3,$4,$5::jsonb,$6::jsonb,$7)`,
     [
@@ -27,14 +27,14 @@ export async function insertPublishedVersion(
     ],
   );
   await executor.query(
-    `UPDATE "_damat_pipeline_definitions" SET "active_version_id"=$2,"updated_at"=NOW()
+    `UPDATE "damat"."_damat_pipeline_definitions" SET "active_version_id"=$2,"updated_at"=NOW()
      WHERE "id"=$1`,
     [draft.definition_id, id],
   );
   await syncPipelineTriggers(executor, id, draft.manifest, mutation.actor);
   await validatePipelineComposition(executor);
   await executor.query(
-    `INSERT INTO "_damat_pipeline_activity" ("type","details","actor")
+    `INSERT INTO "damat"."_damat_pipeline_activity" ("type","details","actor")
      VALUES ('version.published',$1::jsonb,$2::jsonb)`,
     [
       JSON.stringify({
@@ -48,7 +48,7 @@ export async function insertPublishedVersion(
     ],
   );
   await executor.query(
-    `DELETE FROM "_damat_pipeline_drafts" WHERE "definition_id"=$1`,
+    `DELETE FROM "damat"."_damat_pipeline_drafts" WHERE "definition_id"=$1`,
     [draft.definition_id],
   );
   return id;

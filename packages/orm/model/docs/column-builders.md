@@ -31,7 +31,8 @@ columns.jsonb()                 // JsonColumnBuilder({binary:true})
 columns.uuid()                  // UuidColumnBuilder
 columns.bytea()                 // ByteaColumnBuilder
 columns.enum(EnumBuilder)       // EnumColumnBuilder
-columns.vector(dims)            // VectorColumnBuilder
+columns.vector(dims)            // VectorColumnBuilder (native VECTOR)
+columns.halfVector(dims)        // HalfVectorColumnBuilder (native HALFVEC)
 columns.belongsTo / hasMany / hasOne   // relation builders (see relations.md)
 columns.indexes(name?) / columns.constrains(name?)  // index/constraint builders
 ```
@@ -171,16 +172,25 @@ reference in `ColumnSchema.enum`) and `_enumTsType` (used by `toTsType()`). It
 keeps **no** reference to the `EnumBuilder` afterwards — like a PG column
 referencing a named `CREATE TYPE`.
 
-### `VectorColumnBuilder` (`vector.ts`)
+### Native vector builders (`vector.ts`)
 
 ```ts
-columns.vector(1536); // real[] with length=1536
-columns.vector(768).dimensions(512);
+columns.vector(1536); // VECTOR(1536), dimensions=1536
+columns.halfVector(768).dimensions(512); // HALFVEC(512)
 ```
 
-SQL type `real`, always `array = true`, with the dimension stored in `length`.
-`.dimensions(d)` updates both the internal count and `length`; `toSchema()`
-re-syncs `length` to the current dimension count.
+SQL types are `vector` and `halfvec`; both are scalar PostgreSQL extension
+values with `array = false` and dimensionality in `dimensions`.
+Dimensions must be positive integers. `.dimensions(d)` validates and updates
+the metadata. Calling `.array()` throws because `VECTOR[]`/`HALFVEC[]` is not
+part of the native model contract.
+`toTsType()` remains `number[]` (or `number[] | null`) because the pgvector
+adapter decodes both types to JavaScript arrays.
+
+Runtime boundaries can reuse the root exports `assertVectorValue` and
+`assertColumnVectorValue`. They reject non-arrays, wrong dimensions,
+non-numeric elements, and `NaN`/infinite values; callers decide whether
+`undefined` or `null` is allowed for the surrounding field.
 
 ## `EnumBuilder` (`src/properties/enum/base.ts`)
 

@@ -1,5 +1,9 @@
 import { cleanupIndexSchema } from "../../utils/cleanupIndex";
-import { IndexSchema, IndexType, IndexColumn } from "@/types";
+import {
+  IndexColumn,
+  IndexSchema,
+  IndexType,
+} from "@/types";
 
 /**
  * Index builder for fluent API.
@@ -17,6 +21,7 @@ export class IndexBuilder {
   private _type: IndexType = "btree";
   private _where?: string;
   private _concurrently?: boolean;
+  private _with?: Record<string, string | number | boolean>;
 
   constructor(name?: string) {
     this._name = name || "";
@@ -48,6 +53,12 @@ export class IndexBuilder {
     return this;
   }
 
+  /** Set PostgreSQL index storage parameters. */
+  with(parameters: Record<string, string | number | boolean>): this {
+    this._with = { ...parameters };
+    return this;
+  }
+
   /** Build concurrently (no table lock) */
   concurrently(): this {
     this._concurrently = true;
@@ -56,8 +67,13 @@ export class IndexBuilder {
 
   /** Convert to IndexSchema */
   toSchema(tableName: string, indexNumber?: number): IndexSchema {
-    if (!this._name || this._name === "") {
-      this._name = `${tableName}_${this._columns.map((col) => col.name).join("_")}`;
+    const hasExpression = this._columns.some((column) =>
+      "expression" in column,
+    );
+    if (!this._name && !hasExpression) {
+      this._name = `${tableName}_${this._columns
+        .map((col) => ("name" in col ? col.name : ""))
+        .join("_")}`;
     }
     return cleanupIndexSchema(
       tableName,
@@ -68,6 +84,7 @@ export class IndexBuilder {
         type: this._type,
         where: this._where,
         concurrently: this._concurrently,
+        with: this._with,
       },
       indexNumber,
     );

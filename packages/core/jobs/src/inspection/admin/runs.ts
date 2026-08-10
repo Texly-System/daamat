@@ -20,7 +20,7 @@ export async function cancelInspectedJob(
     });
     if (run) return run;
     const found = await executor.query<{ status: string }>(
-      `SELECT "status" FROM "_damat_job_runs" WHERE "id"=$1`,
+      `SELECT "status" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [id],
     );
     if (!found.rowCount) throw notFound("job run", id);
@@ -38,7 +38,7 @@ export async function retryInspectedJob(
   validateWorkActor(actor);
   const run = await options.client.transaction(async (executor) => {
     const current = await executor.query<{ status: string }>(
-      `SELECT "status" FROM "_damat_job_runs" WHERE "id"=$1 FOR UPDATE`,
+      `SELECT "status" FROM "damat"."_damat_job_runs" WHERE "id"=$1 FOR UPDATE`,
       [id],
     );
     if (!current.rowCount) throw notFound("job run", id);

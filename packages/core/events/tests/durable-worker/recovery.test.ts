@@ -21,14 +21,14 @@ test("expired lease recovery preserves lost attempt identity", async () => {
     leaseMs: 30_000,
   });
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
     [item.id],
   );
   expect(await reconcileExpiredEventDeliveryLeases({ limit: 10 })).toBe(1);
   expect((await deliveryRow(item.id)).status).toBe("pending");
   const activity = await pool.query(
-    `SELECT "worker_id","lease_token","type" FROM "_damat_event_activity"
+    `SELECT "worker_id","lease_token","type" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 ORDER BY "id" DESC LIMIT 1`,
     [item.id],
   );
@@ -48,7 +48,7 @@ test("claim path uses the same expired lease recovery transition", async () => {
     leaseMs: 30_000,
   });
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
     [item.id],
   );
@@ -60,7 +60,7 @@ test("claim path uses the same expired lease recovery transition", async () => {
   });
   expect(reclaimed).toMatchObject({ attemptCount: 2, workerId: "new-worker" });
   const types = await pool.query(
-    `SELECT "type" FROM "_damat_event_activity"
+    `SELECT "type" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 ORDER BY "id"`,
     [item.id],
   );

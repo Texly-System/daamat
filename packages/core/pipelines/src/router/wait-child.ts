@@ -30,7 +30,7 @@ export async function processChild(
       node.versionId,
     );
     await executor.query(
-      `UPDATE "_damat_pipeline_node_executions" SET "child_run_id"=$2 WHERE "id"=$1`,
+      `UPDATE "damat"."_damat_pipeline_node_executions" SET "child_run_id"=$2 WHERE "id"=$1`,
       [execution.id, child.id],
     );
     await waitNode(executor, execution);

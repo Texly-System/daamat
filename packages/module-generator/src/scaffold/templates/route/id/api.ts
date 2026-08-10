@@ -28,7 +28,7 @@ export const GET: RouteHandler = async (c) => {
 export const PATCH: RouteHandler = async (c) => {
   const { id } = getValidated<${n.paramsType}>(c, "params");
   const data = getValidated<${n.updateType}>(c, "body");
-  const result = await update${n.pascal}Workflow.execute({ id, data });
+  const result = await update${n.pascal}Workflow.execute({ ${n.pk}: id, data });
   if (!result.success) {
     return c.json({ success: false, error: result.error?.message ?? "failed" }, 500);
   }

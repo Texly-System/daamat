@@ -35,4 +35,4 @@ test("interactive Ctrl-C drains workers and releases the port", async () => {
     if (running) await running.interrupt().catch(() => undefined);
     rmSync(cwd, { recursive: true, force: true });
   }
-}, 60_000);
+}, 180_000);

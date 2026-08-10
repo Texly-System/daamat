@@ -35,8 +35,8 @@ export const mapDraft = (row: DraftRow): PipelineDraft => ({
 
 export async function getPipelineDraft(client: DurabilityClient, name: string) {
   const result = await client.query<DraftRow>(
-    `SELECT d.*,p."name" FROM "_damat_pipeline_drafts" d
-     JOIN "_damat_pipeline_definitions" p ON p."id"=d."definition_id"
+    `SELECT d.*,p."name" FROM "damat"."_damat_pipeline_drafts" d
+     JOIN "damat"."_damat_pipeline_definitions" p ON p."id"=d."definition_id"
      WHERE p."name"=$1`,
     [name],
   );
@@ -47,9 +47,9 @@ export async function listPipelineDefinitions(
   client: DurabilityClient,
 ): Promise<PipelineDefinitionSummary[]> {
   const result = await client.query<DefinitionSummaryRow>(
-    `SELECT d.*,EXISTS(SELECT 1 FROM "_damat_pipeline_drafts" x
+    `SELECT d.*,EXISTS(SELECT 1 FROM "damat"."_damat_pipeline_drafts" x
        WHERE x."definition_id"=d."id") AS "has_draft"
-     FROM "_damat_pipeline_definitions" d ORDER BY d."name"`,
+     FROM "damat"."_damat_pipeline_definitions" d ORDER BY d."name"`,
   );
   return result.rows.map((row) => ({
     id: row.id,
@@ -69,7 +69,7 @@ export async function listPipelineVersions(
 ): Promise<StoredPipelineVersion[]> {
   const result = await client.query<AuthoringVersionRow>(
     `SELECT v.*,d."name",d."source",d."active_version_id"=v."id" AS "active"
-     FROM "_damat_pipeline_versions" v JOIN "_damat_pipeline_definitions" d
+     FROM "damat"."_damat_pipeline_versions" v JOIN "damat"."_damat_pipeline_definitions" d
        ON d."id"=v."definition_id" WHERE d."name"=$1 ORDER BY v."created_at" DESC`,
     [name],
   );
@@ -82,7 +82,7 @@ export async function getPipelineLayout(
 ): Promise<PipelineLayout | undefined> {
   const result = await client.query<LayoutRow>(
     `SELECT "revision","layout","actor","reason","created_at"
-     FROM "_damat_pipeline_layouts" WHERE "version_id"=$1
+     FROM "damat"."_damat_pipeline_layouts" WHERE "version_id"=$1
      ORDER BY "revision" DESC LIMIT 1`,
     [versionId],
   );

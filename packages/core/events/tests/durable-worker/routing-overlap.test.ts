@@ -24,7 +24,7 @@ test("overlapping and restarted routers do not duplicate fan-out", async () => {
   ]);
   await routeDurableEvents({ limit: 10 });
   const count = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM "_damat_event_deliveries"
+    `SELECT COUNT(*)::int AS count FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1`,
     [event.id],
   );
@@ -49,7 +49,7 @@ test("routing uses publish policy plus only explicit consumer overrides", async 
   await routeDurableEvents({ limit: 10 });
   const result = await pool.query(
     `SELECT "max_attempts","backoff_ms","backoff_multiplier"
-     FROM "_damat_event_deliveries" WHERE "event_id"=$1`,
+     FROM "damat"."_damat_event_deliveries" WHERE "event_id"=$1`,
     [event.id],
   );
   expect(result.rows[0]).toMatchObject({
@@ -67,7 +67,7 @@ test("consumer membership is frozen when routing completes", async () => {
   defineDurableEventHandler(name, "after", async () => {});
   await routeDurableEvents();
   const rows = await pool.query(
-    `SELECT "consumer" FROM "_damat_event_deliveries"
+    `SELECT "consumer" FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1 ORDER BY "consumer"`,
     [event.id],
   );

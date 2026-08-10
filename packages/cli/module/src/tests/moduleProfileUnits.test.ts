@@ -43,7 +43,7 @@ describe("module profile loading", () => {
 
 describe("module artifact resolution", () => {
   test("uses receiver mappings and CLI targets", async () => {
-    const { ctx } = createContext({});
+    const { ctx } = createContext({ target: ["routes=src/http", "jobs=src/workers"] });
     const resolvedArtifact = artifact();
     const origin = mock(() => request);
     const recipe = mock(() => ({
@@ -58,7 +58,9 @@ describe("module artifact resolution", () => {
       loadProfile: mock(() => manifest()),
       exists: () => true,
       readManifest: mock(() => manifest("receiver")),
-      options: mock(() => ({ targets: { routes: "custom/{id}" } })),
+      options: mock(() => ({
+        targets: { routes: "custom/{id}", jobs: "src/workers" },
+      })),
       recipe,
     });
     expect(origin).toHaveBeenCalledWith("/source", "/project");
@@ -66,6 +68,10 @@ describe("module artifact resolution", () => {
       "receiver.name",
       "receiver",
     );
+    expect(recipe.mock.calls[0]?.[0]).toHaveProperty("overrides.targets", {
+      routes: "custom/{id}",
+      jobs: "src/workers",
+    });
     expect(result.options.targets?.routes).toBe("custom/{id}");
   });
 

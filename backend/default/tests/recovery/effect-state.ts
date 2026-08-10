@@ -2,8 +2,8 @@ import { pool, type WorkKind } from "./context";
 
 export async function effectState(kind: WorkKind, id: string, scope: string) {
   const result = await pool.query<{ count: number; status: string }>(
-    `SELECT e."count",i."status" FROM "_damat_recovery_effects" e
-     JOIN "_damat_idempotency_keys" i ON i."key"=e."work_id"
+    `SELECT e."count",i."status" FROM "damat"."_damat_recovery_effects" e
+     JOIN "damat"."_damat_idempotency_keys" i ON i."key"=e."work_id"
      WHERE e."kind"=$1 AND e."work_id"=$2 AND i."scope"=$3`,
     [kind, id, scope],
   );

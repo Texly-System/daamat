@@ -14,7 +14,7 @@ test("concurrent idempotent publishes create one event and activity", async () =
   expect(right.id).toBe(left.id);
   expect(await listDurableEventActivity(left.id)).toHaveLength(1);
   const count = await pool.query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM "_damat_event_outbox"
+    `SELECT COUNT(*)::text AS count FROM "damat"."_damat_event_outbox"
      WHERE "name" = $1 AND "idempotency_key" = $2`,
     [name, options.idempotencyKey],
   );

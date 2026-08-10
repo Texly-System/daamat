@@ -22,7 +22,7 @@ export async function changePipelinePause(
         status: string;
         paused_from: string | null;
       }>(
-        `SELECT "status","paused_from" FROM "_damat_pipeline_runs"
+        `SELECT "status","paused_from" FROM "damat"."_damat_pipeline_runs"
          WHERE "id"=$1 AND "completed_at" IS NULL FOR UPDATE`,
         [runId],
       );
@@ -44,7 +44,7 @@ export async function changePipelinePause(
         ? "paused"
         : (prior.paused_from ?? (await resumedStatus(executor, runId)));
       const result = await executor.query(
-        `UPDATE "_damat_pipeline_runs" SET "status"=$2,
+        `UPDATE "damat"."_damat_pipeline_runs" SET "status"=$2,
          "paused_from"=CASE WHEN $3 THEN $4 ELSE NULL END,"updated_at"=NOW()
          WHERE "id"=$1 AND "completed_at" IS NULL`,
         [runId, status, paused, prior.status],
@@ -79,7 +79,7 @@ export async function changePipelinePause(
 
 async function resumedStatus(executor: DurabilityExecutor, runId: string) {
   const result = await executor.query(
-    `SELECT 1 FROM "_damat_pipeline_node_executions"
+    `SELECT 1 FROM "damat"."_damat_pipeline_node_executions"
      WHERE "run_id"=$1 AND "status"='waiting' LIMIT 1`,
     [runId],
   );

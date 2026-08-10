@@ -34,7 +34,7 @@ test("start pins a version and persists its ready signal atomically", async () =
     },
   );
   const beforeReplay = await pool.query(
-    `SELECT 1 FROM "_damat_acceleration_outbox"
+    `SELECT 1 FROM "damat"."_damat_acceleration_outbox"
      WHERE "resource_kind"='pipeline' AND "resource_id"=$1`,
     [run.id],
   );
@@ -49,7 +49,7 @@ test("start pins a version and persists its ready signal atomically", async () =
   expect(replay.id).toBe(run.id);
   expect((await findPipelineRun(run.id))?.versionId).toBe(run.versionId);
   const signals = await pool.query(
-    `SELECT 1 FROM "_damat_acceleration_outbox"
+    `SELECT 1 FROM "damat"."_damat_acceleration_outbox"
      WHERE "resource_kind"='pipeline' AND "resource_id"=$1`,
     [run.id],
   );
@@ -78,7 +78,7 @@ test("caller transaction rollback removes the run, node, and wake-up", async () 
   ).rejects.toThrow("rollback pipeline");
   expect(await findPipelineRun(runId)).toBeUndefined();
   const signals = await pool.query(
-    `SELECT 1 FROM "_damat_acceleration_outbox" WHERE "resource_id"=$1`,
+    `SELECT 1 FROM "damat"."_damat_acceleration_outbox" WHERE "resource_id"=$1`,
     [runId],
   );
   expect(signals.rowCount).toBe(0);

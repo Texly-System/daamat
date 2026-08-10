@@ -6,6 +6,7 @@ Change history for this package. For current behavior, read the
 
 | Version | Summary                                                 | Upgrade notes           |
 | ------- | ------------------------------------------------------- | ----------------------- |
+| 1.0.6   | Environment-aware config and optional scaffold Git setup | [1.0.6 →](./1.0.6.md)   |
 | 1.0.4   | Lockstep maintenance and dependency synchronization     | —                       |
 | 1.0.2   | Local TypeScript gate and stable process-launch binding | [1.0.2 →](./1.0.2.md)   |
 | 1.0.0   | Durable backend and PostgreSQL bootstrap                | [Details →](./1.0.0.md) |

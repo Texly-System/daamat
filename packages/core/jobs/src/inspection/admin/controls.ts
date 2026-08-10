@@ -18,7 +18,7 @@ async function lockControl(
     [queue],
   );
   const result = await executor.query<{ paused: boolean }>(
-    `SELECT "paused" FROM "_damat_work_controls"
+    `SELECT "paused" FROM "damat"."_damat_work_controls"
      WHERE "work_kind"='job' AND "scope"=$1 FOR UPDATE`,
     [queue],
   );

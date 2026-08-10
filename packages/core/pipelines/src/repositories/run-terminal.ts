@@ -15,7 +15,7 @@ export async function markPipelineRunTerminal(
   error?: Record<string, unknown>,
 ): Promise<void> {
   const result = await executor.query<{ parent_run_id: string | null }>(
-    `UPDATE "_damat_pipeline_runs" SET "status"=$2,
+    `UPDATE "damat"."_damat_pipeline_runs" SET "status"=$2,
        "output"=$3::jsonb,"error"=$4::jsonb,"completed_at"=NOW(),
        "retention_at"=CASE WHEN "retention_ms" IS NULL THEN NULL
          ELSE NOW()+("retention_ms"*INTERVAL '1 ms') END,"updated_at"=NOW()

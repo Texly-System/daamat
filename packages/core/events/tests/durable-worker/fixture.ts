@@ -22,7 +22,7 @@ export async function seedDelivery(
   const published = await publishDurableEvent(event, { value: 1 });
   await routeDurableEvents();
   const result = await pool.query(
-    `SELECT "id" FROM "_damat_event_deliveries"
+    `SELECT "id" FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1 AND "consumer"=$2`,
     [published.id, consumer],
   );
@@ -31,7 +31,7 @@ export async function seedDelivery(
 
 export async function deliveryRow(id: string) {
   const result = await pool.query(
-    `SELECT * FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT * FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [id],
   );
   return result.rows[0];

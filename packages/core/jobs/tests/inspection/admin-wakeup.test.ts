@@ -26,12 +26,12 @@ test("resume and schedule enable wake only after commit", async () => {
   configureJobWakeupPublisher({
     publish: async () => {
       const control = await pool.query(
-        `SELECT "paused" FROM "_damat_work_controls"
+        `SELECT "paused" FROM "damat"."_damat_work_controls"
          WHERE "work_kind"='job' AND "scope"=$1`,
         [queue],
       );
       const enabled = await pool.query(
-        `SELECT "enabled" FROM "_damat_job_schedules" WHERE "id"=$1`,
+        `SELECT "enabled" FROM "damat"."_damat_job_schedules" WHERE "id"=$1`,
         [schedule.id],
       );
       observed.push(

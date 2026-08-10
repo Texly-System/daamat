@@ -5,28 +5,28 @@ point is `src/index.ts`; it exports runtime parsers and TypeScript contracts.
 
 ## Current module map
 
-| Area                    | Responsibility                                                  |
-| ----------------------- | --------------------------------------------------------------- |
-| `src/types/origin.ts`   | Local, Git, registry, npm, and tarball requests.                |
-| `src/types/manifest.ts` | Universal provider/receiver `damat.json` contract.              |
-| `src/types/recipe.ts`   | Declarative install modes, mappings, packages, and usage hints. |
-| `src/types/lockfile.ts` | Immutable provenance and installer-owned resources.             |
-| `src/types/plan.ts`     | Serializable file, package, and backup operations.              |
-| `src/types/runtime.ts`  | Injected command and logging boundaries.                        |
-| `src/types/security.ts` | Verification and structured finding contracts.                  |
-| `src/schema/`           | Strict runtime validation with no process-global state.         |
-| `src/origin/`           | Origin acquisition and safe archive extraction.                 |
-| `src/integrity/`        | Canonical byte, file, and directory-tree SHA-256 identity.      |
-| `src/recipe/`           | Mode selection, glob mapping, and recipe hashing.               |
-| `src/profile/`          | Capability matching and manifest-to-recipe conversion.          |
-| `src/plan/`             | Serializable source and package operation planning.             |
-| `src/lockfile/`         | Strict reads and atomic deterministic lockfile replacement.     |
-| `src/transaction/`      | Exclusive markers and lean inverse journals.                    |
-| `src/package-manager/`  | Structured Bun, npm, pnpm, and Yarn target adapters.            |
-| `src/package-backend/`  | Explicit Node/Damat backend selection and alpha gating.         |
-| `src/module/`           | Uniform source/Node/Damat module runtime resolution.            |
-| `src/usage/`            | Advisory usage scanning with managed-path exclusions.           |
-| `src/backup/`           | Modified-owned-file backups and exact restoration.              |
+| Area                    | Responsibility                                                                 |
+| ----------------------- | ------------------------------------------------------------------------------ |
+| `src/types/origin.ts`   | Local, Git, registry, npm, and tarball requests.                               |
+| `src/types/manifest.ts` | Universal provider/receiver `damat.json` contract.                             |
+| `src/types/recipe.ts`   | Declarative install modes, mappings, packages, and usage hints.                |
+| `src/types/lockfile.ts` | Immutable provenance and installer-owned resources.                            |
+| `src/types/plan.ts`     | Serializable file, package, and backup operations.                             |
+| `src/types/runtime.ts`  | Injected command and logging boundaries.                                       |
+| `src/types/security.ts` | Verification and structured finding contracts.                                 |
+| `src/schema/`           | Strict runtime validation with no process-global state.                        |
+| `src/origin/`           | Origin acquisition and safe archive extraction.                                |
+| `src/integrity/`        | Canonical byte, file, and directory-tree SHA-256 identity.                     |
+| `src/recipe/`           | Mode selection, glob mapping, and recipe hashing.                              |
+| `src/profile/`          | Capability matching and manifest-to-recipe conversion.                         |
+| `src/plan/`             | Serializable source and package operation planning.                            |
+| `src/lockfile/`         | Strict reads and atomic deterministic lockfile replacement.                    |
+| `src/transaction/`      | Exclusive markers and lean inverse journals.                                   |
+| `src/package-manager/`  | Structured Bun, npm, pnpm, and Yarn target adapters.                           |
+| `src/package-backend/`  | Explicit Node/Damat backend selection and alpha gating.                        |
+| `src/module/`           | Uniform source/Node/Damat module runtime resolution and provider-entry checks. |
+| `src/usage/`            | Advisory usage scanning with managed-path exclusions.                          |
+| `src/backup/`           | Modified-owned-file backups and exact restoration.                             |
 
 ## Schema invariants
 
@@ -38,6 +38,9 @@ point is `src/index.ts`; it exports runtime parsers and TypeScript contracts.
   declared modes.
 - Declared module runtime paths must exist inside the artifact root. Omitted
   optional capabilities remain absent.
+- Manifestless source providers use application-first conventions and accept
+  only direct files or directories with `index.ts`/`index.js`; invalid earlier
+  directories do not shadow later candidates.
 - Manifest validation errors never fall back to convention-only source mode.
 - Node module descriptors use package names, not filesystem paths or traversal.
 - Package backends are `node` or `damat` and are independent of install mode.

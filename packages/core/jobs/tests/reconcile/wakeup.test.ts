@@ -32,7 +32,7 @@ describe("optional job wake-ups", () => {
     });
     const run = await enqueueJob(name, {}, { queue: "wake-failure" });
     const stored = await pool.query(
-      `SELECT 1 FROM "_damat_job_runs" WHERE "id"=$1`,
+      `SELECT 1 FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [run.id],
     );
     expect(stored.rowCount).toBe(1);
@@ -47,7 +47,7 @@ describe("optional job wake-ups", () => {
         visible =
           (
             await pool.query(
-              `SELECT 1 FROM "_damat_job_runs" WHERE "name"=$1`,
+              `SELECT 1 FROM "damat"."_damat_job_runs" WHERE "name"=$1`,
               [name],
             )
           ).rowCount ?? 0;

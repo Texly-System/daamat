@@ -150,7 +150,7 @@ type name. The richer per-table files in `src/tests/__snapshots__/generated/`
 function toModuleSchema(
   moduleName: string,
   models: ModelDefinition[],
-  options?: { schema?: string; enums?: EnumBuilder[] },
+  options?: { schema?: string; enums?: EnumBuilder[]; extensions?: string[] },
 ): ModuleSchema;
 ```
 
@@ -160,6 +160,9 @@ function toModuleSchema(
   keeps `rest` as the table (so `tables` is `Omit<TableSchema, "relations">[]`).
 - Defaults `schema` to `"public"` when not provided.
 - Maps `options.enums` via `e.toSchema()` into `enums` (defaults to `[]`).
+- Carries caller-provided extension requirements and deterministically adds a
+  deduplicated `"vector"` entry whenever any model contains a native vector or
+  half-vector column. No extension field is emitted when the set is empty.
 
 Result shape: `{ moduleName, schema, tables, enums, relationships }`.
 

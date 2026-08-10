@@ -14,14 +14,14 @@ beforeAll(ensureStorage);
 test("retry attempts retain wait timing and each effective schedule", async () => {
   const run = await insertRun({});
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "available_at"=NOW()-INTERVAL '2 seconds'
+    `UPDATE "damat"."_damat_job_runs" SET "available_at"=NOW()-INTERVAL '2 seconds'
      WHERE "id"=$1`,
     [run.id],
   );
   const first = await claim(run.queue, uniqueName("retry-worker-one"));
   await completeJobFailure(first, new Error("first"));
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "available_at"=NOW()-INTERVAL '5 seconds'
+    `UPDATE "damat"."_damat_job_runs" SET "available_at"=NOW()-INTERVAL '5 seconds'
      WHERE "id"=$1`,
     [run.id],
   );

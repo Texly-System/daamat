@@ -18,6 +18,9 @@ test("runs system migrations before modules and records their owner", async () =
   const results = await runMigrations(fake.pool, module.modules, {
     systemMigrations: migrations,
   });
+  expect(fake.sql.indexOf('SET LOCAL search_path TO "public", "damat"')).toBe(
+    fake.sql.indexOf("SYSTEM 1") - 1,
+  );
   expect(fake.sql.indexOf("SYSTEM 2")).toBeLessThan(fake.sql.indexOf("MODULE"));
   expect(fake.inserts.slice(0, 2).map((params) => params.slice(1, 3))).toEqual([
     ["@damatjs/durability", "001"],

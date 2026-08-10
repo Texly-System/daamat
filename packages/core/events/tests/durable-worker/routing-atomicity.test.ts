@@ -22,11 +22,11 @@ test("routing activity failure rolls back fan-out and routed_at", async () => {
 
   await expect(routeDurableEvents({ client })).rejects.toBe(root);
   const outbox = await pool.query(
-    `SELECT "routed_at" FROM "_damat_event_outbox" WHERE "id"=$1`,
+    `SELECT "routed_at" FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
     [event.id],
   );
   const deliveries = await pool.query(
-    `SELECT 1 FROM "_damat_event_deliveries" WHERE "event_id"=$1`,
+    `SELECT 1 FROM "damat"."_damat_event_deliveries" WHERE "event_id"=$1`,
     [event.id],
   );
   expect(outbox.rows[0].routed_at).toBeNull();
@@ -49,7 +49,7 @@ function failingActivityExecutor(
 ): DurabilityExecutor {
   return {
     query: (sql, params) => {
-      if (sql.includes(`INSERT INTO "_damat_event_activity"`)) throw root;
+      if (sql.includes(`INSERT INTO "damat"."_damat_event_activity"`)) throw root;
       return executor.query(sql, params);
     },
   };

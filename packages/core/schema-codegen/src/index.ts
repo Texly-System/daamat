@@ -6,3 +6,4 @@ export * from "./logger";
 export * from "./relation";
 export * from "./render";
 export * from "./types";
+export * from "./primaryKey";

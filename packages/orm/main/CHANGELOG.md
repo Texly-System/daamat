@@ -1,5 +1,20 @@
 # @damatjs/orm
 
+## 1.0.6
+
+### Patch Changes
+
+- Implement native pgvector columns, extension-aware migrations, exact vector
+  validation and serialization, vector indexes, and nearest-neighbor queries.
+- Updated dependencies
+- Updated dependencies
+  - @damatjs/orm-migration@1.0.6
+  - @damatjs/deps@1.0.6
+  - @damatjs/orm-model@1.0.6
+  - @damatjs/orm-pg@1.0.6
+  - @damatjs/orm-processor@1.0.6
+  - @damatjs/orm-connector@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

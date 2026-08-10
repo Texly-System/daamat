@@ -20,15 +20,15 @@ export async function recordEventDeliveryProgress(
       last_recorded_at: Date | null;
     }>(
       `SELECT d."progress",(SELECT MAX(a."occurred_at")
-       FROM "_damat_event_activity" a WHERE a."delivery_id"=d."id"
+       FROM "damat"."_damat_event_activity" a WHERE a."delivery_id"=d."id"
        AND a."type"='progress') AS "last_recorded_at"
-       FROM "_damat_event_deliveries" d WHERE d."id"=$1`,
+       FROM "damat"."_damat_event_deliveries" d WHERE d."id"=$1`,
       [claim.id],
     );
     const row = current.rows[0]!;
     const changed = JSON.stringify(row.progress) !== JSON.stringify(value);
     await executor.query(
-      `UPDATE "_damat_event_deliveries" SET "progress"=$2::jsonb,
+      `UPDATE "damat"."_damat_event_deliveries" SET "progress"=$2::jsonb,
        "updated_at"=NOW() WHERE "id"=$1`,
       [claim.id, JSON.stringify(value)],
     );

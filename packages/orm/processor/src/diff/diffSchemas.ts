@@ -3,6 +3,7 @@ import type { SchemaDiff, SchemaChange } from "../types/diff";
 import { createNameMap } from "./utils";
 import { diffTable } from "./tables";
 import { diffEnums } from "./enums";
+import { diffExtensions } from "./extensions";
 
 /**
  * Compare two ModuleSchemas and produce a full `SchemaDiff`.
@@ -20,6 +21,9 @@ export function diffSchemas(
 ): SchemaDiff {
   const allChanges: SchemaChange[] = [];
   const allWarnings: string[] = [];
+
+  // Extensions must precede enums and tables that may reference them.
+  allChanges.push(...diffExtensions(previous, current));
 
   // Diff native enum types
   const { changes: enumChanges, warnings: enumWarnings } = diffEnums(
@@ -47,6 +51,12 @@ export function diffSchemas(
   }
 
   allChanges.sort((a, b) => a.priority - b.priority);
+
+  for (const change of allChanges) {
+    if (change.type === "alter_column" && change.manualReview) {
+      allWarnings.push(change.manualReview);
+    }
+  }
 
   return {
     hasChanges: allChanges.length > 0,

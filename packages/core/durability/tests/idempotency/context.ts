@@ -3,6 +3,7 @@ import {
   createDurabilityClient,
   durabilitySystemMigrations,
   type DurabilityClient,
+  relocateDamatRelations,
 } from "../../src";
 
 export const databaseUrl = process.env.DATABASE_URL;
@@ -23,9 +24,11 @@ async function ensureTables(pool: Pool): Promise<void> {
   const client = await pool.connect();
   try {
     await client.query("SELECT pg_advisory_lock(724031)");
-    const existing = await client.query(
-      "SELECT to_regclass('_damat_idempotency_keys') AS name",
-    );
+    await client.query('SET search_path TO "public", "damat"');
+    const existing = await client.query(`
+      SELECT COALESCE(to_regclass('damat._damat_idempotency_keys'),
+        to_regclass('public._damat_idempotency_keys')) AS name
+    `);
     if (!existing.rows[0]?.name) {
       const migration = durabilitySystemMigrations.migrations.find(
         ({ id }) => id === "001",
@@ -38,6 +41,7 @@ async function ensureTables(pool: Pool): Promise<void> {
     );
     if (!intentMigration) throw new Error("Missing durability migration 005");
     await client.query(intentMigration.sql);
+    await client.query(relocateDamatRelations(["_damat_idempotency_keys"]));
     await client.query(`
       CREATE TABLE IF NOT EXISTS "_damat_idempotency_test_effects" (
         "scope" TEXT PRIMARY KEY,
@@ -63,7 +67,7 @@ export async function cleanup(
     [scope],
   );
   await context.pool.query(
-    `DELETE FROM "_damat_idempotency_keys" WHERE "scope" = $1`,
+    `DELETE FROM "damat"."_damat_idempotency_keys" WHERE "scope" = $1`,
     [scope],
   );
 }

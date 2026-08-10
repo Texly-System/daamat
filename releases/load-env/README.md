@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version | Summary                                                                                                                                                            | Upgrade notes         |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| 1.0.6   | Lockstep maintenance bump; environment loading behavior is unchanged                                                                                                 | —                     |
 | 1.0.4   | Lockstep maintenance bump; environment loading behavior is unchanged                                                                                                 | —                     |
 | 0.1.3   | Maintenance / repo-wide version bump — the changeset describes cross-module links (`@damatjs/link`); no change to this package's own code (it has no dependencies) | —                     |
 | 0.1.2   | Maintenance / repo-wide version bump — the changeset describes relation-by-table-name in the ORM packages; no change to this package's own code                    | —                     |

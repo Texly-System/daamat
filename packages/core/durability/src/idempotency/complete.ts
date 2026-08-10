@@ -1,5 +1,6 @@
 import type { DurabilityExecutor } from "../client/types";
 import type { JsonValue } from "./types";
+import { damatRelation } from "../migrations/relocation";
 
 export async function completeIdempotency<T extends JsonValue>(
   executor: DurabilityExecutor,
@@ -9,7 +10,7 @@ export async function completeIdempotency<T extends JsonValue>(
 ): Promise<void> {
   assertJsonValue(value);
   await executor.query(
-    `UPDATE "_damat_idempotency_keys"
+    `UPDATE ${damatRelation("_damat_idempotency_keys")}
      SET "status" = 'completed', "result" = $3::jsonb,
        "completed_at" = NOW()
      WHERE "scope" = $1 AND "key" = $2 AND "status" = 'running'`,

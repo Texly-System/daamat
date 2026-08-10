@@ -17,5 +17,6 @@ export async function executeTransaction<
       return callback(tx);
     },
     client._logger,
+    client.accessor._model,
   );
 }

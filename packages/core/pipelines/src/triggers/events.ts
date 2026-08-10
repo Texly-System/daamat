@@ -10,7 +10,7 @@ export async function processPipelineEventTriggers(
 ): Promise<number> {
   const versions = await executor.query<TriggerVersionRow>(
     `SELECT v."id" AS "version_id",d."name",v."manifest",v."created_at"
-     FROM "_damat_pipeline_versions" v JOIN "_damat_pipeline_definitions" d
+     FROM "damat"."_damat_pipeline_versions" v JOIN "damat"."_damat_pipeline_definitions" d
        ON d."active_version_id"=v."id"`,
   );
   let processed = 0;
@@ -63,7 +63,7 @@ async function triggerEnabled(
   triggerId: string,
 ) {
   const result = await executor.query<{ enabled: boolean }>(
-    `SELECT "enabled" FROM "_damat_pipeline_trigger_controls"
+    `SELECT "enabled" FROM "damat"."_damat_pipeline_trigger_controls"
      WHERE "version_id"=$1 AND "trigger_id"=$2`,
     [versionId, triggerId],
   );
@@ -79,8 +79,8 @@ async function unmatchedEvents(
 ): Promise<TriggerEventRow[]> {
   const result = await executor.query<TriggerEventRow>(
     `SELECT e."id",e."payload",e."metadata",e."correlation_id",e."created_at"
-     FROM "_damat_event_outbox" e WHERE e."name"=$1 AND e."created_at">=$2
-       AND NOT EXISTS (SELECT 1 FROM "_damat_pipeline_trigger_receipts" r
+     FROM "damat"."_damat_event_outbox" e WHERE e."name"=$1 AND e."created_at">=$2
+       AND NOT EXISTS (SELECT 1 FROM "damat"."_damat_pipeline_trigger_receipts" r
          WHERE r."version_id"=$3 AND r."trigger_id"=$4 AND r."source_id"=e."id"::text)
      ORDER BY e."created_at",e."id" LIMIT $5`,
     [event, version.created_at, version.version_id, triggerId, limit],

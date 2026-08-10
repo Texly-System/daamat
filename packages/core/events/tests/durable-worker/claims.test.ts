@@ -36,7 +36,7 @@ test("claim atomically creates attempt and activity", async () => {
   });
   expect(claim).toMatchObject({ attemptCount: 1, workerId: "worker-a" });
   const attempts = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM "_damat_event_delivery_attempts"
+    `SELECT COUNT(*)::int AS count FROM "damat"."_damat_event_delivery_attempts"
      WHERE "delivery_id"=$1`,
     [item.id],
   );
@@ -62,7 +62,7 @@ test("paused exact consumer scope is not claimable", async () => {
 async function deliveryStatus(id: string) {
   return (
     await pool.query(
-      `SELECT "status" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+      `SELECT "status" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
       [id],
     )
   ).rows[0].status;

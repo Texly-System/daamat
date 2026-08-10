@@ -13,13 +13,13 @@ export async function lockActivePipelineTree(
 ): Promise<ActivePipelineTreeRow[]> {
   const result = await executor.query<ActivePipelineTreeRow>(
     `WITH RECURSIVE tree AS (
-       SELECT "id",0 AS "depth" FROM "_damat_pipeline_runs" WHERE "id"=$1
+       SELECT "id",0 AS "depth" FROM "damat"."_damat_pipeline_runs" WHERE "id"=$1
        UNION ALL
        SELECT child."id",tree."depth"+1
-       FROM "_damat_pipeline_runs" child JOIN tree
+       FROM "damat"."_damat_pipeline_runs" child JOIN tree
          ON child."parent_run_id"=tree."id"
      ) SELECT run."id",run."status",tree."depth"
-       FROM "_damat_pipeline_runs" run JOIN tree ON tree."id"=run."id"
+       FROM "damat"."_damat_pipeline_runs" run JOIN tree ON tree."id"=run."id"
        WHERE run."completed_at" IS NULL
        ORDER BY tree."depth" DESC,run."id" FOR UPDATE OF run`,
     [runId],

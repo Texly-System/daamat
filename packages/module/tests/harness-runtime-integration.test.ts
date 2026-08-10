@@ -24,7 +24,7 @@ test.skipIf(!databaseUrl)(
     expect(JSON.parse(result!)).toEqual({
       tables: {
         domain: "harness_fixture_records",
-        events: "_damat_event_outbox",
+        events: "damat._damat_event_outbox",
       },
       rejected: true,
       poolReleased: true,

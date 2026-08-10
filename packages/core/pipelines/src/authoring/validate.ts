@@ -27,7 +27,7 @@ export async function validateWebPipeline(
     .map((node) => node.pipeline);
   for (const name of new Set(children)) {
     const result = await client.query(
-      `SELECT 1 FROM "_damat_pipeline_definitions"
+      `SELECT 1 FROM "damat"."_damat_pipeline_definitions"
        WHERE "name"=$1 AND "active_version_id" IS NOT NULL`,
       [name],
     );

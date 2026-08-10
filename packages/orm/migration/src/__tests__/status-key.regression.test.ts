@@ -30,7 +30,7 @@ interface Row {
 function makeStatefulPool() {
   const rows: Row[] = [];
   const query = async (sql: string, params?: unknown[]) => {
-    if (/INSERT INTO "_damat_migration_logs"/.test(sql)) {
+    if (/INSERT INTO (?:"damat"\.)?"_damat_migration_logs"/.test(sql)) {
       rows.push({
         module: params![1] as string,
         name: params![2] as string,

@@ -4,6 +4,7 @@ import type {
   IndexSchema,
   EnumSchema,
 } from "@damatjs/orm-type";
+import { isNativeVectorType } from "./vector";
 
 /**
  * Build a lookup map keyed by `name` from any array of named items.
@@ -19,12 +20,14 @@ export function createNameMap<T>(
  * Check if two columns are structurally equal.
  */
 export function columnsEqual(a: ColumnSchema, b: ColumnSchema): boolean {
+  const vector = isNativeVectorType(a.type) || isNativeVectorType(b.type);
   return (
     a.type === b.type &&
     a.nullable === b.nullable &&
     a.primaryKey === b.primaryKey &&
     a.unique === b.unique &&
-    a.length === b.length &&
+    (vector || a.length === b.length) &&
+    a.dimensions === b.dimensions &&
     a.scale === b.scale &&
     a.default === b.default &&
     a.array === b.array &&
@@ -40,7 +43,9 @@ export function indexesEqual(a: IndexSchema, b: IndexSchema): boolean {
     a.unique === b.unique &&
     a.type === b.type &&
     a.where === b.where &&
-    JSON.stringify(a.columns) === JSON.stringify(b.columns)
+    a.concurrently === b.concurrently &&
+    JSON.stringify(a.columns) === JSON.stringify(b.columns) &&
+    JSON.stringify(a.with) === JSON.stringify(b.with)
   );
 }
 

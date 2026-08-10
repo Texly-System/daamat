@@ -1,6 +1,7 @@
 import { ModuleSchema } from "@damatjs/orm-type";
 import fs from "node:fs";
 import path from "node:path";
+import { withRequiredExtensions } from "../diff/extensions";
 
 /**
  * Load a ModuleSchema from disk.
@@ -44,7 +45,7 @@ export function saveSnapshot(
     fs.mkdirSync(migrationsDir, { recursive: true });
   }
 
-  const output = JSON.stringify(schema, null, 2);
+  const output = JSON.stringify(withRequiredExtensions(schema), null, 2);
   fs.writeFileSync(snapshotPath, output);
 }
 

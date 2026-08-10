@@ -38,7 +38,7 @@ async function retryWith(
   options: RetryJobRunOptions,
 ): Promise<JobRun | undefined> {
   const updated = await executor.query<JobRunRow>(
-    `UPDATE "_damat_job_runs" SET "status"='queued',"progress"=NULL,
+    `UPDATE "damat"."_damat_job_runs" SET "status"='queued',"progress"=NULL,
        "result"=NULL,"last_error"=NULL,"cancellation_requested_at"=NULL,
        "lease_owner"=NULL,"lease_token"=NULL,"lease_expires_at"=NULL,
        "heartbeat_at"=NULL,"completed_at"=NULL,"available_at"=NOW(),

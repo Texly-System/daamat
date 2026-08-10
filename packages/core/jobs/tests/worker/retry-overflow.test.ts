@@ -14,7 +14,7 @@ test("an overflowing retry date dead-letters without retaining a lease", async (
     throw new Error("retry me");
   });
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "name"=$2,
+    `UPDATE "damat"."_damat_job_runs" SET "name"=$2,
        "backoff_ms"=8640000000000000 WHERE "id"=$1`,
     [item.run.id, name],
   );
@@ -27,7 +27,7 @@ test("an overflowing retry date dead-letters without retaining a lease", async (
   await executeJobClaim(claim!, { heartbeatIntervalMs: 5_000 });
   expect((await getJobRun(item.run.id))?.status).toBe("dead_lettered");
   const lease = await pool.query(
-    `SELECT "lease_owner" FROM "_damat_job_runs" WHERE "id"=$1`,
+    `SELECT "lease_owner" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
     [item.run.id],
   );
   expect(lease.rows[0]?.lease_owner).toBeNull();

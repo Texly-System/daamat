@@ -1,41 +1,51 @@
-import { ColumnBuilder } from "./base";
 import { ColumnSchema } from "@/types";
+import { ColumnBuilder } from "./base";
 
-/**
- * Vector column builder — stores a fixed-dimension vector as a real[] array.
- *
- * PostgreSQL representation: real[] (single-precision float array).
- * Dimension is encoded in the ColumnSchema via the `length` field and is
- * required so that application-level validation and DDL generation can enforce
- * the exact array size (e.g. ARRAY[1536] for OpenAI ada-002).
- *
- * Usage:
- *   vector(1536)            — 1536-dimensional vector (real[])
- *   vector(768).nullable()  — nullable 768-dim vector
- */
-export class VectorColumnBuilder extends ColumnBuilder {
+function requireDimensions(value: number): number {
+  if (!Number.isInteger(value) || value <= 0) {
+    throw new Error("Vector dimensions must be a positive integer");
+  }
+  return value;
+}
+
+abstract class NativeVectorColumnBuilder extends ColumnBuilder {
   private _dimensions: number;
 
-  constructor(dimensions: number) {
-    super("real");
-    this._dimensions = dimensions;
-    // Vectors are always stored as arrays
-    this._array = true;
-    // Record dimension in the length field
-    this._length = dimensions;
+  protected constructor(type: "vector" | "halfvec", dimensions: number) {
+    super(type);
+    this._dimensions = requireDimensions(dimensions);
   }
 
-  /** Update the number of dimensions */
-  dimensions(d: number): this {
-    this._dimensions = d;
-    this._length = d;
+  /** Update the native vector dimensionality. */
+  dimensions(value: number): this {
+    this._dimensions = requireDimensions(value);
     return this;
   }
 
-  toSchema(): ColumnSchema {
+  /** Native vectors are scalar extension values, not PostgreSQL arrays. */
+  override array(): never {
+    throw new Error("Native vector columns cannot be converted to arrays");
+  }
+
+  override toSchema(): ColumnSchema {
     const schema = super.toSchema();
-    // Ensure length reflects current dimensions in case it was mutated
-    schema.length = this._dimensions;
+    schema.array = false;
+    schema.dimensions = this._dimensions;
+    delete schema.length;
     return schema;
+  }
+}
+
+/** PostgreSQL VECTOR(dimensions), represented in TypeScript as number[]. */
+export class VectorColumnBuilder extends NativeVectorColumnBuilder {
+  constructor(dimensions: number) {
+    super("vector", dimensions);
+  }
+}
+
+/** PostgreSQL HALFVEC(dimensions), represented in TypeScript as number[]. */
+export class HalfVectorColumnBuilder extends NativeVectorColumnBuilder {
+  constructor(dimensions: number) {
+    super("halfvec", dimensions);
   }
 }

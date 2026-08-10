@@ -16,7 +16,7 @@ test("log persistence failures become visible job failures", async () => {
   defineJob(name, async (_payload, context) => {
     await context.log("info", "force-log-failure");
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
     item.run.id,
     name,
   ]);
@@ -32,7 +32,7 @@ test("log persistence failures become visible job failures", async () => {
     expect((await getJobRun(item.run.id))?.status).toBe("dead_lettered");
   } finally {
     await pool.query(
-      `DROP TRIGGER IF EXISTS "${trigger}" ON "_damat_job_logs"`,
+      `DROP TRIGGER IF EXISTS "${trigger}" ON "damat"."_damat_job_logs"`,
     );
     await pool.query(`DROP FUNCTION IF EXISTS "${fn}"()`);
   }
@@ -47,7 +47,7 @@ async function installFailureTrigger(fn: string, trigger: string) {
       END IF;
       RETURN NEW;
     END $$;
-    CREATE TRIGGER "${trigger}" BEFORE INSERT ON "_damat_job_logs"
+    CREATE TRIGGER "${trigger}" BEFORE INSERT ON "damat"."_damat_job_logs"
     FOR EACH ROW EXECUTE FUNCTION "${fn}"()
   `);
 }

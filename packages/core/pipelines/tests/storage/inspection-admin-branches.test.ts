@@ -27,11 +27,11 @@ test("resume reconstructs waiting state when the prior state is unavailable", as
   const run = await startTestPipeline("resume-waiting");
   await client().pause(run.id, control("pause-waiting"));
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "paused_from"=NULL WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_runs" SET "paused_from"=NULL WHERE "id"=$1`,
     [run.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "status"='waiting' WHERE "run_id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_node_executions" SET "status"='waiting' WHERE "run_id"=$1`,
     [run.id],
   );
   await client().resume(run.id, control("resume-waiting"));
@@ -47,11 +47,13 @@ test("retry rejects a node after it has scheduled downstream work", async () => 
   );
   const first = nodes.find((node) => node.nodeId === "first")!;
   await pool.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_node_executions"
+     SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
     [first.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_runs"
+     SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
     [run.id],
   );
   await expect(

@@ -1,5 +1,17 @@
 # @damatjs/link
 
+## 1.0.6
+
+### Patch Changes
+
+- Updated dependencies
+  - @damatjs/deps@1.0.6
+  - @damatjs/orm-model@1.0.6
+  - @damatjs/orm-pg@1.0.6
+  - @damatjs/orm-type@1.0.6
+  - @damatjs/services@1.0.6
+  - @damatjs/logger@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

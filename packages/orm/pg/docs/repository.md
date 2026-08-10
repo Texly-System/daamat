@@ -5,7 +5,7 @@ Sources: [`src/repository/repository.ts`](../src/repository/repository.ts),
 
 `PgRepository` is the ergonomic CRUD surface. Where `PgModelClient` returns
 `{ rows, rowCount, descriptor }`, the repository unwraps those into plain rows / single rows / counts,
-and adds convenience methods (`findById`, `count`, `exists`, …). One repository wraps one model.
+and adds convenience methods (`findById`, `count`, `exists`, `findNearest`, …). One repository wraps one model.
 
 ## `createRepository` — the factory
 
@@ -55,6 +55,7 @@ execution, so passing a `PoolClient` makes the repo transactional and passing a 
 | `findManyByIds(ids, opt = {})` | `T[]`            | `findMany({ ...opt, where: { id: { in: ids } } })`.                    |
 | `count(where?)`                | `number`         | `SELECT COUNT(*) FROM (<findMany sql>) as subquery`; parses the count. |
 | `exists(where)`                | `boolean`        | `SELECT EXISTS(<findOne sql>) as exists`.                              |
+| `findNearest(options)`         | `Array<{ row: T; distance: number }>` | Native vector/half-vector nearest-neighbor query. |
 
 ### Write methods
 
@@ -75,7 +76,8 @@ Option types (`FindOptions`, `CreateOptions`, `UpdateOptions`, `DeleteOptions`, 
 
 ## `count` / `exists` — subquery wrapping
 
-These two methods do not go through a builder method directly; they wrap the accessor's generated SQL:
+These two methods do not go through a builder method directly; they wrap the accessor's generated SQL
+and still route execution through the exact-client/vector serialization seam:
 
 ```ts
 async count(where?) {
@@ -97,9 +99,12 @@ Notes / gotchas:
 
 - `count` calls `findMany` with `select: []`, which produces `SELECT *` (empty column list ⇒ `*` in the
   builder) wrapped in a counting subquery — so the count is correct regardless of selected columns.
-- `count`/`exists` run via `this.connection.query` directly (bypassing `pgExecuteRaw`), so they are
-  **not** routed through the `QueryLogger`. If logging counts matters, that's a place to extend.
+- `count`/`exists` use `pgExecuteRaw`, preserving modeled vector serialization and per-client registration.
 - The COUNT result comes back as a string (`bigint` text), hence the `parseInt`.
+
+`findNearest` requires a modeled `vector` or `halfvec` column, validates the query vector and positive
+limit (capped at 1000), orders ascending by the selected distance, and strips its reserved distance
+alias before returning `{ row, distance }`.
 
 ## Transactional vs pooled repositories
 

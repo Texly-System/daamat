@@ -18,19 +18,19 @@ export async function savePipelineLayout(
       },
       async (transaction) => {
         const version = await transaction.query(
-          `SELECT 1 FROM "_damat_pipeline_versions" WHERE "id"=$1 FOR UPDATE`,
+          `SELECT 1 FROM "damat"."_damat_pipeline_versions" WHERE "id"=$1 FOR UPDATE`,
           [versionId],
         );
         if (!version.rowCount)
           throw new Error(`Pipeline version "${versionId}" was not found`);
         const revision = await transaction.query<{ value: string }>(
           `SELECT COALESCE(MAX("revision"),0)+1 AS "value"
-           FROM "_damat_pipeline_layouts" WHERE "version_id"=$1`,
+           FROM "damat"."_damat_pipeline_layouts" WHERE "version_id"=$1`,
           [versionId],
         );
         const value = Number(revision.rows[0]!.value);
         await transaction.query(
-          `INSERT INTO "_damat_pipeline_layouts"
+          `INSERT INTO "damat"."_damat_pipeline_layouts"
             ("id","version_id","revision","layout","actor","reason")
            VALUES ($1,$2,$3,$4::jsonb,$5::jsonb,$6)`,
           [
@@ -43,7 +43,7 @@ export async function savePipelineLayout(
           ],
         );
         await transaction.query(
-          `INSERT INTO "_damat_pipeline_activity" ("type","details","actor")
+          `INSERT INTO "damat"."_damat_pipeline_activity" ("type","details","actor")
            VALUES ('layout.saved',$1::jsonb,$2::jsonb)`,
           [
             JSON.stringify({

@@ -27,13 +27,13 @@ test("attempt, activity, and log reads return domain records", async () => {
   await ensureStorage();
   const run = await enqueueJob(uniqueName("records"), {});
   await pool.query(
-    `INSERT INTO "_damat_job_attempts"
+    `INSERT INTO "damat"."_damat_job_attempts"
       ("run_id", "attempt_number", "worker_id", "lease_token", "outcome")
      VALUES ($1, 1, 'worker-1', $2, 'succeeded')`,
     [run.id, crypto.randomUUID()],
   );
   await pool.query(
-    `INSERT INTO "_damat_job_logs"
+    `INSERT INTO "damat"."_damat_job_logs"
       ("run_id", "attempt_number", "level", "message", "sequence")
      VALUES ($1, 1, 'info', 'worked', 1)`,
     [run.id],
@@ -54,7 +54,7 @@ test("schedule repository normalizes PostgreSQL rows", async () => {
   const id = crypto.randomUUID();
   const name = uniqueName("schedule");
   await pool.query(
-    `INSERT INTO "_damat_job_schedules"
+    `INSERT INTO "damat"."_damat_job_schedules"
        ("id","name","job_name","kind","payload","queue","next_occurrence_at")
      VALUES ($1,$2,'scheduled-job','once','{}','scheduled',$3)`,
     [id, name, new Date()],

@@ -133,14 +133,14 @@ Single entry point (`.`). The package re-exports everything under `properties`,
 | `UuidColumnBuilder`                                                                         | class | `columns.uuid()` with `.defaultGenerate()`.                                                                                                         |
 | `ByteaColumnBuilder`                                                                        | class | `columns.bytea()`.                                                                                                                                  |
 | `EnumColumnBuilder`                                                                         | class | `columns.enum(EnumBuilder)`.                                                                                                                        |
-| `VectorColumnBuilder`                                                                       | class | `columns.vector(dims)` — `real[]` with fixed dimensions for embeddings.                                                                             |
+| `VectorColumnBuilder` / `HalfVectorColumnBuilder`                                           | class | `columns.vector(dims)` / `columns.halfVector(dims)` — native `VECTOR(dims)` / `HALFVEC(dims)` values represented as `number[]`.                    |
 
 ### Enums, indexes, constraints
 
 | Export                                         | Kind           | Summary                                                                                                                              |
 | ---------------------------------------------- | -------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
 | `EnumBuilder`                                  | class          | Named PG enum. `.name()`, `.toSchema()`, `.toTsTypeName()`, `.toTsTypeDeclaration()`.                                                |
-| `IndexBuilder` / `indexBuilder(name)`          | class/function | Index: `.columns()`, `.unique()`, `.type()`, `.where()`, `.concurrently()`.                                                          |
+| `IndexBuilder` / `indexBuilder(name)`          | class/function | Index: `.columns()` (named or SQL expression), `.unique()`, `.type()`, `.where()`, `.with()`, `.concurrently()`.                    |
 | `ConstraintBuilder` / `constrainBuilder(name)` | class/function | Table constraint: `.columns()`, `.unique()`, `.primaryKey()`, `.check()`, `.exclude()`, `.indexType()`, `.where()`, `.deferrable()`. |
 
 ### Relations
@@ -170,6 +170,7 @@ Single entry point (`.`). The package re-exports everything under `properties`,
 | `toPascalCase`, `toCamelCase`, `toEnumTypeName`             | function | String-case helpers used by codegen/type emission.                              |
 | `pgTypeToTsBase`, `enumTypeToTsBase`                        | function | Map a `ColumnType` / enum values to a TypeScript type string.                   |
 | `cleanupIndexSchema`                                        | function | Normalise a user index into an `IndexSchema` (auto-name, column normalisation). |
+| `assertVectorValue`, `assertColumnVectorValue`, `isVectorColumn` | functions | Shared finite-number and exact-dimension validation for native `vector`/`halfvec` values. |
 | `registerModel`, `getRegisteredModel`, `hasRegisteredModel` | function | The global table-name → model registry that backs string relation targets.      |
 | `resolveModuleTarget`, `removeLastS`                        | function | Target resolution + table→singular helper.                                      |
 | `PropertyValue`, `ModelProperties`                          | type     | The allowed property value union and the model property map.                    |

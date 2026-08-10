@@ -156,6 +156,11 @@ CLI applies shared durability migrations followed by `@damatjs/events`
 migrations. Standalone migration tooling can import `eventsSystemMigrations`
 from `@damatjs/events/migrations`.
 
+Durable-event tables are framework-owned relations in the PostgreSQL `damat`
+schema. The ordered package migration relocates existing event tables from
+`public` without changing their names; runtime SQL always uses the qualified
+schema name.
+
 Durable retention defaults to 90 days. `retentionMs: "forever"` stores nullable
 retention/expiry values, and audited runtime overrides apply to remaining data.
 PostgreSQL keeps payload metadata, deliveries, attempts, logs, results,

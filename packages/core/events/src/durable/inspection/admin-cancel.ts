@@ -34,7 +34,7 @@ async function cancelLocked(
   reason?: string,
 ): Promise<DurableEventDelivery> {
   const locked = await executor.query<DurableEventDeliveryRow>(
-    `SELECT * FROM "_damat_event_deliveries" WHERE "id"=$1 FOR UPDATE`,
+    `SELECT * FROM "damat"."_damat_event_deliveries" WHERE "id"=$1 FOR UPDATE`,
     [id],
   );
   const current = locked.rows[0];
@@ -53,7 +53,7 @@ async function cancelLocked(
     );
   }
   const result = await executor.query<DurableEventDeliveryRow>(
-    `UPDATE "_damat_event_deliveries" SET
+    `UPDATE "damat"."_damat_event_deliveries" SET
        "status"=CASE WHEN $2 THEN 'cancelled' ELSE "status" END,
        "cancellation_requested_at"=NOW(),"updated_at"=NOW(),
        "completed_at"=CASE WHEN $2 THEN NOW() ELSE "completed_at" END

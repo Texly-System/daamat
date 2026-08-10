@@ -73,6 +73,11 @@ Steps:
    shared plus capability-specific system migrations. Missing database config
    fails startup. Missing migrations fail with `Run: damat-orm migrate:up`
    guidance.
+
+   The migration job creates the dedicated PostgreSQL `damat` schema and keeps
+   Damat-owned relations there. Runtime roles must have `USAGE` on that schema
+   plus the table, sequence, and function privileges needed by their services;
+   startup does not create schemas or grant privileges.
 9. **Durability acceleration** — create one coordinator, subscriber transport,
    transactional-outbox relay, Redis projection rebuild, and publisher gate per
    process. A committed outbox write prompts the relay after commit; several
@@ -195,4 +200,8 @@ interface ServiceInstances {
   headless inspection and control clients; the application owns any HTTP layer.
 - **Health-check `database` placeholder.** `initializeServices` first sets a stub `database`/`redis` health check (status `"Ideal"`) and then overwrites it with the real one when configured. The stub is never user-visible if a DB is configured.
 - **Module default export must be a `defineModule` result.** Anything else throws during `initModules`.
+- **Provider entries are strict at load time.** Bare-source resolution skips
+  invalid heuristic directories, while explicit manifest paths are never
+  replaced; provider files load directly and provider directories require an
+  `index.ts` or `index.js` entry.
 - **Redis surface comes entirely from `@damatjs/redis`.** Document/extend Redis behaviour there, not here — this file is a one-line re-export.

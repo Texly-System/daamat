@@ -20,6 +20,26 @@ const runCreate = (args: string[], options: Record<string, unknown> = {}) => {
 const written = (suffix: string) =>
   writeCalls.find((c) => c.path.endsWith(suffix));
 
+type GeneratedConfig = { projectConfig: { nodeEnv?: string } };
+
+const loadGeneratedConfig = (
+  source: string,
+  nodeEnv?: string,
+): GeneratedConfig => {
+  const transformed = source
+    .replace(
+      'import { defineConfig } from "@damatjs/framework";',
+      "",
+    )
+    .replace("export default defineConfig", "return defineConfig");
+  const configProcess = { env: nodeEnv ? { NODE_ENV: nodeEnv } : {} };
+  const defineConfig = (config: GeneratedConfig) => config;
+  return new Function("process", "defineConfig", transformed)(
+    configProcess,
+    defineConfig,
+  ) as GeneratedConfig;
+};
+
 describe("damat create — scaffold", () => {
   test(".env gets generated secrets and a commented-out REDIS_URL; .env.example stays placeholder", async () => {
     await runCreate(["my-api"]).result;
@@ -45,6 +65,19 @@ describe("damat create — scaffold", () => {
     expect(config).toContain('inspectionVisibility: "metadata"');
     expect(config).toContain("events: { durable:");
     expect(config).toContain("pipelines:");
+  });
+
+  test("generated config maps only exact production NODE_ENV to production", async () => {
+    await runCreate(["my-api"]).result;
+    const source = written("my-api/damat.config.ts")!.content;
+    expect(source).toContain('process.env.NODE_ENV === "production"');
+    expect(source).not.toContain('nodeEnv: "development"');
+    const production = await loadGeneratedConfig(source, "production");
+    const absent = await loadGeneratedConfig(source);
+    const staging = await loadGeneratedConfig(source, "staging");
+    expect(production.projectConfig.nodeEnv).toBe("production");
+    expect(absent.projectConfig.nodeEnv).toBe("development");
+    expect(staging.projectConfig.nodeEnv).toBe("development");
   });
 
   test("tsconfig has the app-level @workflows aliases module add expects", async () => {

@@ -5,7 +5,7 @@ export function createRecordingPool(fail = false) {
     query: async (statement: string) => {
       sql.push(statement);
       if (fail && statement === "SELECT 1") throw new Error("query failed");
-      if (statement.includes('INSERT INTO "_damat_idempotency_keys"')) {
+      if (statement.includes('INSERT INTO "damat"."_damat_idempotency_keys"')) {
         return { rows: [{ scope: "test" }], rowCount: 1 };
       }
       return { rows: [], rowCount: 0 };

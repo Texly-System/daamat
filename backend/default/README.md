@@ -131,8 +131,10 @@ docker compose --env-file backend/default/.env.production.local \
 ```
 
 The stack uses separate bootstrap, migration, runtime, and backup database
-roles. The runtime role cannot create schemas or own tables. PostgreSQL is not
-published, API binding defaults to `127.0.0.1`, and application containers are
+roles. Damat infrastructure relations live in the dedicated `damat` schema;
+the runtime role has `USAGE` and CRUD privileges there but cannot create the
+schema or own its tables. PostgreSQL is not published, API binding defaults to
+`127.0.0.1`, and application containers are
 non-root, read-only, capability-free, and protected from privilege escalation.
 Use private managed services and deployment-secret injection in production.
 The reference backend is vendor-neutral and does not select an auth provider.

@@ -12,18 +12,18 @@ export async function saveDraft(
   mutation: PipelineMutation,
 ) {
   await executor.query(
-    `INSERT INTO "_damat_pipeline_definitions" ("id","name","source")
+    `INSERT INTO "damat"."_damat_pipeline_definitions" ("id","name","source")
      VALUES ($1,$2,'web') ON CONFLICT ("name") DO NOTHING`,
     [crypto.randomUUID(), name],
   );
   const owner = await executor.query<DefinitionRow>(
-    `SELECT * FROM "_damat_pipeline_definitions" WHERE "name"=$1 FOR UPDATE`,
+    `SELECT * FROM "damat"."_damat_pipeline_definitions" WHERE "name"=$1 FOR UPDATE`,
     [name],
   );
   if (owner.rows[0]!.source !== "web")
     throw new Error(`Pipeline "${name}" is code-owned`);
   const prior = await executor.query<{ revision: string }>(
-    `SELECT "revision" FROM "_damat_pipeline_drafts"
+    `SELECT "revision" FROM "damat"."_damat_pipeline_drafts"
      WHERE "definition_id"=$1 FOR UPDATE`,
     [owner.rows[0]!.id],
   );
@@ -42,7 +42,7 @@ export async function saveDraft(
   if (!result.rows[0]) throw new Error("Pipeline draft revision conflict");
   const revision = Number(result.rows[0].revision);
   await executor.query(
-    `INSERT INTO "_damat_pipeline_activity" ("type","details","actor")
+    `INSERT INTO "damat"."_damat_pipeline_activity" ("type","details","actor")
      VALUES ('draft.saved',$1::jsonb,$2::jsonb)`,
     [
       JSON.stringify({
@@ -66,10 +66,10 @@ function writeDraft(
 ) {
   const statement =
     revision === undefined
-      ? `INSERT INTO "_damat_pipeline_drafts"
+      ? `INSERT INTO "damat"."_damat_pipeline_drafts"
         ("definition_id","revision","manifest","actor","reason")
        VALUES ($1,1,$2::jsonb,$3::jsonb,$4) RETURNING "revision"`
-      : `UPDATE "_damat_pipeline_drafts" SET "revision"="revision"+1,
+      : `UPDATE "damat"."_damat_pipeline_drafts" SET "revision"="revision"+1,
         "manifest"=$2::jsonb,"actor"=$3::jsonb,"reason"=$4,"updated_at"=NOW()
        WHERE "definition_id"=$1 AND "revision"=$5 RETURNING "revision"`;
   const parameters: unknown[] = [

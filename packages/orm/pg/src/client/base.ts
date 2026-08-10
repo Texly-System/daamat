@@ -3,37 +3,14 @@ import type { ModelDefinition } from "@damatjs/orm-model";
 import type { QueryLogger } from "@damatjs/orm-core";
 import { ModelAccessor } from "../query";
 import { executeFindMany, executeFindOne } from "./ops/find";
-import {
-  executeCreate,
-  executeCreateMany,
-  executeUpdate,
-  executeDelete,
-  executeUpsert,
-  executeUpsertMany,
-} from "./ops/mutate";
+import { executeCreate, executeCreateMany, executeUpdate, executeDelete, executeUpsert, executeUpsertMany } from "./ops/mutate";
 import { executeTransaction } from "./ops/transaction";
-import type {
-  FindOptions,
-  CreateOptions,
-  CreateManyOptions,
-  UpdateOptions,
-  DeleteOptions,
-  UpsertOptions,
-  UpsertManyOptions,
-  FindOneOptions,
-  PgModelClientLike,
-} from "./types";
-import type {
-  PgSelectResult,
-  PgInsertResult,
-  PgUpdateResult,
-  PgDeleteResult,
-} from "../types";
+import type { FindOptions, CreateOptions, CreateManyOptions, UpdateOptions, DeleteOptions, UpsertOptions, UpsertManyOptions, FindOneOptions, PgModelClientLike } from "./types";
+import type { PgSelectResult, PgInsertResult, PgUpdateResult, PgDeleteResult } from "../types";
+import { attachVectorPool } from "../executor";
+import { withClient } from "./factory";
 
-export class PgModelClient<
-  T extends QueryResultRow = Record<string, unknown>,
-  Cols extends string = string,
-> implements PgModelClientLike<T, Cols> {
+export class PgModelClient<T extends QueryResultRow = Record<string, unknown>, Cols extends string = string> implements PgModelClientLike<T, Cols> {
   readonly accessor: ModelAccessor<Cols>;
   readonly _pool: Pool;
   readonly _conn: Pool | PoolClient;
@@ -49,6 +26,7 @@ export class PgModelClient<
     this._pool = pool;
     this._conn = conn ?? pool;
     this._logger = logger ?? undefined;
+    attachVectorPool(pool, model);
   }
 
   async findMany(options: FindOptions<Cols> = {}): Promise<PgSelectResult<T>> {
@@ -99,11 +77,6 @@ export class PgModelClient<
   }
 
   withClient(client: PoolClient): PgModelClient<T, Cols> {
-    return new PgModelClient<T, Cols>(
-      (this.accessor as any)._model,
-      this._pool,
-      client,
-      this._logger,
-    );
+    return withClient(this, client);
   }
 }

@@ -23,7 +23,7 @@ export async function listDurableEventLogs(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventLog[]> {
   const result = await eventExecutor(executor).query<DurableEventLogRow>(
-    `SELECT * FROM "_damat_event_logs" WHERE "delivery_id"=$1
+    `SELECT * FROM "damat"."_damat_event_logs" WHERE "delivery_id"=$1
      ORDER BY "attempt_number","sequence"`,
     [deliveryId],
   );
@@ -35,7 +35,7 @@ export async function listEventDeliveryLogsBatch(
   executor: DurabilityExecutor,
 ): Promise<DurableEventLog[]> {
   const result = await executor.query<DurableEventLogRow>(
-    `SELECT * FROM "_damat_event_logs" WHERE "delivery_id"=ANY($1::uuid[])
+    `SELECT * FROM "damat"."_damat_event_logs" WHERE "delivery_id"=ANY($1::uuid[])
      ORDER BY "delivery_id","attempt_number","sequence"`,
     [deliveryIds],
   );

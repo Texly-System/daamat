@@ -30,14 +30,15 @@ export const recoveryRedisUrl = (mode: RedisMode) =>
 export async function initializeRecovery(): Promise<void> {
   setDurabilityClient(createDurabilityClient({ pool }));
   const ready = await pool.query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM pg_class
-     WHERE relname=ANY($1::text[])`,
+    `SELECT COUNT(*)::text AS count FROM pg_class c
+     JOIN pg_namespace n ON n.oid=c.relnamespace
+     WHERE n.nspname='damat' AND c.relname=ANY($1::text[])`,
     [["_damat_job_runs", "_damat_event_outbox", "_damat_idempotency_keys"]],
   );
   if (ready.rows[0]?.count !== "3") {
     throw new Error("Recovery database needs Damat system migrations");
   }
-  await pool.query(`CREATE TABLE IF NOT EXISTS "_damat_recovery_effects" (
+  await pool.query(`CREATE TABLE IF NOT EXISTS "damat"."_damat_recovery_effects" (
     "kind" text NOT NULL, "work_id" text NOT NULL, "count" int NOT NULL,
     PRIMARY KEY ("kind", "work_id"))`);
 }
@@ -67,12 +68,15 @@ export async function cleanupWork(
   scope: string,
   effectId: string,
 ): Promise<void> {
-  const table = kind === "job" ? "_damat_job_runs" : "_damat_event_outbox";
-  await pool.query(`DELETE FROM "${table}" WHERE "id"=$1`, [id]);
-  await pool.query(`DELETE FROM "_damat_idempotency_keys" WHERE "scope"=$1`, [
+  const table =
+    kind === "job"
+      ? '"damat"."_damat_job_runs"'
+      : '"damat"."_damat_event_outbox"';
+  await pool.query(`DELETE FROM ${table} WHERE "id"=$1`, [id]);
+  await pool.query(`DELETE FROM "damat"."_damat_idempotency_keys" WHERE "scope"=$1`, [
     scope,
   ]);
-  await pool.query(`DELETE FROM "_damat_recovery_effects" WHERE "work_id"=$1`, [
+  await pool.query(`DELETE FROM "damat"."_damat_recovery_effects" WHERE "work_id"=$1`, [
     effectId,
   ]);
 }

@@ -2,6 +2,7 @@ import type { QueryResultRow } from "@damatjs/deps/pg";
 import { getDurabilityClient } from "../client/global";
 import type { DurabilityExecutor } from "../client/types";
 import type { ListWorkersOptions, WorkerRecord, WorkerState } from "./types";
+import { damatRelation } from "../migrations/relocation";
 
 export function workerExecutor(executor?: DurabilityExecutor) {
   return executor ?? getDurabilityClient();
@@ -66,7 +67,7 @@ export async function listWorkers(
   const staleAfter = options.staleAfterMs ?? 90_000;
   const ids = options.ids ?? [];
   const result = await workerExecutor(options.executor).query<WorkerRow>(
-    `SELECT * FROM "_damat_workers"
+    `SELECT * FROM ${damatRelation("_damat_workers")}
      WHERE ($1::text[] IS NULL OR "id" = ANY($1))
      ORDER BY "started_at" DESC, "id" ASC`,
     [ids.length ? ids : null],

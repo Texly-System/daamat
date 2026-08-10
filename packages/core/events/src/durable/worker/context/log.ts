@@ -29,7 +29,7 @@ export async function recordEventDeliveryLog(
        COALESCE(SUM(OCTET_LENGTH("message")+OCTET_LENGTH("context"::text)),0)::text
          AS "bytes",
        (OCTET_LENGTH($3::text)+OCTET_LENGTH(($4::jsonb)::text))::text
-         AS "candidate_bytes" FROM "_damat_event_logs"
+         AS "candidate_bytes" FROM "damat"."_damat_event_logs"
        WHERE "delivery_id"=$1 AND "attempt_number"=$2`,
       [claim.id, claim.attemptCount, message, JSON.stringify(data)],
     );
@@ -42,11 +42,11 @@ export async function recordEventDeliveryLog(
       return;
     }
     await executor.query(
-      `INSERT INTO "_damat_event_logs"
+      `INSERT INTO "damat"."_damat_event_logs"
        ("event_id","delivery_id","attempt_number","consumer","level",
         "message","context","worker_id","correlation_id","sequence")
        VALUES ($1,$2,$3,$4,$5,$6,$7::jsonb,$8,$9,
-        COALESCE((SELECT MAX("sequence")+1 FROM "_damat_event_logs"
+        COALESCE((SELECT MAX("sequence")+1 FROM "damat"."_damat_event_logs"
           WHERE "delivery_id"=$2 AND "attempt_number"=$3),1))`,
       [
         claim.eventId,
@@ -68,7 +68,7 @@ async function recordTruncation(
   claim: ClaimedEventDelivery,
 ): Promise<void> {
   const existing = await executor.query(
-    `SELECT 1 FROM "_damat_event_activity" WHERE "delivery_id"=$1
+    `SELECT 1 FROM "damat"."_damat_event_activity" WHERE "delivery_id"=$1
      AND "attempt_number"=$2 AND "type"='logs_truncated'`,
     [claim.id, claim.attemptCount],
   );

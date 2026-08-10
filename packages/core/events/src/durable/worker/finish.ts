@@ -21,7 +21,7 @@ export async function finishEventDelivery(
 ): Promise<void> {
   const terminal = input.status !== "retry_wait";
   const updated = await executor.query<{ progress: JsonValue | null }>(
-    `UPDATE "_damat_event_deliveries" SET "status"=$4,"result"=$5::jsonb,
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"=$4,"result"=$5::jsonb,
      "last_error"=$6::jsonb,"available_at"=COALESCE($7,"available_at"),
      "retention_at"=GREATEST("retention_at",COALESCE($7,"available_at")),
      "lease_owner"=NULL,"lease_token"=NULL,"lease_expires_at"=NULL,
@@ -80,7 +80,7 @@ async function closeEventDeliveryAttempt(
   input: FinishEventDeliveryInput,
 ): Promise<number> {
   const result = await executor.query(
-    `UPDATE "_damat_event_delivery_attempts" SET "finished_at"=NOW(),
+    `UPDATE "damat"."_damat_event_delivery_attempts" SET "finished_at"=NOW(),
      "duration_ms"=GREATEST(0,EXTRACT(EPOCH FROM (NOW()-"started_at"))*1000),
      "result"=$4::jsonb,"outcome"=$5,"error"=$6::jsonb
      WHERE "delivery_id"=$1 AND "attempt_number"=$2 AND "lease_token"=$3

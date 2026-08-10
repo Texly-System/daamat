@@ -32,7 +32,7 @@ export async function appendDurableEventActivity(
   metadata: Record<string, unknown> = {},
 ): Promise<DurableEventActivity> {
   const result = await executor.query<DurableEventActivityRow>(
-    `INSERT INTO "_damat_event_activity" ("event_id","type","metadata")
+    `INSERT INTO "damat"."_damat_event_activity" ("event_id","type","metadata")
      VALUES ($1,$2,$3::jsonb) RETURNING *`,
     [eventId, type, JSON.stringify(metadata)],
   );
@@ -45,7 +45,7 @@ export async function appendEventActivity(
   activity: AppendEventActivityOptions,
 ): Promise<void> {
   await executor.query(
-    `INSERT INTO "_damat_event_activity"
+    `INSERT INTO "damat"."_damat_event_activity"
      ("event_id","delivery_id","consumer","attempt_number","type",
       "previous_status","next_status","worker_id","lease_token","reason",
       "duration_ms","metadata","actor")
@@ -86,7 +86,7 @@ export async function findDurableEventActivity(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventActivity[]> {
   const result = await eventExecutor(executor).query<DurableEventActivityRow>(
-    `SELECT * FROM "_damat_event_activity"
+    `SELECT * FROM "damat"."_damat_event_activity"
      WHERE "event_id" = $1 ORDER BY "id" ASC`,
     [eventId],
   );

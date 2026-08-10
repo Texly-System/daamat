@@ -26,7 +26,7 @@ test("requested cancellation aborts and records cancelled", async () => {
     leaseMs: 30_000,
   });
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "cancellation_requested_at"=NOW() WHERE "id"=$1`,
     [item.id],
   );
@@ -62,7 +62,7 @@ test("cancellation observed during a cooperative handler becomes terminal", asyn
   });
   await started;
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "cancellation_requested_at"=NOW() WHERE "id"=$1`,
     [item.id],
   );

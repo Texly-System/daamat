@@ -21,6 +21,9 @@ receiver.
 Module and auth scaffolds omit redundant entry metadata. Standard
 `src/index.ts` or sibling `index.ts` entries are discovered by
 `@damatjs/module`; custom layouts declare an explicit override.
+Module install, plan, and update commands mark `--target` repeatable. One
+override stays scalar and subsequent `capability=path` values are passed to the
+installer in order.
 Fresh module profiles expose only the implemented `module` and `tests`
 capabilities. Optional paths are not represented by empty placeholder folders.
 
@@ -37,6 +40,11 @@ of the application logger. On foreground-terminal Ctrl-C, the child
 acknowledges its own shutdown while the parent requests the same stop over IPC.
 The parent sends an operating-system signal only as a bounded unacknowledged
 fallback.
+
+`module init` shares scaffold Git setup with `damat create`: it initializes
+`main`, stages generated files, and commits once by default. `--no-git` avoids
+the availability probe and every Git command, while any Git failure remains a
+warning and leaves the package usable.
 
 Module command adapters pass the global verbose state into their handled-error
 reports. The flag can appear before `module` or after its subcommand.

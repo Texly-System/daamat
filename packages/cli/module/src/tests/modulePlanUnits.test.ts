@@ -1,7 +1,5 @@
 import { describe, expect, mock, test } from "bun:test";
 import { buildModuleInstallPlan } from "../commands/module/shared/plan";
-import { executeModulePlan } from "../commands/module/shared/execute";
-import { reportModulePlan } from "../commands/module/shared/report";
 import { createContext } from "./helpers";
 import { artifact, lock, manifest, plan, request } from "./fixtures/installer";
 
@@ -50,38 +48,28 @@ describe("module plan construction", () => {
       experimentalPackage: true,
     });
   });
-});
 
-describe("module plan reporting and execution", () => {
-  test("reports add warnings, package backend, and custom instructions", () => {
-    const { ctx, logger } = createContext({});
-    const provider = manifest();
-    provider.install!.instructions = { add: ["wire billing"] };
-    reportModulePlan(ctx, plan(), provider);
-    expect(logger.warn).toHaveBeenCalledWith("check usage");
-    expect(logger.info).toHaveBeenCalledWith("wire billing");
-    expect(logger.info).toHaveBeenCalledWith("capability module", {
-      providerSource: "src/**",
-      destination: "src/modules/billing",
-      destinationSource: "fallback",
-      operations: 3,
-    });
-  });
-
-  test("reports default removal instructions", () => {
-    const { ctx, logger } = createContext({});
-    reportModulePlan(ctx, plan("remove"));
-    expect(logger.info.mock.calls.flat().join(" ")).toContain("billing");
-  });
-
-  test("executes plans with the shared runtime", async () => {
+  test("passes every target override through the resolved recipe", async () => {
     const { ctx } = createContext({});
-    const execute = mock(async () => {});
-    const runtime = { now: () => "now" };
-    await executeModulePlan(ctx, plan(), manifest(), {
-      execute: execute as never,
-      runtime: mock(() => runtime as never),
+    const expected = plan();
+    const install = mock(() => expected);
+    const recipe = {
+      schemaVersion: 1,
+      id: "billing",
+      kind: "module" as const,
+      targets: { routes: "src/http", jobs: "src/workers" },
+    };
+    await buildModuleInstallPlan(ctx, "/source", "add", {
+      resolve: mock(async () => ({
+        artifact: artifact(),
+        provider: manifest(),
+        recipe,
+        options: { targets: recipe.targets },
+      })),
+      install,
+      update: mock(async () => expected),
+      readLock: mock(() => lock()),
     });
-    expect(execute).toHaveBeenCalledWith(expect.anything(), runtime);
+    expect(install.mock.calls[0]?.[0].recipe).toBe(recipe);
   });
 });

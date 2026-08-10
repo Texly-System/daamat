@@ -1,4 +1,5 @@
-import { moduleDevChild, within, type ProcessResult } from "./moduleDevProcess";
+import { moduleDevChild, type ProcessResult } from "./moduleDevProcess";
+import { within } from "./moduleDevUtils";
 
 export async function runCollidingModuleDev(
   cwd: string,

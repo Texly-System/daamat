@@ -12,7 +12,7 @@ test("metadata and hidden visibility strip payload and results only", async () =
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "progress"=$2::jsonb,
+    `UPDATE "damat"."_damat_event_deliveries" SET "progress"=$2::jsonb,
        "result"=$3::jsonb,"last_error"=$4::jsonb WHERE "id"=$1`,
     [
       delivery.id,
@@ -22,7 +22,7 @@ test("metadata and hidden visibility strip payload and results only", async () =
     ],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_delivery_attempts"
+    `INSERT INTO "damat"."_damat_event_delivery_attempts"
       ("delivery_id","attempt_number","worker_id","lease_token","result","error")
      VALUES ($1,1,'worker-a',$2,$3::jsonb,$4::jsonb)`,
     [delivery.id, crypto.randomUUID(), '{"secret":"attempt"}', "{}"],

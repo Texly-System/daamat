@@ -1,6 +1,7 @@
-import type { CliRuntime, CommandContext, CommandOption } from "../types";
-import { extractPositionalArgs } from "./extractPositional";
+import type { CommandOption } from "../types";
+import { setParsedOption } from "./setParsedOption";
 export { extractPositionalArgs } from "./extractPositional";
+export { buildCommandContext } from "./buildCommandContext";
 
 /**
  * Parse raw argv tokens against a command's option definitions.
@@ -18,6 +19,7 @@ export function parseCommandArgs(
   const options: Record<string, unknown> = {};
   const positional: string[] = [];
   const unknown: string[] = [];
+  const occurrences = new Set<string>();
 
   for (const def of optionDefs) {
     if (def.default !== undefined) {
@@ -56,7 +58,7 @@ export function parseCommandArgs(
           (d) => d.type === "boolean" && d.name === token.slice(5),
         );
         if (negated) {
-          options[negated.name] = false;
+          setParsedOption(options, occurrences, negated, false);
           continue;
         }
       }
@@ -68,12 +70,21 @@ export function parseCommandArgs(
       }
 
       if (def.type === "boolean") {
-        options[def.name] =
-          inlineValue !== undefined ? inlineValue !== "false" : true;
+        setParsedOption(
+          options,
+          occurrences,
+          def,
+          inlineValue !== undefined ? inlineValue !== "false" : true,
+        );
       } else {
         const value = inlineValue ?? args[++i];
         if (value === undefined) continue;
-        options[def.name] = def.type === "number" ? Number(value) : value;
+        setParsedOption(
+          options,
+          occurrences,
+          def,
+          def.type === "number" ? Number(value) : value,
+        );
       }
     } else {
       positional.push(arg);
@@ -81,19 +92,4 @@ export function parseCommandArgs(
   }
 
   return { options, positional, unknown };
-}
-
-export function buildCommandContext(
-  commandName: string,
-  rawArgs: readonly string[],
-  options: Record<string, unknown>,
-  runtime: Pick<CliRuntime, "cwd" | "logger">,
-): CommandContext {
-  return {
-    command: commandName,
-    args: extractPositionalArgs([...rawArgs]),
-    options,
-    logger: runtime.logger,
-    cwd: runtime.cwd,
-  };
 }

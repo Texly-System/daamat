@@ -12,7 +12,7 @@ test("summarizes delivery state activity duration leases and worker load", async
   const seeded = await seedEvent(["alpha", "beta"]);
   const now = new Date("2026-01-02T12:00:00.000Z");
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET
+    `UPDATE "damat"."_damat_event_deliveries" SET
        "status"=CASE "consumer" WHEN 'alpha' THEN 'dead_lettered' ELSE 'running' END,
        "lease_expires_at"=CASE "consumer" WHEN 'beta' THEN $2::timestamptz ELSE NULL END,
        "lease_owner"=CASE "consumer" WHEN 'beta' THEN 'worker-a' ELSE NULL END,
@@ -32,7 +32,7 @@ test("summarizes delivery state activity duration leases and worker load", async
     ],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_delivery_attempts"
+    `INSERT INTO "damat"."_damat_event_delivery_attempts"
       ("delivery_id","attempt_number","worker_id","lease_token","started_at",
        "finished_at","duration_ms","outcome","available_at","wait_ms")
      VALUES ($1,1,'worker-a',$2,$3,$4,300,'dead_lettered',$3,300)`,
@@ -44,14 +44,14 @@ test("summarizes delivery state activity duration leases and worker load", async
     ],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_activity" ("event_id","delivery_id","consumer",
+    `INSERT INTO "damat"."_damat_event_activity" ("event_id","delivery_id","consumer",
        "type","next_status","occurred_at")
      VALUES ($1,$2,'alpha','dead_lettered','dead_lettered',$3),
        ($1,$2,'alpha','lease_recovered','dead_lettered',$3)`,
     [seeded.event.id, seeded.deliveries[0]!.id, new Date(now.getTime() - 500)],
   );
   await pool.query(
-    `INSERT INTO "_damat_workers" ("id","capabilities","hostname","process_id",
+    `INSERT INTO "damat"."_damat_workers" ("id","capabilities","hostname","process_id",
        "concurrency","in_flight","last_heartbeat_at","application","deployment")
      VALUES ('worker-a','["events:test"]','host',1,4,2,$1,$2::jsonb,$3::jsonb)`,
     [

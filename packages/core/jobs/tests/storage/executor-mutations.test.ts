@@ -12,7 +12,7 @@ test("cancel and retry accept an active durability transaction", async () => {
 
   const retryRun = await enqueueJob(uniqueName("retry-executor"), {});
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "status"='dead_lettered' WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_job_runs" SET "status"='dead_lettered' WHERE "id"=$1`,
     [retryRun.id],
   );
   const retried = await durability.transaction((executor) =>

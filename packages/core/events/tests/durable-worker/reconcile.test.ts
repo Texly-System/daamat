@@ -17,7 +17,7 @@ test("due retry promotion is bounded and records retry_ready", async () => {
   const first = await retryingDelivery();
   const second = await retryingDelivery();
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "available_at"=NOW()-INTERVAL '1 second' WHERE "id" IN ($1,$2)`,
     [first.id, second.id],
   );
@@ -28,7 +28,7 @@ test("due retry promotion is bounded and records retry_ready", async () => {
   ];
   expect(statuses.filter((status) => status === "pending")).toHaveLength(1);
   const activity = await pool.query(
-    `SELECT COUNT(*)::int AS count FROM "_damat_event_activity"
+    `SELECT COUNT(*)::int AS count FROM "damat"."_damat_event_activity"
      WHERE "type"='retry_ready'`,
   );
   expect(activity.rows[0].count).toBe(1);

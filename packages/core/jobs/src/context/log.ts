@@ -30,7 +30,7 @@ export async function recordJobLog(
          AS "bytes",
        (OCTET_LENGTH($3::text)+OCTET_LENGTH(($4::jsonb)::text))::text
          AS "candidate_bytes"
-       FROM "_damat_job_logs"
+       FROM "damat"."_damat_job_logs"
        WHERE "run_id" = $1 AND "attempt_number" = $2`,
       [claim.id, claim.attemptCount, message, JSON.stringify(data)],
     );
@@ -43,13 +43,13 @@ export async function recordJobLog(
       return;
     }
     await executor.query(
-      `INSERT INTO "_damat_job_logs"
+      `INSERT INTO "damat"."_damat_job_logs"
        ("run_id","attempt_number","level","message","context","worker_id",
         "correlation_id","sequence")
        SELECT $1,$2,$3,$4,$5::jsonb,$6,"correlation_id",
-         COALESCE((SELECT MAX("sequence")+1 FROM "_damat_job_logs"
+         COALESCE((SELECT MAX("sequence")+1 FROM "damat"."_damat_job_logs"
            WHERE "run_id"=$1 AND "attempt_number"=$2),1)
-       FROM "_damat_job_runs" WHERE "id"=$1`,
+       FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [
         claim.id,
         claim.attemptCount,
@@ -67,7 +67,7 @@ async function recordTruncation(
   claim: ClaimedJobRun,
 ): Promise<void> {
   const existing = await executor.query(
-    `SELECT 1 FROM "_damat_job_activity"
+    `SELECT 1 FROM "damat"."_damat_job_activity"
      WHERE "run_id"=$1 AND "attempt_number"=$2 AND "type"='logs_truncated'`,
     [claim.id, claim.attemptCount],
   );

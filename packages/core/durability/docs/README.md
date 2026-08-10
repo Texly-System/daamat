@@ -19,7 +19,8 @@
 | `src/leases/`                 | UUID lease-token creation                           |
 | `src/migrations/types.ts`     | System migration and catalog contracts              |
 | `src/migrations/catalog.ts`   | Catalog validation, deduplication, and ordering     |
-| `src/migrations/shared-*`     | Shared `_damat_` table descriptors                  |
+| `src/migrations/relocation.ts`| Qualified relation and forward-only relocation SQL  |
+| `src/migrations/shared-*`     | Shared `damat._damat_` table descriptors             |
 | `src/migrations/readiness.ts` | Read-only applied-migration validation              |
 | `src/errors.ts`               | Setup and migration-readiness errors                |
 
@@ -62,6 +63,6 @@
 - Progress terminal values are recorded regardless of the sampling interval.
 - Catalog owners must match every migration they contain.
 - Migration identity is the `(owner, id)` pair; duplicates are rejected.
-- Readiness queries `_damat_migration_logs` and never creates a table.
+- Readiness queries `damat._damat_migration_logs` and never creates a table.
 - Missing tracker state and missing migration rows use the same actionable
   readiness error, with missing owner/id pairs retained as metadata.

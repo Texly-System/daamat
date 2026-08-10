@@ -1,5 +1,14 @@
 # @damatjs/deps
 
+## 1.0.6
+
+### Patch Changes
+
+- Implement native pgvector columns, extension-aware migrations, exact vector
+  validation and serialization, vector indexes, and nearest-neighbor queries.
+- Raise the Hono dependency floor to 4.12.34 to exclude known vulnerable
+  releases.
+
 ## 1.0.5
 
 ## 1.0.4

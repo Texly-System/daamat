@@ -28,7 +28,7 @@ export async function appendJobActivity(
   input: AppendActivityInput,
 ): Promise<JobActivity> {
   const result = await executor.query<JobActivityRow>(
-    `INSERT INTO "_damat_job_activity"
+    `INSERT INTO "damat"."_damat_job_activity"
        ("run_id","attempt_number","type","previous_status","next_status",
         "worker_id","lease_token","reason","duration_ms","metadata","actor")
      VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10::jsonb,$11::jsonb)
@@ -61,7 +61,7 @@ export async function findJobActivity(
   executor?: DurabilityExecutor,
 ): Promise<JobActivity[]> {
   const result = await jobExecutor(executor).query<JobActivityRow>(
-    `SELECT * FROM "_damat_job_activity"
+    `SELECT * FROM "damat"."_damat_job_activity"
      WHERE "run_id" = $1 ORDER BY "id" ASC`,
     [runId],
   );

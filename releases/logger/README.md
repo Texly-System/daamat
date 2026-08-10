@@ -12,6 +12,7 @@ Those rows are marked inline below with no link.
 
 | Version | Summary                                                                                           | Upgrade notes         |
 | ------- | ------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.6   | Lockstep maintenance bump; logger behavior is unchanged                                           | —                     |
 | 1.0.4   | Lockstep maintenance bump; logger behavior is unchanged                                           | —                     |
 | 1.0.3   | Pretty errors render one stack without a duplicate heading                                        | [1.0.3 →](./1.0.3.md) |
 | 0.1.3   | Version-sync bump (cross-module links land in other packages); no change to the logger's own code | —                     |

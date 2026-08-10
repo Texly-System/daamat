@@ -6,13 +6,15 @@ import { rebuildReadyProjection } from "../../services/initialize/accelerationPr
 
 test("projection rebuild replaces every durable ready index", async () => {
   const now = new Date(1_000);
+  const sqls: string[] = [];
   const executor = {
     query: async (sql: string) => {
-      if (sql.includes("_damat_job_runs"))
+      sqls.push(sql);
+      if (sql.includes('"damat"."_damat_job_runs"'))
         return rows([{ id: "job", scope: "q", available_at: now }]);
       if (sql.includes("routed_at"))
         return rows([{ id: "event", scope: "router", available_at: now }]);
-      if (sql.includes("_damat_pipeline_node_executions")) {
+      if (sql.includes('"damat"."_damat_pipeline_node_executions"')) {
         return rows([{ id: "pipeline", scope: "onboard", available_at: now }]);
       }
       return rows([
@@ -43,6 +45,7 @@ test("projection rebuild replaces every durable ready index", async () => {
     ['damat:ready:events:delivery:["mail","audit"]', 1_000, "delivery"],
     ["damat:ready:pipelines:router", 1_000, "pipeline"],
   ]);
+  expect(sqls).toHaveLength(4);
 });
 
 test("projection audit writes actor, status, and details", async () => {
@@ -61,6 +64,7 @@ test("projection audit writes actor, status, and details", async () => {
     { error: "offline" },
     executor,
   );
+  expect(queries[0]?.sql).toContain('"damat"."_damat_maintenance_activity"');
   expect(queries.map(({ params }) => params?.[0])).toEqual([
     "requested",
     "failed",

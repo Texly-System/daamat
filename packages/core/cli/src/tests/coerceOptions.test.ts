@@ -37,4 +37,16 @@ describe("coerceOptions", () => {
     const options = { name: "test" };
     expect(coerceOptions(options, undefined)).toEqual(options);
   });
+
+  test("coerces repeatable arrays element by element", () => {
+    expect(
+      coerceOptions(
+        { port: ["3000", "4000"], enabled: [true, false] },
+        [
+          { name: "port", type: "number", repeatable: true },
+          { name: "enabled", type: "boolean", repeatable: true },
+        ],
+      ),
+    ).toEqual({ port: [3000, 4000], enabled: [true, false] });
+  });
 });

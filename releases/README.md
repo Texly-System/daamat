@@ -22,13 +22,12 @@ your target version.
 All active Damat packages are released **in lockstep** — a release moves every
 published package to the same version, whether or not its own code changed.
 
-**Current source version: `1.0.5`** for every active public package.
+**Current source version: `1.0.6`** for every active public package.
 `@damatjs/codegen` is archived at its last npm release, `2.1.0`, and is not part
 of the workspace or active publication set.
 
-Version 1.0.5 fixes local module installation from Bun workspaces and restores
-capability-specific backend destinations for routes, workflows, jobs, events,
-pipelines, links, and tests.
+Version 1.0.6 combines the accepted patch corrections, the dedicated `damat`
+PostgreSQL infrastructure schema, and native pgvector support across the ORM.
 
 A package's folder only carries a `<version>.md` (and a detailed index row) for
 versions where _its own_ code changed; for a lockstep bump with no change of its

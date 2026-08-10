@@ -43,7 +43,7 @@ export async function getDurableEventDelivery(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventDelivery | undefined> {
   const result = await eventExecutor(executor).query<DurableEventDeliveryRow>(
-    `SELECT * FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT * FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [id],
   );
   return result.rows[0] ? mapDurableEventDelivery(result.rows[0]) : undefined;
@@ -54,7 +54,7 @@ export async function listDurableEventDeliveries(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventDelivery[]> {
   const result = await eventExecutor(executor).query<DurableEventDeliveryRow>(
-    `SELECT * FROM "_damat_event_deliveries"
+    `SELECT * FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1 ORDER BY "consumer","id"`,
     [eventId],
   );

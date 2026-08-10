@@ -3,8 +3,8 @@
 Maintainer-facing documentation for `@damatjs/orm-migration`. For the public overview and quick start, see the [package README](../README.md).
 
 This package coordinates module-owned SQL files and ordered inline system
-migrations. Both use one advisory lock and the shared `_damat_migration_logs`
-table.
+migrations. Both use one advisory lock and the shared
+`damat._damat_migration_logs` table.
 
 ## Module map
 
@@ -59,7 +59,7 @@ A single table, `_damat_migration_logs`, records every applied migration keyed b
 
 | Column              | Type        | Meaning                              |
 | ------------------- | ----------- | ------------------------------------ |
-| `id`                | TEXT PK     | `"<module>_<name>"`                  |
+| `id`                | TEXT PK     | `"<module-length>_<module>_<name>"`  |
 | `module`            | TEXT        | Module name                          |
 | `name`              | TEXT        | Migration file name (without `.sql`) |
 | `applied_at`        | TIMESTAMPTZ | When applied (default `NOW()`)       |

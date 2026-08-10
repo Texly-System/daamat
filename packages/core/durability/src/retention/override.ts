@@ -3,6 +3,7 @@ import { getDurabilityClient } from "../client/global";
 import { validateWorkActor } from "../controls";
 import type { RetentionOverride, SetRetentionOverrideInput } from "./types";
 import { applyRetentionOverride } from "./apply";
+import { damatRelation } from "../migrations/relocation";
 
 interface OverrideRow extends QueryResultRow {
   work_kind: RetentionOverride["workKind"];
@@ -20,7 +21,7 @@ export async function setRetentionOverride(
   const retention = input.retentionMs === "forever" ? null : input.retentionMs;
   return getDurabilityClient().transaction(async (executor) => {
     const result = await executor.query<OverrideRow>(
-      `INSERT INTO "_damat_retention_overrides"
+      `INSERT INTO ${damatRelation("_damat_retention_overrides")}
         ("work_kind","scope","retention_ms","actor","reason")
        VALUES ($1,$2,$3,$4::jsonb,$5) ON CONFLICT ("work_kind","scope")
        DO UPDATE SET "retention_ms"=EXCLUDED."retention_ms",
@@ -35,7 +36,7 @@ export async function setRetentionOverride(
       ],
     );
     await executor.query(
-      `INSERT INTO "_damat_maintenance_activity"
+      `INSERT INTO ${damatRelation("_damat_maintenance_activity")}
         ("operation","work_kind","scope","status","actor","details","completed_at")
        VALUES ('retention_override',$1,$2,'completed',$3::jsonb,$4::jsonb,NOW())`,
       [
@@ -58,7 +59,7 @@ export async function getRetentionOverride(
   scope: string,
 ): Promise<RetentionOverride | undefined> {
   const result = await getDurabilityClient().query<OverrideRow>(
-    `SELECT * FROM "_damat_retention_overrides"
+    `SELECT * FROM ${damatRelation("_damat_retention_overrides")}
      WHERE "work_kind"=$1 AND "scope"=$2`,
     [workKind, scope],
   );

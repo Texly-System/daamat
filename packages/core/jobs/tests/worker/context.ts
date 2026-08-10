@@ -35,7 +35,7 @@ export async function queuedRun(
 
 export async function expireLease(runId: string): Promise<void> {
   await pool.query(
-    `UPDATE "_damat_job_runs"
+    `UPDATE "damat"."_damat_job_runs"
      SET "lease_expires_at" = NOW() - INTERVAL '1 second'
      WHERE "id" = $1`,
     [runId],

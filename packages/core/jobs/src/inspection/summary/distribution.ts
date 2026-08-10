@@ -18,9 +18,9 @@ export async function readDistribution(
 ): Promise<DurationDistribution> {
   const source =
     expression === "processing"
-      ? `SELECT "duration_ms"::float8 AS value FROM "_damat_job_attempts"
+      ? `SELECT "duration_ms"::float8 AS value FROM "damat"."_damat_job_attempts"
          WHERE "finished_at">=$1 AND "finished_at"<$2 AND "duration_ms" IS NOT NULL`
-      : `SELECT "wait_ms"::float8 AS value FROM "_damat_job_attempts"
+      : `SELECT "wait_ms"::float8 AS value FROM "damat"."_damat_job_attempts"
          WHERE "started_at">=$1 AND "started_at"<$2 AND "wait_ms" IS NOT NULL`;
   const result = await executor.query<DistributionRow>(
     `SELECT COUNT(*)::text AS count,COALESCE(AVG(value),0)::float8 AS average_ms,

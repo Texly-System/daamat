@@ -14,7 +14,7 @@ test("delivery filters and failed range match the same consumer", async () => {
   const beta = seeded.deliveries.find(({ consumer }) => consumer === "beta")!;
   const now = new Date();
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"=CASE "consumer"
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"=CASE "consumer"
        WHEN 'alpha' THEN 'running' ELSE 'dead_lettered' END,
        "lease_owner"=CASE "consumer" WHEN 'alpha' THEN 'worker-a' END,
        "completed_at"=CASE "consumer" WHEN 'beta' THEN $2::timestamptz END
@@ -22,7 +22,7 @@ test("delivery filters and failed range match the same consumer", async () => {
     [seeded.event.id, now],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_activity"
+    `INSERT INTO "damat"."_damat_event_activity"
        ("event_id","delivery_id","consumer","type","occurred_at")
      VALUES ($1,$2,'beta','dead_lettered',$3)`,
     [seeded.event.id, beta.id, now],

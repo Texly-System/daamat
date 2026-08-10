@@ -14,4 +14,6 @@ export interface ModuleSchema {
   enums?: EnumSchema[];
   /** Relation Schema for the module — all relations collected from every table */
   relationships?: RelationSchema[];
+  /** PostgreSQL extensions required by this module */
+  extensions?: string[];
 }

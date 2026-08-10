@@ -16,7 +16,7 @@ describe("job inspection controls", () => {
     });
     await client.resumeQueue(queue, actor);
     const result = await pool.query(
-      `SELECT "action","actor" FROM "_damat_work_control_activity"
+      `SELECT "action","actor" FROM "damat"."_damat_work_control_activity"
        WHERE "work_kind"='job' AND "scope"=$1 ORDER BY "id"`,
       [queue],
     );
@@ -47,7 +47,7 @@ describe("job inspection controls", () => {
       (await client.disableSchedule(schedule.id, actor, "hold")).enabled,
     ).toBe(false);
     const result = await pool.query(
-      `SELECT "type","actor","metadata" FROM "_damat_job_schedule_activity"
+      `SELECT "type","actor","metadata" FROM "damat"."_damat_job_schedule_activity"
        WHERE "schedule_id"=$1 AND "type" IN ('enabled','disabled') ORDER BY "id"`,
       [schedule.id],
     );

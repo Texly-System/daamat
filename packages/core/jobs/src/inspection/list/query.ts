@@ -2,13 +2,13 @@ export const listRunsSql = `
 SELECT r.*, (date_trunc('milliseconds',r."created_at" AT TIME ZONE 'UTC')
   AT TIME ZONE 'UTC') AS "cursor_at",
   NOW() AS "inspected_at", EXISTS (
-    SELECT 1 FROM "_damat_job_activity" a
+    SELECT 1 FROM "damat"."_damat_job_activity" a
     WHERE a."run_id"=r."id" AND a."type"='lease_recovered') AS "recovered"
-FROM "_damat_job_runs" r
+FROM "damat"."_damat_job_runs" r
 WHERE ($1::text[] IS NULL OR r."status"=ANY($1))
   AND ($2::text[] IS NULL OR r."status"=ANY($2))
   AND ($3::boolean IS NULL OR EXISTS (
-    SELECT 1 FROM "_damat_job_activity" a
+    SELECT 1 FROM "damat"."_damat_job_activity" a
     WHERE a."run_id"=r."id" AND a."type"='lease_recovered')=$3)
   AND ($4::text[] IS NULL OR r."queue"=ANY($4))
   AND ($5::text[] IS NULL OR r."name"=ANY($5))
@@ -26,7 +26,7 @@ WHERE ($1::text[] IS NULL OR r."status"=ANY($1))
   AND ($14::timestamptz IS NULL OR r."completed_at">=$14)
   AND ($15::timestamptz IS NULL OR r."completed_at"<$15)
   AND (($16::timestamptz IS NULL AND $17::timestamptz IS NULL) OR EXISTS (
-    SELECT 1 FROM "_damat_job_activity" f WHERE f."run_id"=r."id"
+    SELECT 1 FROM "damat"."_damat_job_activity" f WHERE f."run_id"=r."id"
       AND f."type" IN ('retry_wait','dead_lettered')
       AND ($16::timestamptz IS NULL OR f."occurred_at">=$16)
       AND ($17::timestamptz IS NULL OR f."occurred_at"<$17)))

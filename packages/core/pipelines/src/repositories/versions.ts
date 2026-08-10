@@ -12,8 +12,8 @@ export async function findActivePipelineVersion(
   versionId?: string,
 ): Promise<ActiveVersionRow | undefined> {
   const result = await executor.query<ActiveVersionRow>(
-    `SELECT v.*,d."name",d."source" FROM "_damat_pipeline_versions" v
-     JOIN "_damat_pipeline_definitions" d ON d."id"=v."definition_id"
+    `SELECT v.*,d."name",d."source" FROM "damat"."_damat_pipeline_versions" v
+     JOIN "damat"."_damat_pipeline_definitions" d ON d."id"=v."definition_id"
      WHERE d."name"=$1 AND v."id"=COALESCE($2::uuid,d."active_version_id")`,
     [name, versionId ?? null],
   );
@@ -25,7 +25,7 @@ export async function findPipelineDefinitionRow(
   name: string,
 ): Promise<DefinitionRow | undefined> {
   const result = await executor.query<DefinitionRow>(
-    `SELECT * FROM "_damat_pipeline_definitions" WHERE "name"=$1`,
+    `SELECT * FROM "damat"."_damat_pipeline_definitions" WHERE "name"=$1`,
     [name],
   );
   return result.rows[0];

@@ -41,7 +41,8 @@ describe("standalone durable module integration", () => {
       expect(result.readiness[1]).toContain("/api");
       expect(result.portReleased).toBe(true);
     },
-    25_000,
+    // Startup plus three sequential 15s durable-work waits can exceed 25s.
+    60_000,
   );
 
   runLive(
@@ -67,6 +68,6 @@ describe("standalone durable module integration", () => {
         portReleased: true,
       });
     },
-    15_000,
+    30_000,
   );
 });

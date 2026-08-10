@@ -17,7 +17,7 @@ describe("job inspection run administration", () => {
     expect(first.cancellationRequestedAt).toBeInstanceOf(Date);
     expect((await client.cancel(run.id, actor)).id).toBe(run.id);
     const activity = await pool.query(
-      `SELECT "actor","reason" FROM "_damat_job_activity"
+      `SELECT "actor","reason" FROM "damat"."_damat_job_activity"
        WHERE "run_id"=$1 AND "type"='cancelled'`,
       [run.id],
     );
@@ -28,7 +28,7 @@ describe("job inspection run administration", () => {
   test("retries only dead letters and preserves history", async () => {
     const run = await insertRun({ status: "dead_lettered" });
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "completed_at"=NOW(),
+      `UPDATE "damat"."_damat_job_runs" SET "completed_at"=NOW(),
        "progress"='{"old":true}',"result"='{"old":true}',
        "last_error"='{"message":"old"}',"cancellation_requested_at"=NOW(),
        "lease_owner"='old-worker',"lease_token"=$2,
@@ -40,7 +40,7 @@ describe("job inspection run administration", () => {
     const cleaned = await pool.query(
       `SELECT "progress","result","last_error","cancellation_requested_at",
        "completed_at","lease_owner","lease_token","lease_expires_at","heartbeat_at"
-       FROM "_damat_job_runs" WHERE "id"=$1`,
+       FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [run.id],
     );
     expect(Object.values(cleaned.rows[0])).toEqual(Array(9).fill(null));
@@ -48,7 +48,7 @@ describe("job inspection run administration", () => {
       code: "INVALID_TRANSITION",
     });
     const activity = await pool.query(
-      `SELECT "actor","metadata" FROM "_damat_job_activity"
+      `SELECT "actor","metadata" FROM "damat"."_damat_job_activity"
        WHERE "run_id"=$1 AND "type"='manual_retry'`,
       [run.id],
     );

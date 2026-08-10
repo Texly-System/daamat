@@ -7,6 +7,7 @@ import type {
   WorkControlIdentity,
 } from "./types";
 import { writeControl } from "./write";
+import { damatRelation } from "../migrations/relocation";
 
 export async function pauseWork(
   options: ChangeWorkControlOptions,
@@ -25,7 +26,7 @@ export async function getWorkControl(
 ): Promise<WorkControl | undefined> {
   const executor = options.executor ?? getDurabilityClient();
   const result = await executor.query<ControlRow>(
-    `SELECT * FROM "_damat_work_controls"
+    `SELECT * FROM ${damatRelation("_damat_work_controls")}
      WHERE "work_kind" = $1 AND "scope" = $2`,
     [options.kind, options.scope],
   );

@@ -14,7 +14,7 @@ test("terminal activity includes the latest progress snapshot", async () => {
     await context.progress({ percent: 73, phase: "writing" });
     return { done: true };
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name" = $2 WHERE "id" = $1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name" = $2 WHERE "id" = $1`, [
     item.run.id,
     name,
   ]);

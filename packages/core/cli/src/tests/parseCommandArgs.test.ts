@@ -12,6 +12,13 @@ const defs: CommandOption[] = [
   { name: "minify", description: "Minify", type: "boolean", default: false },
   { name: "output", alias: "o", description: "Output", type: "string" },
   { name: "port", description: "Port", type: "number" },
+  {
+    name: "target",
+    alias: "t",
+    description: "Capability target",
+    type: "string",
+    repeatable: true,
+  },
 ];
 
 describe("parseCommandArgs", () => {
@@ -55,5 +62,33 @@ describe("parseCommandArgs", () => {
     );
     expect(positional).toEqual(["target", "--literal", "-x"]);
     expect(unknown).toEqual([]);
+  });
+
+  test("accumulates repeated repeatable values in argument order", () => {
+    const { options } = parseCommandArgs(
+      [
+        "--target",
+        "routes=src/http",
+        "--target=jobs=src/workers",
+        "-t",
+        "events=src/events",
+      ],
+      defs,
+    );
+    expect(options.target).toEqual([
+      "routes=src/http",
+      "jobs=src/workers",
+      "events=src/events",
+    ]);
+  });
+
+  test("keeps one repeatable occurrence scalar and non-repeatable last", () => {
+    const one = parseCommandArgs(["--target=routes=src/http"], defs);
+    expect(one.options.target).toBe("routes=src/http");
+    const repeated = parseCommandArgs(
+      ["--output", "first", "--output=second"],
+      defs,
+    );
+    expect(repeated.options.output).toBe("second");
   });
 });

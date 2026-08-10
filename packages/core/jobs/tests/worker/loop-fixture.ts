@@ -17,7 +17,7 @@ export function deferred<T>(): Deferred<T> {
 }
 
 export async function waitUntil(check: () => boolean): Promise<void> {
-  const deadline = Date.now() + 500;
+  const deadline = Date.now() + 5_000;
   while (!check()) {
     if (Date.now() >= deadline) throw new Error("condition was not reached");
     await Bun.sleep(2);

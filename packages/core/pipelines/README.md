@@ -23,6 +23,11 @@ Framework apps enable `services.pipelines`. Import pipeline definitions and
 capability registrations before startup, just as job and event definitions are
 registered before their workers start.
 
+Pipeline infrastructure relations live in PostgreSQL's dedicated `damat`
+schema. Run the system migrations before starting API or worker processes; a
+runtime database role needs `USAGE` on `damat` plus table and sequence
+privileges for the relations it executes.
+
 Direct `job` nodes require `services.jobs`; event publish/wait nodes and event
 triggers require `services.events.durable`. Workflow/action nodes use the
 pipeline package's internal durable queue and do not require a separate job
@@ -155,6 +160,26 @@ Signals may arrive before their wait node becomes active. They are validated
 against the pinned manifest, stored in PostgreSQL, and consumed once. Delays,
 event waits, interval triggers, and five-field UTC cron triggers are also
 durable. Trigger receipts prevent an event from starting the same version twice.
+
+### Event waits have an activation-scoped history boundary
+
+An `event.wait` scans durable event history from the creation of its node
+execution. A matching event published earlier is not consumed, even when its
+correlation ID matches. Correlation narrows the eligible history; it does not
+move this boundary backward. This is intentionally different from
+`signal.wait`, because signals may be buffered before their wait node activates.
+
+For start-work/await-completion flows, fork a correlated `event.wait` branch
+alongside the work or publish branch, then converge both with an `all` join. The
+wait execution is then present before the work can publish the completion fact:
+
+```text
+fork ──> event.wait(completion, correlation) ──┐
+  └──> work ──> event.publish(completion) ─────┴──> join(all)
+```
+
+An earlier-history boundary is not configurable in this contract; applications
+that need one require a future additive API.
 
 ## Headless visual authoring
 

@@ -39,7 +39,7 @@ test("filters every derived operational view", async () => {
 
 async function setState(eventId: string, status: string, future?: string) {
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"=$2,
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"=$2,
        "available_at"=CASE WHEN $3::text IS NULL THEN "available_at"
          ELSE NOW()+($3::text)::interval END,
        "completed_at"=CASE WHEN $2 IN ('succeeded','dead_lettered')

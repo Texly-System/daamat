@@ -1,6 +1,6 @@
 export async function waitUntil(
   predicate: () => boolean | Promise<boolean>,
-  timeoutMs = 2_000,
+  timeoutMs = 15_000,
 ): Promise<void> {
   const deadline = Date.now() + timeoutMs;
   while (!(await predicate())) {

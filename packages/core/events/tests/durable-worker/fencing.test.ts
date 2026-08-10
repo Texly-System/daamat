@@ -29,7 +29,7 @@ test("heartbeat and completion reject stale lease tokens", async () => {
     completeEventDeliverySuccess(stale, { ok: true }),
   ).rejects.toThrow(/lease/i);
   const row = await pool.query(
-    `SELECT "status" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT "status" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [item.id],
   );
   expect(row.rows[0].status).toBe("running");
@@ -46,7 +46,7 @@ test("heartbeat extends only a current unexpired lease", async () => {
   const before = claim!.leaseExpiresAt.getTime();
   await heartbeatEventDelivery(claim!, { leaseMs: 60_000 });
   const row = await pool.query(
-    `SELECT "lease_expires_at" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT "lease_expires_at" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [item.id],
   );
   expect(row.rows[0].lease_expires_at.getTime()).toBeGreaterThan(before);

@@ -21,12 +21,12 @@ test("expired recovery rejects a delivery without an active attempt", async () =
     leaseMs: 30_000,
   });
   await pool.query(
-    `UPDATE "_damat_event_delivery_attempts" SET "finished_at"=NOW()
+    `UPDATE "damat"."_damat_event_delivery_attempts" SET "finished_at"=NOW()
      WHERE "delivery_id"=$1`,
     [item.id],
   );
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
     [item.id],
   );

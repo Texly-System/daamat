@@ -24,7 +24,7 @@ test("cancels waiting delivery and audits the actor atomically", async () => {
   expect(cancelled.status).toBe("cancelled");
   expect(repeated.status).toBe("cancelled");
   const activity = await pool.query(
-    `SELECT "type","actor","reason" FROM "_damat_event_activity"
+    `SELECT "type","actor","reason" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type"='cancelled'`,
     [delivery.id],
   );
@@ -40,7 +40,7 @@ test("running cancellation is idempotent and records one request", async () => {
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='running',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='running',
      "lease_owner"='worker-a',"lease_token"=$2,"lease_expires_at"=NOW()+INTERVAL '1 hour'
      WHERE "id"=$1`,
     [delivery.id, crypto.randomUUID()],
@@ -52,7 +52,7 @@ test("running cancellation is idempotent and records one request", async () => {
 
   expect(repeated.cancellationRequestedAt).toBeInstanceOf(Date);
   const count = await pool.query(
-    `SELECT COUNT(*)::int AS "total" FROM "_damat_event_activity"
+    `SELECT COUNT(*)::int AS "total" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type"='cancellation_requested'`,
     [delivery.id],
   );
@@ -69,7 +69,7 @@ test("rejects cancellation of an unrelated terminal state", async () => {
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='succeeded',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='succeeded',
        "completed_at"=NOW() WHERE "id"=$1`,
     [delivery.id],
   );

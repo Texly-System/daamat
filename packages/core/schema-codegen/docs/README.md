@@ -20,6 +20,9 @@ is `@damatjs/orm-type`.
 - Output ordering, banners, filenames, and whitespace are deterministic.
 - Type strings reflect values returned by the PostgreSQL driver.
 - Nullability and array wrapping are applied after base type mapping.
+- Native `vector` and `halfvec` columns validate positive dimensions and render
+  finite, exact-length `number[]` Zod schemas; ordinary PostgreSQL arrays keep
+  the existing wrapper behavior.
 - The package never reads or writes files and never imports the Damat framework.
 
 ## Detailed guides

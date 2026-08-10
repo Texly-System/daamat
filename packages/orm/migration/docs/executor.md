@@ -23,7 +23,8 @@ Steps:
 1. `const tracker = new MigrationTracker(pool); await tracker.ensureTable();` — create the log table/indexes if missing.
 2. `await bootstrapDatabase(pool);` — install idempotent DB prerequisites (see below).
 3. Run `options.systemMigrations` in global order through the same tracker.
-4. Stop immediately if a system migration fails.
+4. Set a transaction-local `public, damat` search path while executing legacy
+   system SQL, then stop immediately if a system migration fails.
 5. Run each module through `runModuleMigrations`.
 
 System migrations contain inline SQL and are tracked by `(owner, id)`. Their

@@ -11,6 +11,7 @@ Maintainer notes for the dependency re-export package. It is intentionally tiny:
 | `src/zod.ts`     | `export * from "zod"` + a `z` alias for v3-style usage.                                                                                        |
 | `src/effect.ts`  | `export * from "effect"`.                                                                                                                      |
 | `src/pg.ts`      | `export * from "pg"`.                                                                                                                          |
+| `src/pgvector.ts` | Curated official `pgvector/pg` node-postgres adapter (`registerTypes`, `toSql`).                                                               |
 | `src/ioredis.ts` | `export * from "ioredis"`.                                                                                                                     |
 | `src/nanoid.ts`  | `export * from "nanoid"`.                                                                                                                      |
 | `src/uuid.ts`    | `export * from "uuid"`. Reachable via the `./uuid` subpath and the root namespace.                                                             |
@@ -42,6 +43,7 @@ Not applicable — this package contributes no runtime behaviour. Its "flow" is 
 - **Single source of truth for versions.** Every shared external dependency is pinned exactly once here. Other packages depend on `@damatjs/deps` (workspace `*`) instead of the library, so upgrades happen in one `package.json`. `zod` is pinned to an **exact** version (`4.3.6`, no caret) because subtle behavioural changes ripple through validators and error handling across the framework.
 - **Subpaths over root.** The root `index.ts` re-exports under namespaces (`export * as hono`) specifically to prevent name collisions (e.g. both `hono` and `effect` could export overlapping identifiers). Subpath imports (`@damatjs/deps/hono`) are flat and preferred in consumer code.
 - **Curated Hono surface.** `src/hono.ts` is the only non-trivial file: it pulls together the Hono sub-modules the framework actually uses (`cors`, `secureHeaders`, `timing`, `HTTPException`, HTTP-status types) plus `serve` from `@hono/node-server`, so the framework can `import { Hono, cors, serve, HTTPException } from "@damatjs/deps/hono"` from one place.
+- **Curated pgvector adapter.** `src/pgvector.ts` exposes the official node-postgres adapter used by the ORM. Register type parsers with `registerTypes(client)` and serialize modeled values with `toSql(value)`.
 - **`z` alias for ergonomics.** `src/zod.ts` adds `export { zod as z }` so existing v3-style `z.object(...)` code keeps working against zod v4.
 - **`exports` map must mirror `src/`.** When adding a new library, you must add both a `src/<lib>.ts` re-export **and** a `./<lib>` entry in `package.json` `exports`, otherwise the deep import will not resolve in published builds.
 

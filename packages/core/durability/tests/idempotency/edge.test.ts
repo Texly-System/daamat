@@ -15,7 +15,7 @@ test("reports a duplicate operation that is still running", async () => {
   const scope = uniqueScope("running");
   try {
     await context.pool.query(
-      `INSERT INTO "_damat_idempotency_keys"
+      `INSERT INTO "damat"."_damat_idempotency_keys"
         ("scope","key","status","intent_fingerprint")
        VALUES ($1,'same','running',$2)`,
       [scope, intentFingerprint({})],

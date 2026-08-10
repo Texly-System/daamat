@@ -44,12 +44,12 @@ async function installAttemptDelay(deliveryId: string) {
         FROM OLD.heartbeat_at THEN PERFORM pg_sleep(0.2); END IF;
       RETURN NEW; END $$`);
   await pool.query(`CREATE TRIGGER delay_event_attempt_update BEFORE UPDATE ON
-    "_damat_event_delivery_attempts" FOR EACH ROW
+    "damat"."_damat_event_delivery_attempts" FOR EACH ROW
     EXECUTE FUNCTION delay_event_attempt()`);
 }
 
 async function removeAttemptDelay() {
   await pool.query(`DROP TRIGGER IF EXISTS delay_event_attempt_update ON
-    "_damat_event_delivery_attempts"`);
+    "damat"."_damat_event_delivery_attempts"`);
   await pool.query(`DROP FUNCTION IF EXISTS delay_event_attempt()`);
 }

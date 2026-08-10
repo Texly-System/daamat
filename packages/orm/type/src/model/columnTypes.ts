@@ -1,0 +1,21 @@
+/** PostgreSQL column data types, using the exact SQL names. */
+export type ColumnType =
+  | "smallint" | "integer" | "bigint" | "decimal" | "numeric" | "real"
+  | "double precision" | "smallserial" | "serial" | "bigserial"
+  | "money"
+  | "character" | "character varying" | "text"
+  | "bytea"
+  | "timestamp without time zone" | "timestamp with time zone" | "date"
+  | "time without time zone" | "time with time zone" | "interval"
+  | "boolean" | "enum"
+  | "point" | "line" | "lseg" | "box" | "path" | "polygon" | "circle"
+  | "cidr" | "inet" | "macaddr" | "macaddr8"
+  | "bit" | "bit varying"
+  | "tsvector" | "tsquery"
+  | "uuid" | "xml" | "json" | "jsonb" | "jsonpath"
+  | "int4range" | "int8range" | "numrange" | "tsrange" | "tstzrange"
+  | "daterange"
+  | "int4multirange" | "int8multirange" | "nummultirange"
+  | "tsmultirange" | "tstzmultirange" | "datemultirange"
+  | "oid" | "pg_lsn" | "pg_snapshot"
+  | "vector" | "halfvec";

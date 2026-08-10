@@ -89,6 +89,14 @@ interface DiffMigrationResult {
 }
 ```
 
+The processor infers and persists the `vector` extension when models contain
+`vector` or `halfvec` columns. Baseline and incremental files therefore place
+`CREATE EXTENSION IF NOT EXISTS vector` before the first table that uses the
+type. The saved snapshot is normalized with that requirement, so generating
+again against the same models returns no diff. Native vector type/dimension
+changes emit a warning and a manual-review SQL comment; the diff migration
+still writes the current snapshot so the reviewed transition is not repeated.
+
 ## Templating & timestamps
 
 Source: [`utils/template.ts`](../src/utils/template.ts), [`utils/timestamp.ts`](../src/utils/timestamp.ts)
@@ -97,7 +105,7 @@ Source: [`utils/template.ts`](../src/utils/template.ts), [`utils/timestamp.ts`](
 
 Renders the `.sql` file body:
 
-- Each statement in `migration.upStatements` gets a trailing `;` appended **if it doesn't already end with one**, joined by blank lines. Empty statement lists become `-- No changes detected`.
+- Each statement in `migration.upStatements` gets a trailing `;` appended **if it doesn't already end with one**, joined by blank lines. The processor's statement APIs intentionally omit delimiters; generated `.sql` files always include them. Empty statement lists become `-- No changes detected`.
 - `migration.warnings` are rendered as `-- WARNING: ...` comment lines above the body.
 - A header block records the label, module, ISO creation time, and `migration.description`, plus a "review before running in production" note.
 

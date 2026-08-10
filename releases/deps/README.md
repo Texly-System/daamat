@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version | Summary                                                                                                                                                                                                | Upgrade notes         |
 | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------- |
+| 1.0.6   | Added the official `pgvector` 0.3.0 node-postgres adapter at `@damatjs/deps/pgvector`                                                                                                                   | [1.0.6 →](./1.0.6.md) |
 | 1.0.4   | Lockstep maintenance bump; curated dependency exports are unchanged                                                                                                                                    | —                     |
 | 0.1.3   | Maintenance / version-sync bump — cross-module links land in other packages (`@damatjs/link`); deps' own re-export surface and pins are unchanged                                                      | —                     |
 | 0.1.2   | Maintenance / version-sync bump — relation-by-table-name lands in the ORM packages; deps' own surface and pins are unchanged                                                                           | —                     |

@@ -20,7 +20,7 @@ export async function readWorkState(executor: DurabilityExecutor, now: Date) {
        COUNT(*) FILTER (WHERE "status"='running' AND "lease_expires_at">$1)::text active_leases,
        COUNT(*) FILTER (WHERE "status"='running' AND "lease_expires_at"<=$1)::text stale_leases,
        COUNT(*) FILTER (WHERE "status"='dead_lettered')::text dead_letters
-     FROM "_damat_job_runs"`,
+     FROM "damat"."_damat_job_runs"`,
     [now],
   );
   const row = result.rows[0]!;
@@ -48,7 +48,7 @@ export async function readFailureGroups(
     }
   >(
     `SELECT "queue","name",COALESCE("last_error"->>'message','Unknown') message,
-       COUNT(*)::text count FROM "_damat_job_runs"
+       COUNT(*)::text count FROM "damat"."_damat_job_runs"
      WHERE "status"='dead_lettered' AND "completed_at">=$1 AND "completed_at"<$2
      GROUP BY "queue","name",message ORDER BY COUNT(*) DESC,"queue","name" LIMIT 20`,
     [from, to],

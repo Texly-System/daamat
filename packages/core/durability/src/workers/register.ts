@@ -1,12 +1,13 @@
 import type { QueryResultRow } from "@damatjs/deps/pg";
 import { workerExecutor } from "./repository";
 import type { RegisterWorkerOptions } from "./types";
+import { damatRelation } from "../migrations/relocation";
 
 export async function registerWorker(
   options: RegisterWorkerOptions,
 ): Promise<void> {
   const result = await workerExecutor(options.executor).query<QueryResultRow>(
-    `INSERT INTO "_damat_workers"
+    `INSERT INTO ${damatRelation("_damat_workers")}
       ("id", "capabilities", "hostname", "process_id", "application",
        "deployment", "concurrency", "in_flight")
      VALUES ($1, $2::jsonb, $3, $4, $5::jsonb, $6::jsonb, $7, 0)

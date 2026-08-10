@@ -66,7 +66,14 @@ emits a `dist/<name>.js` + `dist/<name>.d.ts` per source file, and
   (`snapshotExist`).
 - **`@damatjs/orm-pg`** — the runtime query layer: `PgEntityManager` (aliased as
   `EntityManager`), the repository pattern, transactions, and the query
-  executor/client.
+  executor/client. It registers pgvector types on pool clients, serializes
+  modeled vectors, and exposes `findNearest`.
+
+Native pgvector behavior is intentionally distributed with the relevant slice:
+`orm-model` records `vector`/`halfvec` and dimensions, `orm-processor` emits
+extension and index DDL, `orm-pg` validates/serializes values and executes
+distance queries, and `schema-codegen` emits exact finite `number[]` validators.
+The umbrella only re-exports these surfaces.
 
 ## Why a meta-package
 

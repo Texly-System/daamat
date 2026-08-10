@@ -9,3 +9,11 @@ test("kit capability runs standalone", async () => {
   const run = await runCapabilityTest(kitCliCapability, ["--help"]);
   expect(run.output.join("\n")).toContain("kit");
 });
+
+test("kit install commands mark target as repeatable", () => {
+  const kit = kitCliCapability.commands[0];
+  const targets = kit?.subcommands
+    ?.filter((command) => ["add", "plan", "update"].includes(command.name))
+    .map((command) => command.options?.find((option) => option.name === "target"));
+  expect(targets?.every((option) => option?.repeatable === true)).toBe(true);
+});

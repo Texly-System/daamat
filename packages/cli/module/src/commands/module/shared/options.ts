@@ -11,6 +11,7 @@ export const moduleInstallOptions: CommandOption[] = [
     name: "target",
     type: "string",
     description: "Override capability destination: capability=path",
+    repeatable: true,
   },
   {
     name: "dry-run",

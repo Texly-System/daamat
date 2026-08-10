@@ -7,7 +7,7 @@ export async function insertJobRun(
   run: NewJobRun,
 ): Promise<JobRun> {
   const result = await executor.query<JobRunRow>(
-    `INSERT INTO "_damat_job_runs" (
+    `INSERT INTO "damat"."_damat_job_runs" (
        "id","name","queue","payload","metadata","priority","available_at",
        "max_attempts","backoff_ms","backoff_multiplier",
        "deduplication_key","correlation_id","schedule_id","scheduled_for"

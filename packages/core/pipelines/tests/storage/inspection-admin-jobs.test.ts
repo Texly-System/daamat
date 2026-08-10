@@ -43,7 +43,7 @@ test("cancelling and retrying pipeline job nodes delegates to durable jobs", asy
   const cancelledNode = (await listPipelineNodeExecutions(cancelled.id))[0]!;
   await client().cancel(cancelled.id, control("cancel-job"));
   const jobStatus = await pool.query(
-    `SELECT "status" FROM "_damat_job_runs" WHERE "id"=$1`,
+    `SELECT "status" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
     [cancelledNode.jobRunId],
   );
   expect(jobStatus.rows[0]?.status).toBe("cancelled");
@@ -56,15 +56,18 @@ test("cancelling and retrying pipeline job nodes delegates to durable jobs", asy
   await routePipelineCycle(100);
   const retriedNode = (await listPipelineNodeExecutions(retried.id))[0]!;
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "status"='dead_lettered',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_job_runs"
+     SET "status"='dead_lettered',"completed_at"=NOW() WHERE "id"=$1`,
     [retriedNode.jobRunId],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_node_executions"
+     SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
     [retriedNode.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_runs"
+     SET "status"='failed',"completed_at"=NOW() WHERE "id"=$1`,
     [retried.id],
   );
   await client().retryNode(retried.id, retriedNode.id, control("retry-job"));

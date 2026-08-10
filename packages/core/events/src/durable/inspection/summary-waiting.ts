@@ -17,7 +17,7 @@ export async function queryEventWaitingDurations(
     max: string | null;
   }>(
     `WITH waits AS (SELECT "wait_ms" AS value
-     FROM "_damat_event_delivery_attempts" WHERE "started_at">=$1
+     FROM "damat"."_damat_event_delivery_attempts" WHERE "started_at">=$1
        AND "started_at"<$2 AND "wait_ms" IS NOT NULL)
      SELECT COUNT(*)::text AS "count",MIN(value)::text AS "min",
        percentile_cont(0.5) WITHIN GROUP (ORDER BY value)::text AS "p50",

@@ -12,7 +12,7 @@ export async function insertDurableEvent(
   event: NewDurableEvent,
 ): Promise<DurableEventRecord | undefined> {
   const result = await executor.query<DurableEventRow>(
-    `INSERT INTO "_damat_event_outbox" (
+    `INSERT INTO "damat"."_damat_event_outbox" (
        "id","name","payload","metadata","policy_version","max_attempts",
        "backoff_ms","backoff_multiplier","retention_ms","idempotency_key",
        "correlation_id","causation_id","occurred_at","available_at","retention_at",
@@ -47,7 +47,7 @@ export async function findDurableEvent(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventRecord | undefined> {
   const result = await eventExecutor(executor).query<DurableEventRow>(
-    `SELECT * FROM "_damat_event_outbox" WHERE "id" = $1`,
+    `SELECT * FROM "damat"."_damat_event_outbox" WHERE "id" = $1`,
     [id],
   );
   return result.rows[0] ? mapDurableEvent(result.rows[0]) : undefined;
@@ -59,7 +59,7 @@ export async function findIdempotentEvent(
   key: string,
 ): Promise<DurableEventRecord | undefined> {
   const result = await executor.query<DurableEventRow>(
-    `SELECT * FROM "_damat_event_outbox"
+    `SELECT * FROM "damat"."_damat_event_outbox"
      WHERE "name" = $1 AND "idempotency_key" = $2`,
     [name, key],
   );
@@ -76,7 +76,7 @@ export async function listDurableEvents(
     : "";
   params.push(limit);
   const result = await eventExecutor(options.executor).query<DurableEventRow>(
-    `SELECT * FROM "_damat_event_outbox" ${where}
+    `SELECT * FROM "damat"."_damat_event_outbox" ${where}
      ORDER BY "created_at" DESC, "id" DESC LIMIT $${params.length}`,
     params,
   );

@@ -11,15 +11,20 @@ const migrations: SystemMigration[] = [
 ];
 
 test("passes when every system migration is recorded", async () => {
+  let sql = "";
   const executor = {
-    query: async () => ({
-      rows: migrations.map(({ owner, id }) => ({ owner, id })),
-      rowCount: migrations.length,
-    }),
+    query: async (statement: string) => {
+      sql = statement;
+      return {
+        rows: migrations.map(({ owner, id }) => ({ owner, id })),
+        rowCount: migrations.length,
+      };
+    },
   };
   await expect(
     assertSystemMigrationsApplied(executor, migrations),
   ).resolves.toBeUndefined();
+  expect(sql).toContain('FROM "damat"."_damat_migration_logs"');
 });
 
 test("reports missing migration identities as metadata", async () => {

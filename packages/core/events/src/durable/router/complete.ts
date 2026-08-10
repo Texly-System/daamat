@@ -7,7 +7,7 @@ export async function completeEventRouting(
   consumers: string[],
 ): Promise<void> {
   await executor.query(
-    `UPDATE "_damat_event_outbox" SET "routed_at"=NOW()
+    `UPDATE "damat"."_damat_event_outbox" SET "routed_at"=NOW()
      WHERE "id"=$1 AND "routed_at" IS NULL`,
     [event.id],
   );

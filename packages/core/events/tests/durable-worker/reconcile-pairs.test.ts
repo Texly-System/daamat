@@ -37,7 +37,7 @@ test("lease reconciliation scopes exact event-consumer pairs", async () => {
 test("retry reconciliation scopes exact event-consumer pairs", async () => {
   const [left, right] = await crossedDeliveries();
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='retry_wait',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='retry_wait',
      "available_at"=NOW()-INTERVAL '1 second' WHERE "id"=ANY($1::uuid[])`,
     [[left.id, right.id]],
   );
@@ -70,7 +70,7 @@ function crossedScope(
 
 async function expire(ids: string[]) {
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second'
      WHERE "id"=ANY($1::uuid[])`,
     [ids],

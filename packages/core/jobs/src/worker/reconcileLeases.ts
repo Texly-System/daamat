@@ -23,7 +23,7 @@ async function recover(
   const result = await executor.query<ExpiredJobLease>(
     `SELECT "id","attempt_count","max_attempts","cancellation_requested_at",
        "lease_owner","lease_token"
-     FROM "_damat_job_runs" WHERE "status"='running'
+     FROM "damat"."_damat_job_runs" WHERE "status"='running'
        AND "lease_expires_at" <= NOW()
        AND ($2::text IS NULL OR "queue"=$2)
      ORDER BY "lease_expires_at","id" FOR UPDATE SKIP LOCKED LIMIT $1`,

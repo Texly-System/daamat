@@ -16,5 +16,7 @@ tarballs all use the same transactional installer and `damat.lock.json`.
 Source mode is stable and editable. Node and Damat package backends require
 `--experimental-package` and are early alpha. Legacy `damat-kit.json` remains a
 read fallback; new kits write only `damat.json`.
+Pass `--target capability=path` more than once to override multiple capability
+destinations; a single target remains compatible with scalar option consumers.
 
 - [Internals](./docs/README.md)

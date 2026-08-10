@@ -19,7 +19,7 @@ export async function recoverExpiredEventDeliveryLease(
   row: ExpiredEventDeliveryLease,
 ): Promise<RecoveredDeliveryStatus> {
   const attempt = await executor.query<{ duration_ms: string }>(
-    `UPDATE "_damat_event_delivery_attempts" SET "finished_at"=NOW(),
+    `UPDATE "damat"."_damat_event_delivery_attempts" SET "finished_at"=NOW(),
      "outcome"='lost',"duration_ms"=GREATEST(0,
        EXTRACT(EPOCH FROM (NOW()-"started_at"))*1000)
      WHERE "delivery_id"=$1 AND "attempt_number"=$2
@@ -36,7 +36,7 @@ export async function recoverExpiredEventDeliveryLease(
       ? "dead_lettered"
       : "pending";
   const recovered = await executor.query(
-    `UPDATE "_damat_event_deliveries" SET "status"=$2,
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"=$2,
      "lease_owner"=NULL,"lease_token"=NULL,"lease_expires_at"=NULL,
      "heartbeat_at"=NULL,
      "available_at"=CASE WHEN $2='pending' THEN NOW() ELSE "available_at" END,

@@ -36,7 +36,7 @@ test("consumers complete independently", async () => {
   });
   for (const claim of claims) await executeEventDelivery(claim);
   const rows = await pool.query(
-    `SELECT "consumer","status" FROM "_damat_event_deliveries"
+    `SELECT "consumer","status" FROM "damat"."_damat_event_deliveries"
      WHERE "event_id"=$1 ORDER BY "consumer"`,
     [published.id],
   );
@@ -61,7 +61,7 @@ test("missing selected handler dead-letters visibly", async () => {
     last_error: { message: expect.stringContaining("Unknown") },
   });
   const activity = await pool.query(
-    `SELECT "type" FROM "_damat_event_activity"
+    `SELECT "type" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 ORDER BY "id" DESC LIMIT 1`,
     [item.id],
   );

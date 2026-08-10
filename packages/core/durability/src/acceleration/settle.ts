@@ -1,12 +1,13 @@
 import { getDurabilityClient } from "../client/global";
 import { emitDurableInvalidation } from "./invalidation";
+import { damatRelation } from "../migrations/relocation";
 import type { AccelerationSignal } from "./types";
 
 export async function markAccelerationSignalPublished(
   signal: AccelerationSignal,
 ): Promise<boolean> {
   const result = await getDurabilityClient().query(
-    `UPDATE "_damat_acceleration_outbox" SET "published_at"=NOW(),
+    `UPDATE ${damatRelation("_damat_acceleration_outbox")} SET "published_at"=NOW(),
        "claim_token"=NULL,"claim_expires_at"=NULL,"last_error"=NULL
      WHERE "id"=$1 AND "claim_token"=$2 AND "published_at" IS NULL`,
     [signal.id, signal.claimToken],
@@ -26,7 +27,7 @@ export async function releaseAccelerationSignal(
   error: unknown,
 ): Promise<void> {
   await getDurabilityClient().query(
-    `UPDATE "_damat_acceleration_outbox" SET "claim_token"=NULL,
+    `UPDATE ${damatRelation("_damat_acceleration_outbox")} SET "claim_token"=NULL,
        "claim_expires_at"=NULL,"last_error"=$3
      WHERE "id"=$1 AND "claim_token"=$2 AND "published_at" IS NULL`,
     [

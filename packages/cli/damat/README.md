@@ -42,4 +42,12 @@ Both forms pass verbose mode to module command error handling and print one
 handled-error summary followed by the underlying stack. Without the flag,
 failures retain the concise retry hint.
 
+Composed `module` and `kit` installation commands preserve repeated
+`--target capability=path` options through to the installer.
+
+Both `damat create <name>` and `damat module init <name>` initialize a `main`
+Git repository and initial commit by default. Use `--no-git` on either command
+to skip the probe and all Git setup while keeping dependency and database flags
+independent.
+
 See [composer internals](./docs/README.md) and the [Damat guide](../../../docs/GUIDE.md).

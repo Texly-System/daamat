@@ -23,7 +23,7 @@ test("schedules with persisted occurrences cannot be deleted", async () => {
   const scheduleId = await insertSchedule();
   await insertRun({ scheduleId, scheduledFor: new Date() });
   await expect(
-    pool.query(`DELETE FROM "_damat_job_schedules" WHERE "id" = $1`, [
+    pool.query(`DELETE FROM "damat"."_damat_job_schedules" WHERE "id" = $1`, [
       scheduleId,
     ]),
   ).rejects.toThrow();
@@ -34,7 +34,7 @@ test("attempt-scoped activity and logs require an existing attempt", async () =>
   const run = await enqueueJob(uniqueName("attempt-fk"), {});
   await expect(
     pool.query(
-      `INSERT INTO "_damat_job_logs"
+      `INSERT INTO "damat"."_damat_job_logs"
        ("run_id","attempt_number","level","message","sequence")
        VALUES ($1,99,'info','missing',1)`,
       [run.id],
@@ -42,13 +42,13 @@ test("attempt-scoped activity and logs require an existing attempt", async () =>
   ).rejects.toThrow();
   await expect(
     pool.query(
-      `INSERT INTO "_damat_job_activity" ("run_id","attempt_number","type")
+      `INSERT INTO "damat"."_damat_job_activity" ("run_id","attempt_number","type")
        VALUES ($1,99,'missing')`,
       [run.id],
     ),
   ).rejects.toThrow();
   await pool.query(
-    `INSERT INTO "_damat_job_activity" ("run_id","type")
+    `INSERT INTO "damat"."_damat_job_activity" ("run_id","type")
      VALUES ($1,'run_level')`,
     [run.id],
   );
@@ -66,7 +66,7 @@ test("millisecond policy and duration columns use bigint", async () => {
   ];
   const result = await pool.query<{ data_type: string }>(
     `SELECT data_type FROM information_schema.columns
-     WHERE table_name = $1 AND column_name = $2`,
+     WHERE table_schema='damat' AND table_name = $1 AND column_name = $2`,
     columns[0],
   );
   for (const [table, column] of columns) {
@@ -76,7 +76,8 @@ test("millisecond policy and duration columns use bigint", async () => {
         : (
             await pool.query<{ data_type: string }>(
               `SELECT data_type FROM information_schema.columns
-               WHERE table_name = $1 AND column_name = $2`,
+               WHERE table_schema='damat' AND table_name = $1
+                 AND column_name = $2`,
               [table, column],
             )
           ).rows[0];

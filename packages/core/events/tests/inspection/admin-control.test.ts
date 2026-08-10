@@ -32,12 +32,12 @@ test("pauses and resumes a consumer with exact audit and wake-up", async () => {
   await client.resumeConsumer(seeded.name, "alpha", actor);
 
   const control = await pool.query(
-    `SELECT "paused" FROM "_damat_work_controls"
+    `SELECT "paused" FROM "damat"."_damat_work_controls"
      WHERE "work_kind"='event' AND "scope"=$1`,
     [scope],
   );
   const activity = await pool.query(
-    `SELECT "action","actor" FROM "_damat_work_control_activity"
+    `SELECT "action","actor" FROM "damat"."_damat_work_control_activity"
      WHERE "work_kind"='event' AND "scope"=$1 ORDER BY "id"`,
     [scope],
   );

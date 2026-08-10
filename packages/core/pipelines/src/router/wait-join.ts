@@ -14,7 +14,7 @@ export async function processJoin(
   const incoming = run.manifest.edges.filter((edge) => edge.to === node.id);
   const result = await executor.query<{ count: string }>(
     `SELECT COUNT(DISTINCT "from_execution_id")::text AS "count"
-     FROM "_damat_pipeline_transitions" WHERE "to_execution_id"=$1`,
+     FROM "damat"."_damat_pipeline_transitions" WHERE "to_execution_id"=$1`,
     [execution.id],
   );
   const count = Number(result.rows[0]?.count ?? 0);

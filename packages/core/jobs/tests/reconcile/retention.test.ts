@@ -21,7 +21,7 @@ describe("job retention", () => {
     const active = await queuedRun(queue);
     const actor = { id: crypto.randomUUID(), type: "system" as const };
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"='succeeded',
+      `UPDATE "damat"."_damat_job_runs" SET "status"='succeeded',
        "completed_at"='2000-01-01T00:00:00Z' WHERE "id"=ANY($1::uuid[])`,
       [[first.run.id, second.run.id]],
     );
@@ -34,13 +34,13 @@ describe("job retention", () => {
     });
     expect(result.deletedRuns).toBe(1);
     const remaining = await pool.query(
-      `SELECT "id" FROM "_damat_job_runs" WHERE "id"=ANY($1::uuid[])`,
+      `SELECT "id" FROM "damat"."_damat_job_runs" WHERE "id"=ANY($1::uuid[])`,
       [[first.run.id, second.run.id, active.run.id]],
     );
     expect(remaining.rowCount).toBe(2);
     expect(remaining.rows.some(({ id }) => id === active.run.id)).toBe(true);
     const audit = await pool.query(
-      `SELECT "status","details" FROM "_damat_maintenance_activity"
+      `SELECT "status","details" FROM "damat"."_damat_maintenance_activity"
        WHERE "actor"->>'id'=$1 ORDER BY "id"`,
       [actor.id],
     );
@@ -60,7 +60,7 @@ describe("job retention", () => {
       ["two", two.run],
     ] as const) {
       await pool.query(
-        `INSERT INTO "_damat_job_deduplication"
+        `INSERT INTO "damat"."_damat_job_deduplication"
          ("queue","job_name","deduplication_key","run_id","expires_at")
          VALUES ($1,$2,$3,$4,NOW()-INTERVAL '1 second')`,
         [run.queue, run.name, key, run.id],
@@ -73,7 +73,7 @@ describe("job retention", () => {
     });
     expect(result.deletedDeduplication).toBe(1);
     const remaining = await pool.query(
-      `SELECT 1 FROM "_damat_job_deduplication"
+      `SELECT 1 FROM "damat"."_damat_job_deduplication"
        WHERE "run_id"=ANY($1::uuid[])`,
       [[one.run.id, two.run.id]],
     );

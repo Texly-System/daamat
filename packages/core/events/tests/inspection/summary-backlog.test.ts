@@ -10,7 +10,7 @@ test("oldest wait includes overdue unrouted outbox events", async () => {
   defineDurableEvent(name);
   const event = await publishDurableEvent(name, {});
   await pool.query(
-    `UPDATE "_damat_event_outbox" SET "available_at"=$2 WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_event_outbox" SET "available_at"=$2 WHERE "id"=$1`,
     [event.id, new Date(now.getTime() - 5_000)],
   );
 

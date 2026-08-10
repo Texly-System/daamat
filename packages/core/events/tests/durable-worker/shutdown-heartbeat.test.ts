@@ -52,7 +52,7 @@ test("shutdown abort immediately stops the delivery heartbeat", async () => {
   release();
   await waitUntil(async () => {
     const row = await pool.query(
-      `SELECT "stopped_at" FROM "_damat_workers" WHERE "id"=$1`,
+      `SELECT "stopped_at" FROM "damat"."_damat_workers" WHERE "id"=$1`,
       [worker.id],
     );
     return row.rows[0]?.stopped_at instanceof Date;
@@ -62,7 +62,7 @@ test("shutdown abort immediately stops the delivery heartbeat", async () => {
 async function lease(id: string): Promise<Date | null> {
   return (
     await pool.query(
-      `SELECT "lease_expires_at" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+      `SELECT "lease_expires_at" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
       [id],
     )
   ).rows[0].lease_expires_at;

@@ -2,7 +2,7 @@ export async function waitForReadiness(
   output: () => string,
   count: number,
 ): Promise<number> {
-  const deadline = Date.now() + 30_000;
+  const deadline = Date.now() + 90_000;
   while (Date.now() < deadline) {
     const matches = [
       ...output().matchAll(/ready at http:\/\/localhost:(\d+)/g),

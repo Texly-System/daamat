@@ -6,7 +6,12 @@ export const moduleInitCommand: Command = {
   name: "init",
   description: "Scaffold a new standalone module package",
   usage:
-    "damat module init <name> [--database-url <url>] [--no-database-setup]",
+    "damat module init <name> [--database-url <url>] [--no-database-setup] [--no-git] [--no-install]",
+  examples: [
+    "damat module init inventory",
+    "damat module init inventory --no-git   # scaffold without a repository",
+    "damat module init inventory --no-install   # install later",
+  ],
   options: [
     ...databaseSetupOptions,
     {
@@ -20,6 +25,13 @@ export const moduleInitCommand: Command = {
       type: "boolean",
       default: true,
       description: "Run bun install (use --no-install to defer)",
+    },
+    {
+      name: "git",
+      type: "boolean",
+      default: true,
+      description:
+        "Initialize a git repository with an initial commit (use --no-git to skip)",
     },
   ],
   handler: handleModuleInit,

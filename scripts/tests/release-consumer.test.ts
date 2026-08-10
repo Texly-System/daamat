@@ -18,7 +18,7 @@ releaseDescribe("packed release consumer", () => {
     consumer = await createReleaseConsumer(resolve(import.meta.dir, "../.."));
   }, 120_000);
 
-  afterAll(() => consumer?.cleanup());
+  afterAll(() => consumer?.cleanup(), 30_000);
 
   test("installs one shared framework registry", async () => {
     await verifyPackedSingleton(consumer.root);

@@ -55,6 +55,9 @@ const result = await runCli(definition, {
 });
 ```
 
+Options may be marked `repeatable` when a command accepts repeated values. One
+occurrence stays scalar and subsequent occurrences form an ordered array.
+
 ## Runtime and results
 
 ```ts

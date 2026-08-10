@@ -17,7 +17,7 @@ test("failure rejects a claim whose delivery lease was lost", async () => {
   const item = await seedDelivery();
   const deliveryClaim = await claim(item);
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "lease_token"=$2 WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_event_deliveries" SET "lease_token"=$2 WHERE "id"=$1`,
     [item.id, crypto.randomUUID()],
   );
   await expect(
@@ -31,7 +31,7 @@ test("terminal transition loss is logged without retrying the handler", async ()
     handler: async () => {
       calls++;
       await pool.query(
-        `UPDATE "_damat_event_deliveries" SET "lease_token"=$2 WHERE "id"=$1`,
+        `UPDATE "damat"."_damat_event_deliveries" SET "lease_token"=$2 WHERE "id"=$1`,
         [item.id, crypto.randomUUID()],
       );
       throw new Error("handler failed after lease loss");

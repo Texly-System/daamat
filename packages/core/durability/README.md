@@ -160,6 +160,19 @@ catalog migration extends existing retention overrides to the pipeline kind.
 maintenance, acceleration outbox/state, and retention-override tables. Compose catalogs with
 `collectSystemMigrations`, then pass the result to the ORM migration runner.
 
+`damatRelation(name)` returns a quoted `"damat"."_damat_*"` identifier for
+runtime SQL. `relocateDamatRelations(names)` returns idempotent SQL for moving
+legacy public relations while rejecting source/target conflicts. Its preflight
+also rejects a `damat` schema the migration role does not control or that
+already contains non-Damat relations.
+
+Shared Damat relations live in the dedicated PostgreSQL `damat` schema. Use
+`damatRelation(name)` when building runtime SQL and
+`relocateDamatRelations(names)` when adding an ordered forward-only relocation
+migration for another durable capability. The migration runner keeps a
+transaction-local `public, damat` search path only for legacy migration SQL;
+runtime queries remain fully qualified.
+
 Framework startup never creates these tables. Use
 `assertSystemMigrationsApplied` for a read-only readiness check; missing
 migrations instruct the operator to run `damat-orm migrate:up`.

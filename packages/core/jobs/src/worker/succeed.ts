@@ -10,7 +10,7 @@ export async function completeJobSuccess(
 ): Promise<"succeeded" | "cancelled"> {
   const status = await getDurabilityClient().transaction(async (executor) => {
     const cancellation = await executor.query(
-      `SELECT 1 FROM "_damat_job_runs"
+      `SELECT 1 FROM "damat"."_damat_job_runs"
        WHERE "id"=$1 AND "lease_owner"=$2 AND "lease_token"=$3
          AND "cancellation_requested_at" IS NOT NULL FOR UPDATE`,
       [claim.id, claim.workerId, claim.leaseToken],

@@ -22,7 +22,7 @@ test("router keeps PostgreSQL polling without Redis", async () => {
   const event = await publishDurableEvent(uniqueEvent("router-poll"), {});
   await waitUntil(async () => {
     const row = await pool.query(
-      `SELECT "routed_at" FROM "_damat_event_outbox" WHERE "id"=$1`,
+      `SELECT "routed_at" FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
       [event.id],
     );
     return row.rows[0].routed_at instanceof Date;

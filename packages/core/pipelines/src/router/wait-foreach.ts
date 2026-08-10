@@ -29,7 +29,7 @@ export async function processForEach(
       return;
     }
     await executor.query(
-      `UPDATE "_damat_pipeline_node_executions" SET "input"=$2::jsonb WHERE "id"=$1`,
+      `UPDATE "damat"."_damat_pipeline_node_executions" SET "input"=$2::jsonb WHERE "id"=$1`,
       [execution.id, JSON.stringify({ items })],
     );
     await startAvailableChildren(executor, run, execution, node, items, 0, 0);

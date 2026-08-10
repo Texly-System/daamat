@@ -28,7 +28,7 @@ test("retention deletion is bounded by its batch size", async () => {
     await runEventRetention({ actor, batchSize: 1, terminalBefore: future }),
   ).toMatchObject({ deletedEvents: 1 });
   const remaining = await pool.query(
-    `SELECT 1 FROM "_damat_event_outbox" WHERE "id"=ANY($1::uuid[])`,
+    `SELECT 1 FROM "damat"."_damat_event_outbox" WHERE "id"=ANY($1::uuid[])`,
     [events.map(({ id }) => id)],
   );
   expect(remaining.rowCount).toBe(1);
@@ -45,7 +45,7 @@ test("retention preserves pending, running, retry_wait, and unrouted events", as
   await runEventRetention({ actor, batchSize: 10, terminalBefore: future });
   const ids = [pending.eventId, running.eventId, retry.eventId, unrouted.id];
   const remaining = await pool.query(
-    `SELECT "id" FROM "_damat_event_outbox" WHERE "id"=ANY($1::uuid[])`,
+    `SELECT "id" FROM "damat"."_damat_event_outbox" WHERE "id"=ANY($1::uuid[])`,
     [ids],
   );
   expect(remaining.rowCount).toBe(4);

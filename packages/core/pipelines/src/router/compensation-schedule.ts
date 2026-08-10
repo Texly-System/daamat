@@ -14,13 +14,13 @@ export async function scheduleNextCompensation(
   terminalError: Record<string, unknown> | undefined = run.error ?? undefined,
 ): Promise<string | undefined> {
   const completed = await executor.query<NodeExecutionRow>(
-    `SELECT * FROM "_damat_pipeline_node_executions"
+    `SELECT * FROM "damat"."_damat_pipeline_node_executions"
      WHERE "run_id"=$1 AND "phase"='forward' AND "status"='succeeded'
      ORDER BY "completed_at" DESC,"id" DESC`,
     [run.id],
   );
   const existing = await executor.query<{ node_id: string }>(
-    `SELECT "node_id" FROM "_damat_pipeline_node_executions"
+    `SELECT "node_id" FROM "damat"."_damat_pipeline_node_executions"
      WHERE "run_id"=$1 AND "phase"='compensation'`,
     [run.id],
   );

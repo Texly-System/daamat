@@ -13,13 +13,13 @@ test("detail batches attempt and log history across deliveries", async () => {
   const seeded = await seedEvent(["alpha", "beta"]);
   for (const delivery of seeded.deliveries) {
     await pool.query(
-      `INSERT INTO "_damat_event_delivery_attempts"
+      `INSERT INTO "damat"."_damat_event_delivery_attempts"
          ("delivery_id","attempt_number","worker_id","lease_token")
        VALUES ($1,1,'worker-a',$2)`,
       [delivery.id, crypto.randomUUID()],
     );
     await pool.query(
-      `INSERT INTO "_damat_event_logs"
+      `INSERT INTO "damat"."_damat_event_logs"
          ("event_id","delivery_id","attempt_number","consumer","level",
           "message","sequence") VALUES ($1,$2,1,$3,'info',$3,1)`,
       [seeded.event.id, delivery.id, delivery.consumer],

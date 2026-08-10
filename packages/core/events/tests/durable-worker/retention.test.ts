@@ -28,7 +28,7 @@ test("retention removes routed zero-consumer events and audits atomically", asyn
     deletedEvents: 1,
   });
   const audit = await pool.query(
-    `SELECT "status" FROM "_damat_maintenance_activity"
+    `SELECT "status" FROM "damat"."_damat_maintenance_activity"
      WHERE "operation"='event_retention' ORDER BY "id" DESC LIMIT 1`,
   );
   expect(audit.rows[0].status).toBe("completed");
@@ -43,7 +43,7 @@ test("retention preserves unrouted and active delivery events", async () => {
     terminalBefore: new Date(Date.now() + 91 * 86_400_000),
   });
   const rows = await pool.query(
-    `SELECT "id" FROM "_damat_event_outbox" WHERE "id" IN ($1,$2)`,
+    `SELECT "id" FROM "damat"."_damat_event_outbox" WHERE "id" IN ($1,$2)`,
     [unrouted.id, active.eventId],
   );
   expect(rows.rows).toHaveLength(2);

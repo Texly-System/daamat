@@ -41,7 +41,7 @@ test("lease recovery activity includes lost attempt duration", async () => {
   const item = await seedDelivery();
   const deliveryClaim = await claim(item);
   await pool.query(
-    `UPDATE "_damat_event_deliveries"
+    `UPDATE "damat"."_damat_event_deliveries"
      SET "lease_expires_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
     [item.id],
   );

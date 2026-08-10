@@ -46,7 +46,9 @@ The rest of core reads the resulting runtime rather than reading process state.
 Command trees and defaults are resolved through `dispatchManual`, then enter the
 same `runCommand`/`executeCommand` pipeline. Parsing supports `--name value`,
 `--name=value`, aliases, boolean negation, and `--` as the terminator after which
-all tokens are positional.
+all tokens are positional. Options marked `repeatable` keep one occurrence
+scalar and accumulate repeated values in argument order; unmarked options retain
+last-value behavior.
 
 ## Shared execution pipeline
 

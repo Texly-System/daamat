@@ -13,12 +13,20 @@ beforeEach(async () => {
 test("graceful stop drains before persisting stopped", async () => {
   let release!: () => void;
   const gate = new Promise<void>((resolve) => (release = resolve));
-  const item = await seedDelivery({ handler: async () => gate });
+  let markStarted!: () => void;
+  const started = new Promise<void>((resolve) => (markStarted = resolve));
+  const item = await seedDelivery({
+    handler: async () => {
+      markStarted();
+      await gate;
+    },
+  });
   const worker = createWorker(item);
   worker.start();
   await waitUntil(
     async () => (await deliveryRow(item.id)).status === "running",
   );
+  await started;
   const stopping = worker.stop({ graceMs: 2_000 });
   await waitUntil(
     async () =>

@@ -23,7 +23,7 @@ export async function processEventWait(
   const correlation = evaluatePipelineValue(node.correlation, context);
   const result = await executor.query<EventMatch>(
     `SELECT "id","payload","metadata","correlation_id"
-     FROM "_damat_event_outbox" WHERE "name"=$1 AND "created_at">=$2
+     FROM "damat"."_damat_event_outbox" WHERE "name"=$1 AND "created_at">=$2
        AND ($3::text IS NULL OR "correlation_id"=$3)
      ORDER BY "created_at","id" LIMIT 1`,
     [

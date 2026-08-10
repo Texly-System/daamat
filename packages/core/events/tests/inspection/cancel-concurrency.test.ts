@@ -29,7 +29,7 @@ test("concurrent cancel and retry serialize without deadlock", async () => {
     reason: { name: "DurableEventTransitionError" },
   });
   const activity = await pool.query(
-    `SELECT "type" FROM "_damat_event_activity"
+    `SELECT "type" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type" IN ('cancelled','manual_retry')`,
     [delivery.id],
   );
@@ -53,7 +53,7 @@ test("concurrent cancel and worker finish serialize without deadlock", async () 
 
   expect(results.every((result) => !isDeadlock(result))).toBe(true);
   const row = await pool.query(
-    `SELECT "status" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT "status" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [delivery.id],
   );
   expect(["cancelled", "succeeded"]).toContain(row.rows[0].status);

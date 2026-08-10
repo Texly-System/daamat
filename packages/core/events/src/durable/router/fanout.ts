@@ -13,7 +13,7 @@ export async function fanOutEvent(
   });
   for (const consumer of consumers) {
     const inserted = await executor.query<{ id: string }>(
-      `INSERT INTO "_damat_event_deliveries"
+      `INSERT INTO "damat"."_damat_event_deliveries"
        ("id","event_id","consumer","max_attempts","backoff_ms",
         "backoff_multiplier","available_at","retention_at")
        VALUES ($1,$2,$3,$4,$5,$6,$7,$8)

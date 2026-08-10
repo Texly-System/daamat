@@ -61,7 +61,7 @@ test("child nodes honor explicit versions and project child failure", async () =
   const execution = (await listPipelineNodeExecutions(run.id))[0]!;
   expect(execution.childRunId).toBeString();
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='failed',"error"='{"name":"Child"}',
+    `UPDATE "damat"."_damat_pipeline_runs" SET "status"='failed',"error"='{"name":"Child"}',
      "completed_at"=NOW(),"retention_at"=NOW()+INTERVAL '1 day' WHERE "id"=$1`,
     [execution.childRunId],
   );

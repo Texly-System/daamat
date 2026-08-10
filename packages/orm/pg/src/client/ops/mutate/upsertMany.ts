@@ -15,6 +15,8 @@ export async function executeUpsertMany<
     client._conn,
     sql,
     client._logger,
+    client.accessor._model,
+    json,
   );
   return { rows, rowCount, descriptor: json as UpsertDescriptor };
 }

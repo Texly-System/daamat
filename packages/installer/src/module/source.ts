@@ -1,6 +1,7 @@
 import { join } from "node:path";
 import type { ModuleArtifactLocation, ResolvedModule } from "./types";
 import { assertArtifactPath, firstExisting } from "./path";
+import { isProviderEntry } from "./provider";
 
 const local = (root: string, name: string) => {
   const path = firstExisting([join(root, name), join(root, "src", name)]);
@@ -8,11 +9,12 @@ const local = (root: string, name: string) => {
 };
 
 function provider(cwd: string, root: string, id: string, name: string) {
-  return firstExisting([
+  const candidates = [
     join(cwd, "src", name, id),
     join(root, name),
     join(root, "src", name),
-  ]);
+  ];
+  return candidates.find((candidate) => isProviderEntry(candidate));
 }
 
 export function resolveBareSource(

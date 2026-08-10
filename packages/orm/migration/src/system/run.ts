@@ -17,6 +17,7 @@ async function executeSystemMigration(
   const client = await pool.connect();
   try {
     await client.query("BEGIN");
+    await client.query('SET LOCAL search_path TO "public", "damat"');
     await client.query(migration.sql);
     await tracker.recordApplied(
       migration.owner,

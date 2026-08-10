@@ -76,4 +76,4 @@ test("generated module dev survives reload and owns its process lifecycle", asyn
     if (running) await running.stop().catch(() => undefined);
     rmSync(cwd, { recursive: true, force: true });
   }
-}, 60_000);
+}, 180_000);

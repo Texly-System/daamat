@@ -22,7 +22,7 @@ export async function cancelPipelineRun(
         throw new Error(`Active pipeline run "${runId}" was not found`);
       const runIds = active.map((run) => run.id);
       const jobs = await executor.query<{ job_run_id: string }>(
-        `SELECT "job_run_id" FROM "_damat_pipeline_node_executions"
+        `SELECT "job_run_id" FROM "damat"."_damat_pipeline_node_executions"
          WHERE "run_id"=ANY($1::uuid[]) AND "status" IN ('queued','running')
            AND "job_run_id" IS NOT NULL`,
         [runIds],
@@ -38,7 +38,7 @@ export async function cancelPipelineRun(
         await markPipelineRunTerminal(executor, run.id, "cancelled");
       }
       await executor.query(
-        `UPDATE "_damat_pipeline_node_executions" SET "status"='cancelled',
+        `UPDATE "damat"."_damat_pipeline_node_executions" SET "status"='cancelled',
          "completed_at"=NOW(),"updated_at"=NOW()
          WHERE "run_id"=ANY($1::uuid[])
            AND "status" IN ('ready','queued','running','waiting')`,

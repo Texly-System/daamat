@@ -12,7 +12,7 @@ export async function clonePipelineVersionToDraft(
 ) {
   const result = await client.query<AuthoringVersionRow>(
     `SELECT v.*,d."name",d."source",false AS "active"
-     FROM "_damat_pipeline_versions" v JOIN "_damat_pipeline_definitions" d
+     FROM "damat"."_damat_pipeline_versions" v JOIN "damat"."_damat_pipeline_definitions" d
        ON d."id"=v."definition_id" WHERE v."id"=$1`,
     [versionId],
   );

@@ -11,7 +11,7 @@ export function appendPipelineActivity(
   },
 ): Promise<unknown> {
   return executor.query(
-    `INSERT INTO "_damat_pipeline_activity"
+    `INSERT INTO "damat"."_damat_pipeline_activity"
       ("run_id","node_execution_id","type","details","actor")
      VALUES ($1,$2,$3,$4::jsonb,$5::jsonb)`,
     [

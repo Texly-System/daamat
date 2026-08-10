@@ -3,7 +3,7 @@ import { pool, uniqueName } from "./context";
 export async function insertSchedule(): Promise<string> {
   const id = crypto.randomUUID();
   await pool.query(
-    `INSERT INTO "_damat_job_schedules"
+    `INSERT INTO "damat"."_damat_job_schedules"
      ("id","name","job_name","kind","payload","queue")
      VALUES ($1,$2,'job','once','{}','default')`,
     [id, uniqueName("schedule-integrity")],
@@ -16,7 +16,7 @@ export function insertRun(options: {
   scheduledFor?: Date;
 }) {
   return pool.query(
-    `INSERT INTO "_damat_job_runs"
+    `INSERT INTO "damat"."_damat_job_runs"
      ("id","name","queue","payload","schedule_id","scheduled_for")
      VALUES ($1,'job','default','{}',$2,$3)`,
     [

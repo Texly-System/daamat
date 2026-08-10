@@ -40,7 +40,7 @@ describe("post-commit mutation wake-ups", () => {
   test("retry publication observes the committed queued state", async () => {
     const item = await queuedRun();
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"='dead_lettered',"completed_at"=NOW()
+      `UPDATE "damat"."_damat_job_runs" SET "status"='dead_lettered',"completed_at"=NOW()
        WHERE "id"=$1`,
       [item.run.id],
     );
@@ -49,7 +49,7 @@ describe("post-commit mutation wake-ups", () => {
       publish: async () => {
         visible = (
           await pool.query(
-            `SELECT "status" FROM "_damat_job_runs" WHERE "id"=$1`,
+            `SELECT "status" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
             [item.run.id],
           )
         ).rows[0]!.status;
@@ -77,7 +77,7 @@ describe("post-commit mutation wake-ups", () => {
         visible =
           (
             await pool.query(
-              `SELECT 1 FROM "_damat_job_runs" WHERE "schedule_id"=$1`,
+              `SELECT 1 FROM "damat"."_damat_job_runs" WHERE "schedule_id"=$1`,
               [schedule.id],
             )
           ).rowCount ?? 0;

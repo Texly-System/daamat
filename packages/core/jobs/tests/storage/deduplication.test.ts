@@ -47,7 +47,7 @@ test("legacy deduplication rows fail closed even after expiry", async () => {
   const key = crypto.randomUUID();
   const first = await enqueueJob(name, {});
   await pool.query(
-    `INSERT INTO "_damat_job_deduplication"
+    `INSERT INTO "damat"."_damat_job_deduplication"
       ("queue","job_name","deduplication_key","run_id","expires_at")
      VALUES ($1,$2,$3,$4,NOW() - INTERVAL '1 second')`,
     [first.queue, name, key, first.id],

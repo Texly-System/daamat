@@ -41,9 +41,9 @@ async function executeEffect(
 ) {
   const effect = await context.withIdempotency({ scope, key }, async (tx) => {
     const result = await tx.query<{ count: number | string }>(
-      `INSERT INTO "_damat_recovery_effects" ("kind","work_id","count")
+      `INSERT INTO "damat"."_damat_recovery_effects" ("kind","work_id","count")
        VALUES ($1,$2,1) ON CONFLICT ("kind","work_id") DO UPDATE
-       SET "count"="_damat_recovery_effects"."count"+1 RETURNING "count"`,
+       SET "count"="damat"."_damat_recovery_effects"."count"+1 RETURNING "count"`,
       [kind, key],
     );
     return { count: Number(result.rows[0]!.count) };

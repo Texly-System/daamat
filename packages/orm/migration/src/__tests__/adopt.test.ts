@@ -20,7 +20,7 @@ function pool(applied = false, inserted = true) {
           const rows = applied ? [{ module: "demo", name: "Migration1_Index" }] : [];
           return { rows, rowCount: rows.length };
         }
-        if (/INSERT INTO "_damat_migration_logs"/.test(sql)) {
+        if (/INSERT INTO (?:"damat"\.)?"_damat_migration_logs"/.test(sql)) {
           return { rows: [], rowCount: inserted ? 1 : 0 };
         }
         return { rows: [], rowCount: 0 };
@@ -45,7 +45,7 @@ describe("adoptMigration", () => {
       reason: "concurrent index committed",
     });
     const insert = fake.calls.find((call) =>
-      /INSERT INTO "_damat_migration_logs"/.test(call.sql),
+      /INSERT INTO (?:"damat"\.)?"_damat_migration_logs"/.test(call.sql),
     )!;
     expect(insert.params).toEqual([
       expect.any(String),

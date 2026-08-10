@@ -14,9 +14,9 @@ export async function claimTerminalJobExecutions(
   const result = await executor.query<TerminalJobExecution>(
     `SELECT n.*,j."status" AS "job_status",j."result" AS "job_result",
        j."last_error" AS "job_error"
-     FROM "_damat_pipeline_node_executions" n
-     JOIN "_damat_job_runs" j ON j."id"=n."job_run_id"
-     JOIN "_damat_pipeline_runs" r ON r."id"=n."run_id"
+     FROM "damat"."_damat_pipeline_node_executions" n
+     JOIN "damat"."_damat_job_runs" j ON j."id"=n."job_run_id"
+     JOIN "damat"."_damat_pipeline_runs" r ON r."id"=n."run_id"
      WHERE n."status" IN ('queued','running')
        AND j."status" IN ('succeeded','dead_lettered','cancelled')
        AND r."status" NOT IN ('succeeded','failed','cancelled','compensated','compensation_failed')
@@ -32,8 +32,8 @@ export async function claimRoutableNodes(
   limit: number,
 ): Promise<NodeExecutionRow[]> {
   const result = await executor.query<NodeExecutionRow>(
-    `SELECT n.* FROM "_damat_pipeline_node_executions" n
-     JOIN "_damat_pipeline_runs" r ON r."id"=n."run_id"
+    `SELECT n.* FROM "damat"."_damat_pipeline_node_executions" n
+     JOIN "damat"."_damat_pipeline_runs" r ON r."id"=n."run_id"
      WHERE n."status" IN ('ready','waiting')
        AND r."status" IN ('running','waiting','compensating')
        AND (n."kind"<>'delay' OR n."available_at"<=NOW())

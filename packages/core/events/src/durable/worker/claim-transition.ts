@@ -14,7 +14,7 @@ export async function claimEventDeliveryRow(
 ): Promise<ClaimedEventDelivery> {
   const token = createLeaseToken();
   const result = await executor.query<EventDeliveryClaimRow>(
-    `UPDATE "_damat_event_deliveries" SET "status"='running',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='running',
      "attempt_count"="attempt_count"+1,"lease_owner"=$2,"lease_token"=$3,
      "lease_expires_at"=NOW()+($4*INTERVAL '1 ms'),"heartbeat_at"=NOW(),
      "started_at"=COALESCE("started_at",NOW()),"updated_at"=NOW()
@@ -40,7 +40,7 @@ export async function claimEventDeliveryRow(
   const claimedRow = result.rows[0]!;
   const claim = mapEventDeliveryClaim(claimedRow);
   await executor.query(
-    `INSERT INTO "_damat_event_delivery_attempts"
+    `INSERT INTO "damat"."_damat_event_delivery_attempts"
      ("delivery_id","attempt_number","worker_id","lease_token","heartbeat_at",
       "available_at","wait_ms") VALUES ($1,$2,$3,$4,NOW(),$5,$6)`,
     [

@@ -38,7 +38,7 @@ export const moduleCommand: Command = {
     ctx.logger.info(
       [
         "Authoring (inside a module package):",
-        "  damat module init <name>        Scaffold a standalone module package",
+        "  damat module init <name>        Scaffold a standalone module package (use --no-git to skip Git)",
         "  damat module dev                Run the module as a live app",
         "  damat module database:setup     Create DB + apply module migrations",
         "  damat module migration:create   Diff models -> migration",

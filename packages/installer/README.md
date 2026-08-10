@@ -12,7 +12,12 @@ Those paths come from `damat.json`,
 never from `package.json.exports`. Malformed manifests fail before fallback,
 package descriptors accept only valid unscoped or `@scope/name` names, and
 resolved paths are checked by real location so symlinks cannot escape the
-artifact.
+artifact. Manifestless bare-source modules retain conventional provider
+compatibility: for each workflow, job, event, or pipeline, the resolver checks
+`src/<capability>/<module-id>`, then `<capability>`, then `src/<capability>`.
+Only a direct file or a directory with `index.ts`/`index.js` is selected; an
+empty earlier directory is ignored. Explicit manifest paths remain authoritative
+and are reported as provider-load errors when their entry is invalid.
 
 ## Install
 

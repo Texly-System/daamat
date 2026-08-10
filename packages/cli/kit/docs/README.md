@@ -12,3 +12,5 @@
 
 All origins and mutations are delegated to `@damatjs/installer`. No Kit path
 maintains a separate copy algorithm or install record.
+Kit install, plan, and update commands preserve repeated `--target` overrides;
+the shared adapter maps them to one capability target map.

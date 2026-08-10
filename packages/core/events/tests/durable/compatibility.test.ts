@@ -26,11 +26,11 @@ test("ephemeral emit only invokes its configured broadcaster", async () => {
 test("ordinary emit never writes the durable outbox", async () => {
   await ensureEventStorage();
   const before = await pool.query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM "_damat_event_outbox"`,
+    `SELECT COUNT(*)::text AS count FROM "damat"."_damat_event_outbox"`,
   );
   await new EventBus().emit("account.deleted", { id: "a1" });
   const after = await pool.query<{ count: string }>(
-    `SELECT COUNT(*)::text AS count FROM "_damat_event_outbox"`,
+    `SELECT COUNT(*)::text AS count FROM "damat"."_damat_event_outbox"`,
   );
   expect(after.rows[0]!.count).toBe(before.rows[0]!.count);
 });

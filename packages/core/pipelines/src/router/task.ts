@@ -59,7 +59,7 @@ export async function dispatchTask(
     },
   );
   await executor.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "status"='queued',
+    `UPDATE "damat"."_damat_pipeline_node_executions" SET "status"='queued',
        "input"=$2::jsonb,"job_run_id"=$3,"started_at"=NOW(),"updated_at"=NOW()
      WHERE "id"=$1`,
     [execution.id, JSON.stringify(input ?? null), job.id],

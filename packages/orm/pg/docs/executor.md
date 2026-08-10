@@ -37,6 +37,13 @@ Key points:
   `result.rows.length` keeps the count meaningful for `RETURNING` queries.
 - **No error wrapping here.** Logging then rethrow — callers decide how to wrap.
 
+For a model containing `vector`/`halfvec` columns, `pgExecuteRaw` acquires (or uses) one exact
+`PoolClient`, awaits `@damatjs/deps/pgvector` `registerTypes(client)`, serializes only modeled vector
+operands with `toSql`, executes on that same client, and releases only clients it acquired. Successful
+registrations are cached per physical client; failures are intentionally retryable after migrations
+create the `vector` extension. Best-effort `connect` listeners cover newly created pool clients but
+are not the authoritative execution path.
+
 ## `pgTransaction`
 
 ```ts
@@ -44,6 +51,7 @@ async function pgTransaction<R>(
   pool: Pool,
   callback: (client: PoolClient) => Promise<R>,
   logger?: QueryLogger,
+  model?: ModelDefinition,
 ): Promise<R>;
 ```
 

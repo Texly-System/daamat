@@ -21,7 +21,7 @@ test("list applies lineage, timing, worker, and lease filters", async () => {
   const run = await insertRun({ status: "running", createdAt: now });
   const worker = uniqueName("filter-worker");
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "started_at"=$2::timestamptz,
+    `UPDATE "damat"."_damat_job_runs" SET "started_at"=$2::timestamptz,
      "available_at"=$2::timestamptz,"lease_owner"=$3,"lease_token"=$4,
      "lease_expires_at"=$2::timestamptz+INTERVAL '1 hour',
      "correlation_id"='correlation-filter',"deduplication_key"='dedup-filter',
@@ -29,7 +29,7 @@ test("list applies lineage, timing, worker, and lease filters", async () => {
     [run.id, now, worker, crypto.randomUUID(), schedule.id],
   );
   await pool.query(
-    `INSERT INTO "_damat_job_activity" ("run_id","type","occurred_at")
+    `INSERT INTO "damat"."_damat_job_activity" ("run_id","type","occurred_at")
      VALUES ($1,'retry_wait',$2),($1,'lease_recovered',$2)`,
     [run.id, now],
   );
@@ -60,7 +60,7 @@ test("list filters terminal time and validates limits", async () => {
   const now = new Date();
   const run = await insertRun({ status: "cancelled", createdAt: now });
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "completed_at"=$2 WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_job_runs" SET "completed_at"=$2 WHERE "id"=$1`,
     [run.id, now],
   );
   const range = {

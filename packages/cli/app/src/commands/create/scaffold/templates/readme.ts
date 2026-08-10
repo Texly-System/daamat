@@ -13,6 +13,10 @@ bun run db:setup       # creates PostgreSQL DB + durability/jobs/events/pipeline
 bun run dev            # repeats the idempotent setup check, then starts on :6543
 \`\`\`
 
+\`damat create\` initializes a Git repository on \`main\` and commits this
+scaffold by default. Use \`damat create <name> --no-git\` when you will manage
+version control separately; Git failures never remove generated files.
+
 Verify it's alive:
 
 \`\`\`bash

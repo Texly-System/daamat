@@ -57,7 +57,7 @@ test("replaces an expired completed key", async () => {
   const scope = uniqueScope("expired");
   try {
     await context.pool.query(
-      `INSERT INTO "_damat_idempotency_keys"
+      `INSERT INTO "damat"."_damat_idempotency_keys"
         ("scope", "key", "status", "result", "expires_at", "intent_fingerprint")
        VALUES ($1, 'same', 'completed', '{"old":true}',
          NOW() - INTERVAL '1 second', 'known-old-intent')`,
@@ -78,7 +78,7 @@ test("rejects an expired legacy key without a fingerprint", async () => {
   const scope = uniqueScope("legacy-expired");
   try {
     await context.pool.query(
-      `INSERT INTO "_damat_idempotency_keys"
+      `INSERT INTO "damat"."_damat_idempotency_keys"
         ("scope", "key", "status", "result", "expires_at")
        VALUES ($1, 'same', 'completed', '{"old":true}',
          NOW() - INTERVAL '1 second')`,

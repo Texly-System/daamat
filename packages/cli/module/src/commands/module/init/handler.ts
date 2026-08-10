@@ -4,6 +4,7 @@ import type { Command } from "@damatjs/cli";
 import {
   databaseName,
   databaseOption,
+  initializeGit,
   resolveDatabaseSelection,
 } from "@damatjs/cli-support";
 import { scaffoldModule } from "./scaffold";
@@ -33,6 +34,9 @@ export const handleModuleInit: Command["handler"] = async (ctx) => {
   }
   scaffoldModule(targetDir, name, database.url);
   ctx.logger.success(`Module package created at ${targetDir}`);
+  if (ctx.options.git !== false) {
+    initializeGit(targetDir, ctx.logger, "chore: scaffold damat module");
+  }
   const shouldInstall = databaseOption(ctx.options, "install") === true;
   const installed = shouldInstall
     ? installModuleDependencies(targetDir, ctx.logger)

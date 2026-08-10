@@ -18,7 +18,8 @@ export async function deletePipelineDraft(
       },
       async (transaction) => {
         const result = await transaction.query<{ definition_id: string }>(
-          `DELETE FROM "_damat_pipeline_drafts" d USING "_damat_pipeline_definitions" p
+          `DELETE FROM "damat"."_damat_pipeline_drafts" d
+           USING "damat"."_damat_pipeline_definitions" p
            WHERE d."definition_id"=p."id" AND p."name"=$1 AND p."source"='web'
              AND d."revision"=$2 RETURNING d."definition_id"`,
           [name, expectedRevision],
@@ -26,7 +27,7 @@ export async function deletePipelineDraft(
         if (!result.rows[0])
           throw new Error("Pipeline draft revision conflict");
         await transaction.query(
-          `INSERT INTO "_damat_pipeline_activity" ("type","details","actor")
+          `INSERT INTO "damat"."_damat_pipeline_activity" ("type","details","actor")
            VALUES ('draft.deleted',$1::jsonb,$2::jsonb)`,
           [
             JSON.stringify({ name, expectedRevision, reason: mutation.reason }),

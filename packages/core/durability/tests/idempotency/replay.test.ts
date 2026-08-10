@@ -61,7 +61,7 @@ test("rejects a runtime value that is not JSON-safe", async () => {
       ),
     ).rejects.toThrow(/JSON/i);
     const stored = await context.pool.query(
-      `SELECT 1 FROM "_damat_idempotency_keys" WHERE "scope" = $1`,
+      `SELECT 1 FROM "damat"."_damat_idempotency_keys" WHERE "scope" = $1`,
       [scope],
     );
     expect(stored.rowCount).toBe(0);

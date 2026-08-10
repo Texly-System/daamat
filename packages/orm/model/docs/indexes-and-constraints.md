@@ -18,6 +18,7 @@ class IndexBuilder {
   unique(): this;
   type(indexType: IndexType): this; // default "btree"
   where(condition: string): this; // partial index
+  with(parameters: Record<string, string | number | boolean>): this;
   concurrently(): this; // CREATE INDEX CONCURRENTLY
   toSchema(tableName: string, indexNumber?: number): IndexSchema;
 }
@@ -41,17 +42,19 @@ class IndexBuilder {
 cleanupIndexSchema(tableName: string, index: IndexSchema, indexNumber?: number): IndexSchema
 ```
 
-- Normalises every column to `{ name }` (preserving `order` when present).
+- Normalises named columns and preserves expression columns, operator classes,
+  and `order` when present.
 - Auto-generates a name when `index.name` is unset:
   `"<idx_|uniq_><tableName>_<col1_col2_…>"`, suffixed with `_<indexNumber>` when
   provided. `uniq_` prefix when `unique`, else `idx_`.
-- Emits `name`, `columns`, `unique` (defaulting `false`), plus `type` and `where`
-  only when set.
+- Emits `name`, `columns`, `unique` (defaulting `false`), plus `type`, `where`,
+  `with`, and `concurrently` when set.
+- Expression indexes must provide an explicit name; arbitrary SQL expressions
+  are intentionally not used for automatic identifier generation.
 
-> Gotcha: `cleanupIndexSchema` does **not** carry through `concurrently`. The
-> `IndexBuilder` accepts `.concurrently()` and passes it in, but the cleanup
-> output drops it. If `concurrently` needs to reach DDL, fix it here. `unique` is
-> always defaulted to `false` (never left undefined).
+`cleanupIndexSchema` preserves `concurrently`, storage parameters, predicates,
+operator classes, and expression columns so downstream DDL can retain the full
+index contract. `unique` is always defaulted to `false` (never left undefined).
 
 Naming precedence subtlety: `IndexBuilder.toSchema()` may set its own
 `"<tableName>_<cols>"` name first; only if it leaves the name empty does

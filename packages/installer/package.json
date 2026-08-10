@@ -1,6 +1,6 @@
 {
   "name": "@damatjs/installer",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Headless transactional installer engine for Damat artifacts",
   "type": "module",
   "main": "dist/index.js",

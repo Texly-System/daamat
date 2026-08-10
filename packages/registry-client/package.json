@@ -1,7 +1,7 @@
 {
   "name": "@damatjs/registry-client",
   "description": "Typed HTTP client for the Damat registry gateway — discovery, verdict, and publish",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "exports": {
     ".": {

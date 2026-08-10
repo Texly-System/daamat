@@ -1,6 +1,8 @@
-import { dirname } from "node:path";
 import { waitForReadiness } from "./moduleDevReadiness";
+import { moduleDevEnv, read, within } from "./moduleDevUtils";
 type Child = ReturnType<typeof Bun.spawn>;
+const STARTUP_TIMEOUT = 90_000;
+const SHUTDOWN_TIMEOUT = 30_000;
 export interface ProcessResult {
   code: number;
   stdout: string;
@@ -11,36 +13,6 @@ export interface RunningModuleDev {
   output: () => string;
   waitForReadiness: (count: number) => Promise<number>;
   stop: () => Promise<ProcessResult>;
-}
-export function moduleDevEnv(
-  databaseUrl: string,
-): Record<string, string | undefined> {
-  return {
-    ...process.env,
-    DATABASE_URL: databaseUrl,
-    LOG_LEVEL: "fatal",
-    REDIS_URL: "",
-    NO_COLOR: "1",
-    PATH: `${dirname(process.execPath)}:${process.env.PATH ?? ""}`,
-  };
-}
-export async function within<T>(work: Promise<T>, ms: number): Promise<T> {
-  let timer: ReturnType<typeof setTimeout>;
-  const expired = new Promise<never>((_, reject) => {
-    timer = setTimeout(() => reject(new Error("Module dev timed out")), ms);
-  });
-  return Promise.race([work, expired]).finally(() => clearTimeout(timer));
-}
-async function read(
-  stream: ReadableStream<Uint8Array>,
-  update?: (text: string) => void,
-): Promise<string> {
-  let text = "";
-  for await (const chunk of stream) {
-    text += new TextDecoder().decode(chunk);
-    update?.(text);
-  }
-  return text;
 }
 export function moduleDevChild(
   cwd: string,
@@ -60,11 +32,22 @@ export async function startModuleDev(
 ): Promise<RunningModuleDev> {
   const child = moduleDevChild(cwd, databaseUrl, 0);
   let output = "";
+  let booting = true;
   let ready!: (port: number) => void;
   let failed!: (error: Error) => void;
   const listening = new Promise<number>((resolve, reject) => {
-    ready = resolve;
-    failed = reject;
+    ready = (port) => {
+      if (booting) {
+        booting = false;
+        resolve(port);
+      }
+    };
+    failed = (error) => {
+      if (booting) {
+        booting = false;
+        reject(error);
+      }
+    };
   });
   const stdout = read(child.stdout, (text) => {
     output = text;
@@ -72,24 +55,40 @@ export async function startModuleDev(
     if (match) ready(Number(match[1]));
   });
   const stderr = read(child.stderr);
-  void child.exited.then(async (code) =>
-    failed(new Error(`Module dev exited ${code}: ${await stderr}`)),
-  );
+  void child.exited.then(async (code) => {
+    if (!booting) return;
+    failed(new Error(`Module dev exited ${code}: ${await stderr}`));
+  });
   try {
-    const port = await within(listening, 30_000);
+    const port = await within(listening, STARTUP_TIMEOUT);
     return {
       port,
       output: () => output,
       waitForReadiness: (count) => waitForReadiness(() => output, count),
       stop: async () => {
         child.kill("SIGINT");
-        const code = await within(child.exited, 15_000);
-        return { code, stdout: await stdout, stderr: await stderr };
+        try {
+          const code = await within(
+            child.exited,
+            SHUTDOWN_TIMEOUT,
+            "Module dev shutdown timed out",
+          );
+          return { code, stdout: await stdout, stderr: await stderr };
+        } catch (error) {
+          child.kill("SIGKILL");
+          await child.exited;
+          await Promise.all([stdout, stderr]);
+          throw error;
+        }
       },
     };
   } catch (error) {
     child.kill("SIGKILL");
     await child.exited;
-    throw error;
+    await Promise.all([stdout, stderr]);
+    const detail = error instanceof Error ? error.message : String(error);
+    throw new Error(`${detail}\nModule dev output:\n${output}`, {
+      cause: error,
+    });
   }
 }

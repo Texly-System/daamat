@@ -29,7 +29,7 @@ export async function queryEventThroughput(
        COUNT(*) FILTER (WHERE a."type"='retry_wait')::text AS "retried",
        COUNT(*) FILTER (WHERE a."type"='cancelled')::text AS "cancelled",
        COUNT(*) FILTER (WHERE a."type"='lease_recovered')::text AS "recovered"
-     FROM "_damat_event_activity" a JOIN "_damat_event_outbox" o
+     FROM "damat"."_damat_event_activity" a JOIN "damat"."_damat_event_outbox" o
        ON o."id"=a."event_id" WHERE a."occurred_at">=$1 AND a."occurred_at"<$2
        AND a."type" IN
          ('succeeded','dead_lettered','retry_wait','cancelled','lease_recovered')

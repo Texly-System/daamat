@@ -1,12 +1,13 @@
 import type { QueryResultRow } from "@damatjs/deps/pg";
 import { workerExecutor } from "./repository";
 import type { HeartbeatWorkerOptions, WorkerIdentityOptions } from "./types";
+import { damatRelation } from "../migrations/relocation";
 
 export async function heartbeatWorker(
   options: HeartbeatWorkerOptions,
 ): Promise<void> {
   const result = await workerExecutor(options.executor).query<QueryResultRow>(
-    `UPDATE "_damat_workers" SET
+    `UPDATE ${damatRelation("_damat_workers")} SET
        "last_heartbeat_at" = NOW(),
        "in_flight" = $2,
        "concurrency" = COALESCE($3, "concurrency")
@@ -21,7 +22,7 @@ export async function stopWorker(
   options: WorkerIdentityOptions,
 ): Promise<void> {
   const result = await workerExecutor(options.executor).query<QueryResultRow>(
-    `UPDATE "_damat_workers" SET
+    `UPDATE ${damatRelation("_damat_workers")} SET
        "stopping_at" = COALESCE("stopping_at", NOW()),
        "stopped_at" = COALESCE("stopped_at", NOW()),
        "in_flight" = 0
@@ -35,7 +36,7 @@ export async function markWorkerStopping(
   options: WorkerIdentityOptions,
 ): Promise<void> {
   const result = await workerExecutor(options.executor).query<QueryResultRow>(
-    `UPDATE "_damat_workers" SET
+    `UPDATE ${damatRelation("_damat_workers")} SET
        "stopping_at" = COALESCE("stopping_at", NOW())
      WHERE "id" = $1`,
     [options.id],

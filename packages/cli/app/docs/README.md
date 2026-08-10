@@ -20,8 +20,15 @@ The create scaffold writes an optional receiver `damat.json` whose accepts map
 defines the backend's module, route, workflow, job, event, pipeline, link,
 test, migration, model, and generated-type locations.
 
+`damat create` initializes Git on `main`, stages the completed scaffold, and
+creates an initial commit. `--no-git` disables the availability probe and every
+Git command; missing Git or setup failures warn without removing scaffold files.
+
 `create` shares database option/prompt handling with module init. The generated
 app enables the jobs, durable events, and pipelines workers in all mode, so
 `damat-orm database:setup` selects every required system migration. Setup may be
 deferred with `--no-database-setup`; the generated dev script remains a safe
 idempotent preflight.
+
+Generated `damat.config.ts` derives `projectConfig.nodeEnv` from the exact
+`NODE_ENV=production` value and otherwise selects `development`.

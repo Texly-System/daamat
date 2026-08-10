@@ -10,7 +10,7 @@ export async function completeEventDeliverySuccess(
 ): Promise<"succeeded" | "cancelled"> {
   return getDurabilityClient().transaction(async (executor) => {
     const cancelled = await executor.query(
-      `SELECT 1 FROM "_damat_event_deliveries" WHERE "id"=$1
+      `SELECT 1 FROM "damat"."_damat_event_deliveries" WHERE "id"=$1
        AND "event_id"=$4 AND "consumer"=$5
        AND "status"='running' AND "lease_owner"=$2 AND "lease_token"=$3
        AND "lease_expires_at">NOW() AND "cancellation_requested_at" IS NOT NULL
@@ -40,7 +40,7 @@ export async function completeEventDeliveryFailure(
   return getDurabilityClient().transaction(async (executor) => {
     const state = await executor.query<{ cancelled: boolean }>(
       `SELECT "cancellation_requested_at" IS NOT NULL AS "cancelled"
-       FROM "_damat_event_deliveries" WHERE "id"=$1
+       FROM "damat"."_damat_event_deliveries" WHERE "id"=$1
        AND "event_id"=$4 AND "consumer"=$5 AND "status"='running'
        AND "lease_owner"=$2 AND "lease_token"=$3
        AND "lease_expires_at">NOW() FOR UPDATE`,

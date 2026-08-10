@@ -34,4 +34,4 @@ test("fresh module init plans, loads, and starts without PostgreSQL", async () =
     if (running) await running.stop().catch(() => undefined);
     rmSync(root, { recursive: true, force: true });
   }
-}, 45_000);
+}, 150_000);

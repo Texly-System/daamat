@@ -75,7 +75,7 @@ export function generateDescription(diff: SchemaDiff): string;
 - `quoteIdentifier(name)` → `"name"`, doubling any embedded `"`.
 - `qualifiedTable(table, schema)` → `"schema"."table"`.
 - `resolveSchema(options, tableSchema?)` → `options.schema ?? tableSchema ?? "public"`.
-- `columnTypeSql(col)` — builds the SQL type fragment: named enums reference the quoted enum type (`"my_enum"` / `"my_enum"[]`); `character`/`character varying` append `(length)`; `numeric`/`decimal` become `NUMERIC`, `NUMERIC(p)`, or `NUMERIC(p, s)`; everything else uppercases the type name; arrays get a `[]` suffix.
+- `columnTypeSql(col)` — builds the SQL type fragment: named enums reference the quoted enum type (`"my_enum"` / `"my_enum"[]`); native vectors require positive `dimensions` and emit exact `VECTOR(n)` / `HALFVEC(n)` (never an array suffix); `character`/`character varying` append `(length)`; `numeric`/`decimal` become `NUMERIC`, `NUMERIC(p)`, or `NUMERIC(p, s)`; everything else uppercases the type name; ordinary arrays get a `[]` suffix.
 - `columnDefinitionSql(col, skipPrimaryKey?)` — full inline definition: `"name" TYPE [PRIMARY KEY | NULL/NOT NULL] [UNIQUE] [DEFAULT <expr>]`. Single-column PKs are inlined as `PRIMARY KEY`; pass `skipPrimaryKey = true` for composite PKs (the table emitter adds a separate `CONSTRAINT ... PRIMARY KEY (...)`).
 
 ## Per-concern emitters
@@ -92,7 +92,8 @@ export function generateDescription(diff: SchemaDiff): string;
 - `generateAddColumn` — `ALTER TABLE ... ADD COLUMN <columnDefinitionSql>`.
 - `generateDropColumn` — `ALTER TABLE ... DROP COLUMN[ IF EXISTS] "col"[ CASCADE]`.
 - `generateAlterColumn` → **`string[]`** — one statement per attribute, because PostgreSQL requires them separately:
-  - `type` → `ALTER COLUMN "c" TYPE NEWTYPE USING "c"::NEWTYPE`.
+  - ordinary `type` → `ALTER COLUMN "c" TYPE NEWTYPE USING "c"::NEWTYPE`.
+  - native vector type/dimension changes → a `-- MANUAL REVIEW` comment and no automatic cast; nullable/default clauses on the same change remain executable.
   - `length` _without_ a `type` change → `ALTER COLUMN "c" TYPE VARCHAR(len)`.
   - `nullable` → `DROP NOT NULL` (→ nullable) or `SET NOT NULL`.
   - `default` → `SET DEFAULT <expr>` or `DROP DEFAULT`.
@@ -101,9 +102,14 @@ export function generateDescription(diff: SchemaDiff): string;
 
 ### Indexes — `sqlGenerator/indexes.ts`
 
-- `generateCreateIndex(index, tableName, schema, opts)` — `CREATE[ UNIQUE] INDEX[ IF NOT EXISTS] "name" ON "schema"."table"[ USING <method>] (cols)[ WHERE <pred>]`. Falls back to a derived name if `index.name` is absent; per-column `order` (`ASC`/`DESC`) is appended; `type` other than `btree` becomes `USING GIN`/`GIST`/etc.
+- `generateCreateIndex(index, tableName, schema, opts)` — `CREATE[ UNIQUE] INDEX[ CONCURRENTLY][ IF NOT EXISTS] "name" ON "schema"."table"[ USING <method>] (cols)[ WITH (...)] [ WHERE <pred>]`. Falls back to a derived name for named columns; raw expression indexes require an explicit name. Per-column names are quoted, expressions are left raw, operator classes and `order` (`ASC`/`DESC`) are appended, and `type` supports `hnsw`/`ivfflat` as well as the ordinary methods.
 - `generateAddIndex(change, opts)` — resolves schema and delegates to `generateCreateIndex`.
-- `generateDropIndex(change, opts)` — `DROP INDEX[ IF EXISTS] "schema"."indexName"` (indexes are schema-qualified, not table-qualified).
+- `generateDropIndex(change, opts)` — `DROP INDEX[ CONCURRENTLY][ IF EXISTS] "schema"."indexName"` (indexes are schema-qualified, not table-qualified). Diff changes carry the old index's `concurrently` flag through changed/removed drops.
+
+### Extensions — `sqlGenerator/extensions.ts`
+
+`create_extension` emits `CREATE EXTENSION IF NOT EXISTS <name>` before enums or
+tables. Extension changes are additive; no generator emits `DROP EXTENSION`.
 
 ### Foreign keys — `sqlGenerator/foreignKeys.ts`
 

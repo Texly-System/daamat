@@ -46,7 +46,8 @@ applyDefaults(options, definitions);
 validateOptions(options, definitions, commandName);
 ```
 
-The shared execution pipeline runs these in that order. A missing required
+The shared execution pipeline runs these in that order. Repeatable option arrays
+are coerced element by element according to their declared type. A missing required
 option throws `MissingRequiredOptionError`; `executeCommand` converts that error
 to a result without invoking the handler.
 

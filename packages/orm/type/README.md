@@ -125,13 +125,13 @@ driver types from `@damatjs/deps` and four type groups: `connection`, `model`,
 
 | Export                                                                             | Kind      | Summary                                                                               |
 | ---------------------------------------------------------------------------------- | --------- | ------------------------------------------------------------------------------------- |
-| `ColumnType`                                                                       | type      | Union of ~80 PostgreSQL SQL type names (`"integer"`, `"text"`, `"jsonb"`, …).         |
-| `ColumnSchema`                                                                     | interface | A serialized column (name, type, nullability, default, length/scale, enum, array, …). |
+| `ColumnType`                                                                       | type      | PostgreSQL SQL type names, including native pgvector `"vector"`/`"halfvec"`.          |
+| `ColumnSchema`                                                                     | interface | A serialized column (name, type, nullability, default, dimensions, length/scale, …). |
 | `TableSchema`                                                                      | interface | A serialized table: columns, indexes, foreignKeys, constraints, relations.            |
 | `ModuleSchema`                                                                     | interface | A collection of tables + enums + hoisted relationships.                               |
 | `EnumSchema`                                                                       | interface | Named PG enum (`name`, `values`, optional `schema`).                                  |
-| `IndexType`                                                                        | type      | `"btree" \| "hash" \| "gin" \| "gist" \| "brin"`.                                     |
-| `IndexSchema` / `IndexColumn`                                                      | interface | Index definition and per-column order.                                                |
+| `IndexType`                                                                        | type      | B-tree/hash/GIN/GiST/BRIN plus pgvector `"hnsw"` and `"ivfflat"`.                     |
+| `IndexSchema` / `IndexColumn`                                                      | type      | Index definitions with named or expression columns and operator classes.              |
 | `ConstraintType` / `ConstraintSchema`                                              | type      | `unique` / `primary_key` / `check` / `exclude` constraint union.                      |
 | `UniqueConstraint`, `PrimaryKeyConstraint`, `CheckConstraint`, `ExcludeConstraint` | interface | Per-kind constraint shapes.                                                           |
 | `ForeignKeyAction`                                                                 | type      | `"CASCADE" \| "SET NULL" \| "SET DEFAULT" \| "RESTRICT" \| "NO ACTION"`.              |

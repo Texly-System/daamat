@@ -36,9 +36,11 @@ test("interval, cron, and event triggers create pinned auditable runs", async ()
   });
   await syncPipelineDefinitions();
   await pool.query(
-    `UPDATE "_damat_pipeline_schedules" SET "next_at"=
-      CASE "trigger_id" WHEN 'interval' THEN NOW()-INTERVAL '2 minutes' ELSE NOW()-INTERVAL '1 minute' END
-     WHERE "version_id"=(SELECT "active_version_id" FROM "_damat_pipeline_definitions" WHERE "name"=$1)`,
+    `UPDATE "damat"."_damat_pipeline_schedules" SET "next_at"=
+      CASE "trigger_id" WHEN 'interval' THEN NOW()-INTERVAL '2 minutes'
+        ELSE NOW()-INTERVAL '1 minute' END
+     WHERE "version_id"=(SELECT "active_version_id"
+       FROM "damat"."_damat_pipeline_definitions" WHERE "name"=$1)`,
     [definition.name],
   );
   await publishDurableEvent(event, { value: 3 });
@@ -47,7 +49,7 @@ test("interval, cron, and event triggers create pinned auditable runs", async ()
   const runs = await listPipelineRuns({ name: definition.name, limit: 20 });
   expect(runs.length).toBeGreaterThanOrEqual(3);
   const receipts = await pool.query(
-    `SELECT "trigger_id" FROM "_damat_pipeline_trigger_receipts" WHERE "version_id"=$1`,
+    `SELECT "trigger_id" FROM "damat"."_damat_pipeline_trigger_receipts" WHERE "version_id"=$1`,
     [runs[0]!.versionId],
   );
   expect(receipts.rows.map((row) => row.trigger_id)).toEqual(

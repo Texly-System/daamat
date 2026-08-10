@@ -1,7 +1,17 @@
-export const MIGRATION_TRACKER_TABLE = "_damat_migration_logs";
+import {
+  damatRelation,
+  relocateDamatRelations,
+} from "@damatjs/durability";
 
-export const MIGRATION_TRACKER_SCHEMA = `
-CREATE TABLE IF NOT EXISTS "${MIGRATION_TRACKER_TABLE}" (
+export const MIGRATION_TRACKER_TABLE = "_damat_migration_logs";
+export const MIGRATION_TRACKER_RELATION = damatRelation(
+  MIGRATION_TRACKER_TABLE,
+);
+
+export const MIGRATION_TRACKER_SCHEMA = `${relocateDamatRelations([
+  MIGRATION_TRACKER_TABLE,
+])}
+CREATE TABLE IF NOT EXISTS ${MIGRATION_TRACKER_RELATION} (
   "id" TEXT PRIMARY KEY,
   "module" TEXT NOT NULL,
   "name" TEXT NOT NULL,
@@ -15,13 +25,13 @@ CREATE TABLE IF NOT EXISTS "${MIGRATION_TRACKER_TABLE}" (
   "status" TEXT NOT NULL DEFAULT 'applied',
   UNIQUE ("module", "name")
 );
-ALTER TABLE "${MIGRATION_TRACKER_TABLE}"
+ALTER TABLE ${MIGRATION_TRACKER_RELATION}
   ADD COLUMN IF NOT EXISTS "checksum" TEXT,
   ADD COLUMN IF NOT EXISTS "adopted_at" TIMESTAMPTZ,
   ADD COLUMN IF NOT EXISTS "adoption_actor" TEXT,
   ADD COLUMN IF NOT EXISTS "adoption_reason" TEXT;
 CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_module"
-  ON "_damat_migration_logs" ("module");
+  ON ${MIGRATION_TRACKER_RELATION} ("module");
 CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_status"
-  ON "_damat_migration_logs" ("status");
+  ON ${MIGRATION_TRACKER_RELATION} ("status");
 `;

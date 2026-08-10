@@ -7,6 +7,7 @@ test("declares ordered pipeline storage with explicit names", () => {
   expect(catalog.migrations.map(({ id, order }) => [id, order])).toEqual([
     ["001", 1000],
     ["002", 1100],
+    ["003", 1230],
   ]);
   const sql = catalog.migrations[0]!.sql;
   for (const table of [
@@ -23,4 +24,12 @@ test("declares ordered pipeline storage with explicit names", () => {
   expect(sql).not.toMatch(/CONSTRAINT\s+(?!")/);
   expect(sql).toContain('FOREIGN KEY ("definition_id","version_id")');
   expect(sql).toContain('FOREIGN KEY ("run_id","node_execution_id")');
+  const relocation = catalog.migrations[2]!.sql;
+  expect(relocation).toContain('CREATE SCHEMA "damat"');
+  expect(relocation).toContain(
+    'ALTER TABLE "public"."_damat_pipeline_definitions" SET SCHEMA "damat"',
+  );
+  expect(relocation).toContain(
+    'ALTER TABLE "public"."_damat_pipeline_activity" SET SCHEMA "damat"',
+  );
 });

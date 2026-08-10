@@ -6,6 +6,7 @@ Change history for this package. For how it works **now**, read the
 
 | Version       | Summary                                                                                                                                                                            | Upgrade notes         |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.6         | Dedicated migration tracker schema plus native pgvector generation                                                                                                                | [1.0.6 →](./1.0.6.md) |
 | 1.0.4         | Same-session transactional tracking, source checksums, and audited adoption for untracked commits                                                                                  | [1.0.4 →](./1.0.4.md) |
 | 1.0.0         | Resolved package migrations plus ordered inline system migrations                                                                                                                  | [next →](./1.0.0.md)  |
 | 0.6.0         | Advisory-lock serialization of concurrent runs, non-transactional execution for `CONCURRENTLY`/`ADD VALUE` statements, status API keyed by module name                             | [0.6.0 →](./0.6.0.md) |

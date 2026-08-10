@@ -21,6 +21,9 @@ public usage surface.
 
 ## Claim transaction
 
+The seven job relations live in the framework-owned `damat` PostgreSQL schema;
+the ordered `005` migration relocates pre-existing public tables in place.
+
 `claimJobRuns` opens one durability transaction and selects due work with:
 
 ```sql

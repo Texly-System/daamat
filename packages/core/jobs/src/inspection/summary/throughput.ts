@@ -23,7 +23,7 @@ export async function readThroughput(
        COUNT(*) FILTER (WHERE "status"='succeeded')::text AS succeeded,
        COUNT(*) FILTER (WHERE "status"='dead_lettered')::text AS failed,
        COUNT(*) FILTER (WHERE "status"='cancelled')::text AS cancelled
-     FROM "_damat_job_runs" WHERE "completed_at">=$1 AND "completed_at"<$2
+     FROM "damat"."_damat_job_runs" WHERE "completed_at">=$1 AND "completed_at"<$2
      GROUP BY bucket_start,"queue","name"
      ORDER BY bucket_start,"queue","name"`,
     [from, to, intervalMs],

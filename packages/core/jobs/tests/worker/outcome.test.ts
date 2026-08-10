@@ -16,7 +16,7 @@ async function execute(
     const name = `${item.name}-handler`;
     defineJob(name, handler);
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "name" = $2 WHERE "id" = $1`,
+      `UPDATE "damat"."_damat_job_runs" SET "name" = $2 WHERE "id" = $1`,
       [item.run.id, name],
     );
   } else {
@@ -80,7 +80,7 @@ test("non-error throws are serialized into visible failures", async () => {
   }, 1);
   expect(failed.run?.status).toBe("dead_lettered");
   const error = await pool.query(
-    `SELECT "last_error" FROM "_damat_job_runs" WHERE "id"=$1`,
+    `SELECT "last_error" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
     [failed.claim.id],
   );
   expect(error.rows[0]?.last_error).toEqual({

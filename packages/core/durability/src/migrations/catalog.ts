@@ -4,10 +4,18 @@ import { shared002 } from "./shared-002";
 import { shared003 } from "./shared-003";
 import { shared004 } from "./shared-004";
 import { shared005 } from "./shared-005";
+import { shared006 } from "./shared-006";
 
 export const durabilitySystemMigrations: SystemMigrationCatalog = {
   owner: "@damatjs/durability",
-  migrations: [shared001, shared002, shared003, shared004, shared005],
+  migrations: [
+    shared001,
+    shared002,
+    shared003,
+    shared004,
+    shared005,
+    shared006,
+  ],
 };
 
 export function collectSystemMigrations(

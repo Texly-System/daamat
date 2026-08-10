@@ -63,9 +63,9 @@ async function readDetailRow(
     `SELECT r.*,
        (date_trunc('milliseconds',r."created_at" AT TIME ZONE 'UTC')
          AT TIME ZONE 'UTC') AS "cursor_at", NOW() AS "inspected_at",
-       EXISTS (SELECT 1 FROM "_damat_job_activity" a
+       EXISTS (SELECT 1 FROM "damat"."_damat_job_activity" a
          WHERE a."run_id"=r."id" AND a."type"='lease_recovered') AS "recovered"
-     FROM "_damat_job_runs" r WHERE r."id"=$1`,
+     FROM "damat"."_damat_job_runs" r WHERE r."id"=$1`,
     [id],
   );
   return result.rows[0];

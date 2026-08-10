@@ -5,8 +5,9 @@ import { publishDurableEvent } from "../../src";
 test("activity and logs identities are tied to their delivery", async () => {
   await ensureEventStorage();
   const result = await pool.query<{ name: string; definition: string }>(
-    `SELECT conname AS name, pg_get_constraintdef(oid) AS definition
-     FROM pg_constraint WHERE conname IN
+    `SELECT conname AS name, pg_get_constraintdef(c.oid) AS definition
+     FROM pg_constraint c JOIN pg_namespace n ON n.oid=c.connamespace
+     WHERE n.nspname='damat' AND conname IN
        ('_damat_event_activity_delivery_identity_fkey',
         '_damat_event_logs_delivery_identity_fkey') ORDER BY conname`,
   );
@@ -20,7 +21,9 @@ test("activity and logs identities are tied to their delivery", async () => {
 test("outbox snapshots delivery policy with database checks", async () => {
   await ensureEventStorage();
   const result = await pool.query<{ conname: string }>(
-    `SELECT conname FROM pg_constraint WHERE conname IN
+    `SELECT conname FROM pg_constraint c
+     JOIN pg_namespace n ON n.oid=c.connamespace
+     WHERE n.nspname='damat' AND conname IN
       ('_damat_event_outbox_max_attempts_check',
        '_damat_event_outbox_backoff_ms_check',
        '_damat_event_outbox_backoff_multiplier_check',
@@ -34,7 +37,7 @@ test("activity rejects partial delivery identity", async () => {
   const event = await publishDurableEvent(`scope.${crypto.randomUUID()}`, {});
   await expect(
     pool.query(
-      `INSERT INTO "_damat_event_activity"
+      `INSERT INTO "damat"."_damat_event_activity"
         ("event_id","delivery_id","type") VALUES ($1,$2,'invalid')`,
       [event.id, crypto.randomUUID()],
     ),

@@ -5,4 +5,5 @@ export interface CommandOption {
   type?: "string" | "boolean" | "number";
   default?: unknown;
   required?: boolean;
+  repeatable?: boolean;
 }

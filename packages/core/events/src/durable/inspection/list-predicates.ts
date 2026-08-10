@@ -28,7 +28,7 @@ export function eventListPredicates(
   addDeliveryFilters(clauses, params, filter);
   addEventViewFilters(clauses, params, filter);
   if (filter.recovered !== undefined) {
-    const exists = `EXISTS (SELECT 1 FROM "_damat_event_activity" r
+    const exists = `EXISTS (SELECT 1 FROM "damat"."_damat_event_activity" r
       WHERE r."event_id"=o."id" AND r."type"='lease_recovered')`;
     clauses.push(filter.recovered ? exists : `NOT ${exists}`);
   }
@@ -78,10 +78,10 @@ function addDeliveryFilters(
   if (filter.failed?.from || filter.failed?.to) {
     const activity = [`a."delivery_id"=d."id"`, `a."type"='dead_lettered'`];
     addRange(activity, params, 'a."occurred_at"', filter.failed);
-    parts.push(`EXISTS (SELECT 1 FROM "_damat_event_activity" a
+    parts.push(`EXISTS (SELECT 1 FROM "damat"."_damat_event_activity" a
       WHERE ${activity.join(" AND ")})`);
   }
   if (parts.length)
-    clauses.push(`EXISTS (SELECT 1 FROM "_damat_event_deliveries" d
+    clauses.push(`EXISTS (SELECT 1 FROM "damat"."_damat_event_deliveries" d
       WHERE d."event_id"=o."id" AND ${parts.join(" AND ")})`);
 }

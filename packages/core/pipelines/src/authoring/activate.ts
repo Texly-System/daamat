@@ -22,26 +22,27 @@ export async function activatePipelineVersion(
           id: string;
           active_version_id: string | null;
         }>(
-          `SELECT "id","active_version_id" FROM "_damat_pipeline_definitions"
+          `SELECT "id","active_version_id" FROM "damat"."_damat_pipeline_definitions"
            WHERE "name"=$1 FOR UPDATE`,
           [name],
         );
         const definition = owner.rows[0];
         if (!definition) throw new Error(`Pipeline "${name}" was not found`);
         const version = await transaction.query(
-          `SELECT 1 FROM "_damat_pipeline_versions" WHERE "id"=$1 AND "definition_id"=$2`,
+          `SELECT 1 FROM "damat"."_damat_pipeline_versions" WHERE "id"=$1 AND "definition_id"=$2`,
           [versionId, definition.id],
         );
         if (!version.rowCount)
           throw new Error("Pipeline version does not belong to the definition");
         await transaction.query(
-          `UPDATE "_damat_pipeline_definitions" SET "active_version_id"=$2,"updated_at"=NOW()
+          `UPDATE "damat"."_damat_pipeline_definitions"
+           SET "active_version_id"=$2,"updated_at"=NOW()
            WHERE "id"=$1`,
           [definition.id, versionId],
         );
         await validatePipelineComposition(transaction);
         await transaction.query(
-          `INSERT INTO "_damat_pipeline_activity" ("type","details","actor")
+          `INSERT INTO "damat"."_damat_pipeline_activity" ("type","details","actor")
            VALUES ('version.activated',$1::jsonb,$2::jsonb)`,
           [
             JSON.stringify({

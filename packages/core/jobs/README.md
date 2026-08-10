@@ -17,6 +17,10 @@ Framework applications configure `projectConfig.databaseUrl` and
 `services.jobs`. Redis is not required. Optional Redis wake-ups reduce polling
 latency without becoming the source of truth.
 
+Job tables are framework-owned relations in the PostgreSQL `damat` schema.
+Run the package migration before starting workers; the ordered relocation
+migration moves existing job tables from `public` without changing their names.
+
 ## Define and enqueue
 
 ```ts

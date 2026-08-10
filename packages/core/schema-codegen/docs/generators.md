@@ -69,6 +69,11 @@ For camel-case foreign keys such as `packageId`, a model relation named
 
 Each takes `(table, ...)` and returns `string[]`. Enum columns whose values are known are replaced with `z.enum(['a','b'])` (looked up in `allEnums`).
 
+Vector and half-vector columns use
+`z.array(z.number().finite()).length(dimensions)` in every generated new,
+update, and query schema. Their nullable/default/optional decoration is applied
+by the surrounding renderer exactly like other columns.
+
 - `generateNewZodSchema(table, autoFields, allEnums)` — `new<Pascal>Schema = z.object({...}).strict()` + `type New<Pascal>Input = z.infer<...>`. Skips `autoFields` and `deleted_at`/`created_at`/`updated_at`. Nullable → `.nullable().optional()`; has default → `.optional()`; else required.
 - `generateUpdateZodSchema(table, allEnums)` — `update<Pascal>Schema` + `Update<Pascal>Input`. Skips primary keys and `id`/timestamps/soft-delete. Every field `.optional()` (nullable also `.nullable()`).
 - `generateQueryZodSchema(table, allEnums)` — `<camel>QuerySchema` + `<Pascal>Query`. Every column optional; integer/bigint/boolean columns become `z.coerce.*` (query strings); adds `limit`/`offset`/`orderBy`/`orderDir` pagination fields.

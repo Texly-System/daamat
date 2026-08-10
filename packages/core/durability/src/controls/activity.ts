@@ -1,4 +1,5 @@
 import { getDurabilityClient } from "../client/global";
+import { damatRelation } from "../migrations/relocation";
 import { mapActivity, mapMaintenance } from "./rows";
 import type { ActivityRow, MaintenanceRow } from "./rows";
 import type {
@@ -13,7 +14,7 @@ export async function listWorkControlActivity(
 ): Promise<WorkControlActivity[]> {
   const executor = options.executor ?? getDurabilityClient();
   const result = await executor.query<ActivityRow>(
-    `SELECT * FROM "_damat_work_control_activity"
+    `SELECT * FROM ${damatRelation("_damat_work_control_activity")}
      WHERE "work_kind" = $1 AND "scope" = $2
      ORDER BY "id" ASC LIMIT $3`,
     [options.kind, options.scope, options.limit ?? 100],
@@ -26,7 +27,7 @@ export async function recordMaintenanceActivity(
 ): Promise<MaintenanceActivity> {
   const executor = options.executor ?? getDurabilityClient();
   const result = await executor.query<MaintenanceRow>(
-    `INSERT INTO "_damat_maintenance_activity"
+    `INSERT INTO ${damatRelation("_damat_maintenance_activity")}
       ("operation", "work_kind", "scope", "status", "actor", "details",
        "completed_at")
      VALUES ($1, $2, $3, $4, $5::jsonb, $6::jsonb, $7)

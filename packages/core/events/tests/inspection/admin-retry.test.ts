@@ -14,13 +14,13 @@ test("retries a dead letter, advances retention, and wakes after commit", async 
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `UPDATE "_damat_event_outbox" SET "available_at"=NOW()-INTERVAL '2 hours',
+    `UPDATE "damat"."_damat_event_outbox" SET "available_at"=NOW()-INTERVAL '2 hours',
        "retention_at"=NOW()-INTERVAL '1 hour'
      WHERE "id"=$1`,
     [seeded.event.id],
   );
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='dead_lettered',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='dead_lettered',
        "available_at"=NOW()-INTERVAL '2 hours',
        "completed_at"=NOW(),"retention_at"=NOW()+INTERVAL '30 days',
        "progress"='{"step":1}',"result"='{"old":true}',
@@ -31,7 +31,7 @@ test("retries a dead letter, advances retention, and wakes after commit", async 
     [delivery.id, crypto.randomUUID()],
   );
   const before = await pool.query(
-    `SELECT "retention_at" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+    `SELECT "retention_at" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
     [delivery.id],
   );
   let committed = false;
@@ -40,7 +40,7 @@ test("retries a dead letter, advances retention, and wakes after commit", async 
     publish: async (_channel, value) => {
       message = value;
       const row = await pool.query(
-        `SELECT "status" FROM "_damat_event_deliveries" WHERE "id"=$1`,
+        `SELECT "status" FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
         [delivery.id],
       );
       committed = row.rows[0].status === "pending";
@@ -68,7 +68,7 @@ test("retries a dead letter, advances retention, and wakes after commit", async 
     inspectionClient().retryDelivery(delivery.id, actor),
   ).rejects.toHaveProperty("name", "DurableEventTransitionError");
   const activity = await pool.query(
-    `SELECT "actor","metadata" FROM "_damat_event_activity"
+    `SELECT "actor","metadata" FROM "damat"."_damat_event_activity"
      WHERE "delivery_id"=$1 AND "type"='manual_retry'`,
     [delivery.id],
   );

@@ -15,7 +15,7 @@ export async function recoverExpiredJobLease(
   row: ExpiredJobLease,
 ): Promise<JobRunStatus> {
   await executor.query(
-    `UPDATE "_damat_job_attempts" SET "finished_at"=NOW(),"outcome"='lost',
+    `UPDATE "damat"."_damat_job_attempts" SET "finished_at"=NOW(),"outcome"='lost',
        "duration_ms"=GREATEST(0,EXTRACT(EPOCH FROM (NOW()-"started_at"))*1000)
      WHERE "run_id"=$1 AND "attempt_number"=$2 AND "finished_at" IS NULL`,
     [row.id, row.attempt_count],
@@ -26,7 +26,7 @@ export async function recoverExpiredJobLease(
       ? "dead_lettered"
       : "queued";
   await executor.query(
-    `UPDATE "_damat_job_runs" SET "status"=$2,"lease_owner"=NULL,
+    `UPDATE "damat"."_damat_job_runs" SET "status"=$2,"lease_owner"=NULL,
        "lease_token"=NULL,"lease_expires_at"=NULL,"heartbeat_at"=NULL,
        "available_at"=CASE WHEN $2='queued' THEN NOW() ELSE "available_at" END,
        "completed_at"=CASE WHEN $2='queued' THEN NULL ELSE NOW() END,"updated_at"=NOW()

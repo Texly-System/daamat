@@ -41,7 +41,7 @@ test("versions can be activated and scheduled triggers can be controlled", async
   ).toBe(true);
   await client.setTriggerEnabled(v1.id, "minute", false, mutation("off"));
   const control = await pool.query(
-    `SELECT "enabled" FROM "_damat_pipeline_trigger_controls" WHERE "version_id"=$1`,
+    `SELECT "enabled" FROM "damat"."_damat_pipeline_trigger_controls" WHERE "version_id"=$1`,
     [v1.id],
   );
   expect(control.rows[0]?.enabled).toBe(false);

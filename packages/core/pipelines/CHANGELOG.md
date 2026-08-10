@@ -1,5 +1,23 @@
 # @damatjs/pipelines
 
+## 1.0.6
+
+### Patch Changes
+
+- Restore environment-aware generated backends, align optional Git setup, preserve
+  repeatable installer targets, harden heuristic provider resolution, and document
+  the durable event-wait activation boundary.
+- Move framework-owned PostgreSQL infrastructure into the dedicated `damat`
+  schema with data-preserving forward migrations and fully qualified runtime SQL.
+- Updated dependencies
+- Updated dependencies
+  - @damatjs/durability@1.0.6
+  - @damatjs/events@1.0.6
+  - @damatjs/jobs@1.0.6
+  - @damatjs/deps@1.0.6
+  - @damatjs/workflow-engine@1.0.6
+  - @damatjs/logger@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

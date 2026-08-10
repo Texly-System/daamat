@@ -52,7 +52,7 @@ export async function routePipelineCycle(
       const queue = await processRoutableNode(executor, node);
       if (queue) queues.add(queue);
       const current = await executor.query<NodeState>(
-        `SELECT "status","updated_at" FROM "_damat_pipeline_node_executions" WHERE "id"=$1`,
+        `SELECT "status","updated_at" FROM "damat"."_damat_pipeline_node_executions" WHERE "id"=$1`,
         [node.id],
       );
       const state = current.rows[0];
@@ -75,8 +75,8 @@ export async function routePipelineCycle(
       : { deletedRuns: 0, deletedJobs: 0 };
     const due = await executor.query<NextDelayRow>(
       `SELECT MIN(n."available_at") AS "available_at"
-       FROM "_damat_pipeline_node_executions" n
-       JOIN "_damat_pipeline_runs" r ON r."id"=n."run_id"
+       FROM "damat"."_damat_pipeline_node_executions" n
+       JOIN "damat"."_damat_pipeline_runs" r ON r."id"=n."run_id"
        WHERE n."kind"='delay' AND n."status"='waiting'
          AND r."status" IN ('running','waiting')`,
     );

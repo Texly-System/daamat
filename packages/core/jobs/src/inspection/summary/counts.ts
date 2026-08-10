@@ -11,7 +11,7 @@ export async function readStatusCounts(
   executor: DurabilityExecutor,
 ): Promise<Record<JobRunStatus, number>> {
   const result = await executor.query<CountRow>(
-    `SELECT "status" AS key,COUNT(*)::text AS count FROM "_damat_job_runs"
+    `SELECT "status" AS key,COUNT(*)::text AS count FROM "damat"."_damat_job_runs"
      GROUP BY "status"`,
   );
   const counts: Record<JobRunStatus, number> = {
@@ -32,7 +32,7 @@ export async function readActivityCounts(
   to: Date,
 ): Promise<Record<string, number>> {
   const result = await executor.query<CountRow>(
-    `SELECT "type" AS key,COUNT(*)::text AS count FROM "_damat_job_activity"
+    `SELECT "type" AS key,COUNT(*)::text AS count FROM "damat"."_damat_job_activity"
      WHERE "occurred_at">=$1 AND "occurred_at"<$2 GROUP BY "type"`,
     [from, to],
   );

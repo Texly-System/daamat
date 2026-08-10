@@ -19,7 +19,7 @@ export async function finishClaim(
 ): Promise<void> {
   const terminal = input.status !== "retry_wait";
   const updated = await executor.query<{ progress: unknown }>(
-    `UPDATE "_damat_job_runs" SET "status"=$4, "result"=$5::jsonb,
+    `UPDATE "damat"."_damat_job_runs" SET "status"=$4, "result"=$5::jsonb,
        "last_error"=$6::jsonb, "available_at"=COALESCE($7,"available_at"),
        "lease_owner"=NULL, "lease_token"=NULL, "lease_expires_at"=NULL,
        "heartbeat_at"=NULL, "updated_at"=NOW(),
@@ -55,7 +55,7 @@ async function closeAttempt(
   input: FinishInput,
 ): Promise<void> {
   await executor.query(
-    `UPDATE "_damat_job_attempts" SET "finished_at"=NOW(),
+    `UPDATE "damat"."_damat_job_attempts" SET "finished_at"=NOW(),
        "duration_ms"=GREATEST(0,EXTRACT(EPOCH FROM (NOW()-"started_at"))*1000),
        "result"=$4::jsonb, "outcome"=$5, "error"=$6::jsonb
      WHERE "run_id"=$1 AND "attempt_number"=$2 AND "lease_token"=$3

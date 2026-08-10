@@ -21,9 +21,20 @@ existing database.
 3. Start API and worker processes only after that job succeeds.
 
 Applied migrations are tracked by owner and migration ID in
-`_damat_migration_logs`, making repeated status and migrate commands idempotent.
-Creating a missing database requires `CREATEDB`; migrating an existing database
-does not.
+`damat._damat_migration_logs`, making repeated status and migrate commands
+idempotent. All framework-owned durability, job, event, and pipeline relations
+live in the dedicated `damat` schema; application, module, and link tables stay
+in their configured application schemas.
+
+The 1.0.6 migration preflight moves an existing public migration tracker before
+reading its history. Forward system migrations relocate the remaining legacy
+`public._damat_*` tables with `ALTER TABLE ... SET SCHEMA`, preserving data,
+indexes, constraints, identities, grants, and foreign keys. Never start 1.0.6
+API or worker processes against a database that has not completed this step.
+
+Creating a missing database requires `CREATEDB`. Creating the `damat` schema
+requires database `CREATE`; migrating an already prepared database does not
+require an administrative or superuser role.
 
 Next: [Standalone module migrations →](./06b-module-migrations.md)
 

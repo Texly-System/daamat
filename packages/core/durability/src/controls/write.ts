@@ -4,6 +4,7 @@ import type { DurabilityExecutor } from "../client/types";
 import { TransactionalExecutorRequiredError } from "../errors";
 import type { ChangeWorkControlOptions } from "./types";
 import { recordControlSignal } from "./signal";
+import { damatRelation } from "../migrations/relocation";
 
 async function withExecutor<T>(
   executor: DurabilityExecutor | undefined,
@@ -24,7 +25,7 @@ export async function writeControl(
 ): Promise<void> {
   await withExecutor(options.executor, async (executor) => {
     await executor.query(
-      `INSERT INTO "_damat_work_controls"
+      `INSERT INTO ${damatRelation("_damat_work_controls")}
         ("work_kind", "scope", "paused", "reason", "actor")
        VALUES ($1, $2, $3, $4, $5::jsonb)
        ON CONFLICT ("work_kind", "scope") DO UPDATE SET
@@ -41,7 +42,7 @@ export async function writeControl(
       ],
     );
     await executor.query(
-      `INSERT INTO "_damat_work_control_activity"
+      `INSERT INTO ${damatRelation("_damat_work_control_activity")}
         ("work_kind", "scope", "action", "reason", "actor")
        VALUES ($1, $2, $3, $4, $5::jsonb)`,
       [

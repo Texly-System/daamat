@@ -17,7 +17,7 @@ export function createSystemMigrationPool(failSql?: string) {
       }));
       return { rows, rowCount: rows.length };
     }
-    if (/INSERT INTO "_damat_migration_logs"/.test(statement)) {
+    if (/INSERT INTO (?:"damat"\.)?"_damat_migration_logs"/.test(statement)) {
       if (trackerFailure) throw new Error("tracker failed");
       const owner = String(params?.[1]);
       const id = String(params?.[2]);
@@ -32,7 +32,7 @@ export function createSystemMigrationPool(failSql?: string) {
       query: async (statement: string, params?: unknown[]) => {
         sql.push(statement);
         if (statement === failSql) throw new Error("system failed");
-        if (/INSERT INTO "_damat_migration_logs"/.test(statement)) {
+        if (/INSERT INTO (?:"damat"\.)?"_damat_migration_logs"/.test(statement)) {
           return query(statement, params);
         }
         return { rows: [], rowCount: 0 };

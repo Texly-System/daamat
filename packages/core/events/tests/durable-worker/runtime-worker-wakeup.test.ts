@@ -50,7 +50,7 @@ test("worker delivery wake reaches its poll component", async () => {
   );
   await waitUntil(async () => {
     const row = await pool.query(
-      `SELECT "status" FROM "_damat_event_deliveries" WHERE "event_id"=$1`,
+      `SELECT "status" FROM "damat"."_damat_event_deliveries" WHERE "event_id"=$1`,
       [published.id],
     );
     return row.rows[0]?.status === "succeeded";

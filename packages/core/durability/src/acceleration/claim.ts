@@ -1,5 +1,6 @@
 import type { QueryResultRow } from "@damatjs/deps/pg";
 import { getDurabilityClient } from "../client/global";
+import { damatRelation } from "../migrations/relocation";
 import type { AccelerationSignal } from "./types";
 
 interface SignalRow extends QueryResultRow {
@@ -26,12 +27,12 @@ export async function claimAccelerationSignals(
   const rows = await getDurabilityClient().transaction((executor) =>
     executor.query<SignalRow>(
       `WITH selected AS (
-         SELECT "id" FROM "_damat_acceleration_outbox"
+         SELECT "id" FROM ${damatRelation("_damat_acceleration_outbox")}
          WHERE "published_at" IS NULL AND "available_at"<=NOW()
            AND ("claim_expires_at" IS NULL OR "claim_expires_at"<=NOW())
            AND ($4::uuid[] IS NULL OR "id"=ANY($4))
          ORDER BY "revision" FOR UPDATE SKIP LOCKED LIMIT $1)
-       UPDATE "_damat_acceleration_outbox" o SET "claim_token"=$2,
+       UPDATE ${damatRelation("_damat_acceleration_outbox")} o SET "claim_token"=$2,
          "claim_expires_at"=NOW()+($3*INTERVAL '1 ms'),"attempts"="attempts"+1
        FROM selected WHERE o."id"=selected."id" RETURNING o.*`,
       [limit, token, leaseMs, ids?.length ? ids : null],

@@ -53,7 +53,7 @@ async function signalWith(
     );
   const id = crypto.randomUUID();
   const inserted = await executor.query<{ id: string }>(
-    `INSERT INTO "_damat_pipeline_signals"
+    `INSERT INTO "damat"."_damat_pipeline_signals"
       ("id","run_id","name","payload","idempotency_key","actor","reason")
      VALUES ($1,$2,$3,$4::jsonb,$5,$6::jsonb,$7)
      ON CONFLICT ("run_id","name","idempotency_key") DO UPDATE SET "name"=EXCLUDED."name"

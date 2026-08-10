@@ -71,7 +71,7 @@ test("periodic PostgreSQL polling continues with Redis connected", async () => {
 
 async function routed(id: string): Promise<boolean> {
   const row = await pool.query(
-    `SELECT "routed_at" FROM "_damat_event_outbox" WHERE "id"=$1`,
+    `SELECT "routed_at" FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
     [id],
   );
   return row.rows[0].routed_at instanceof Date;

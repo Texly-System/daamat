@@ -47,7 +47,7 @@ export function childRuns(executor: DurabilityExecutor, executionId: string) {
   return executor
     .query<ChildRunRow>(
       `SELECT "id","status","input","output","error","completed_at","created_at"
-       FROM "_damat_pipeline_runs" WHERE "parent_node_execution_id"=$1
+       FROM "damat"."_damat_pipeline_runs" WHERE "parent_node_execution_id"=$1
        ORDER BY split_part("trigger"->>'activation',':',2)::int,"id"`,
       [executionId],
     )

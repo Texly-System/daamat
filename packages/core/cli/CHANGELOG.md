@@ -1,5 +1,13 @@
 # @damatjs/cli
 
+## 1.0.6
+
+### Patch Changes
+
+- Restore environment-aware generated backends, align optional Git setup, preserve
+  repeatable installer targets, harden heuristic provider resolution, and document
+  the durable event-wait activation boundary.
+
 ## 1.0.5
 
 ## 1.0.4

@@ -24,7 +24,7 @@ test("retention reuses one default cutoff for audit and deletion", async () => {
           rowCount: 1,
         };
       }
-      if (sql.includes('SELECT o."id" FROM "_damat_event_outbox"')) {
+      if (sql.includes('SELECT o."id" FROM "damat"."_damat_event_outbox"')) {
         return { rows: [{ id: crypto.randomUUID() }], rowCount: 1 };
       }
       return { rows: [], rowCount: 0 };

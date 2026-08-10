@@ -45,7 +45,7 @@ test("detail snapshots include graph records and respect visibility", async () =
   const started = await startTestPipeline("inspect-detail");
   const completed = await routeToTerminal(started.id);
   await pool.query(
-    `INSERT INTO "_damat_pipeline_signals"
+    `INSERT INTO "damat"."_damat_pipeline_signals"
        ("id","run_id","name","payload","idempotency_key","actor","reason")
      VALUES ($1,$2,'approve',$3::jsonb,'inspection',$4::jsonb,'test')`,
     [

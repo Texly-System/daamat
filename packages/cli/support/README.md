@@ -1,7 +1,8 @@
 # @damatjs/cli-support
 
 Shared Damat-specific helpers used by independent CLI capability packages.
-This package owns system Git detection, Bun type-check execution, best-effort
+This package owns system Git detection and best-effort scaffold repository
+initialization, Bun type-check execution, best-effort
 temporary-file cleanup, and safe `bun add` argument construction.
 Type-check execution uses `bun run tsc --noEmit` from the target project, so it
 selects the installed project-local TypeScript compiler without registry lookup.
@@ -10,6 +11,8 @@ prompts. Password and full-URL input are not echoed by the interactive prompt.
 It also adapts CLI contexts to the headless installer: origin and registry
 resolution, command/fetch ports, runtime flags, modes, package backends, and
 capability target overrides.
+Repeated `--target capability=path` values arrive as an ordered array while a
+single value remains scalar; duplicate capabilities resolve to the last path.
 
 ```ts
 import {

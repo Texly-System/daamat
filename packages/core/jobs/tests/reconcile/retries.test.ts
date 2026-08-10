@@ -10,20 +10,20 @@ describe("job retry reconciliation", () => {
     const future = await queuedRun();
     const otherQueue = await queuedRun();
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"='retry_wait',
+      `UPDATE "damat"."_damat_job_runs" SET "status"='retry_wait',
        "available_at"=CASE WHEN "id"=$1 THEN NOW()-INTERVAL '1 second'
        ELSE NOW()+INTERVAL '1 hour' END WHERE "id"=ANY($2::uuid[])`,
       [due.run.id, [due.run.id, future.run.id]],
     );
     await pool.query(
-      `UPDATE "_damat_job_runs" SET "status"='retry_wait',
+      `UPDATE "damat"."_damat_job_runs" SET "status"='retry_wait',
        "available_at"=NOW()-INTERVAL '1 second' WHERE "id"=$1`,
       [otherQueue.run.id],
     );
 
     expect(await reconcileJobRetries({ limit: 10, queue: due.queue })).toBe(1);
     const states = await pool.query(
-      `SELECT "id","status" FROM "_damat_job_runs" WHERE "id"=ANY($1::uuid[])`,
+      `SELECT "id","status" FROM "damat"."_damat_job_runs" WHERE "id"=ANY($1::uuid[])`,
       [[due.run.id, future.run.id]],
     );
     expect(states.rows.find(({ id }) => id === due.run.id)?.status).toBe(
@@ -33,7 +33,7 @@ describe("job retry reconciliation", () => {
       "retry_wait",
     );
     const isolated = await pool.query(
-      `SELECT "status" FROM "_damat_job_runs" WHERE "id"=$1`,
+      `SELECT "status" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
       [otherQueue.run.id],
     );
     expect(isolated.rows[0]!.status).toBe("retry_wait");

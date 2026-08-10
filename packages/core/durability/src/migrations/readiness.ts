@@ -1,6 +1,7 @@
 import { DurableInfrastructureNotMigratedError } from "../errors";
 import type { DurabilityExecutor } from "../client/types";
 import type { SystemMigration } from "./types";
+import { damatRelation } from "./relocation";
 
 interface AppliedSystemMigration {
   owner: string;
@@ -24,7 +25,7 @@ export async function assertSystemMigrationsApplied(
   try {
     const result = await executor.query<AppliedSystemMigration>(
       `SELECT module AS owner, name AS id
-       FROM "_damat_migration_logs"
+       FROM ${damatRelation("_damat_migration_logs")}
        WHERE status = 'applied'`,
     );
     applied = result.rows;

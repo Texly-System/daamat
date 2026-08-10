@@ -5,6 +5,7 @@ import { events003 } from "./events-003";
 import { events004 } from "./events-004";
 import { events005 } from "./events-005";
 import { events006 } from "./events-006";
+import { events007 } from "./events-007";
 
 export const eventsSystemMigrations: SystemMigrationCatalog = {
   owner: "@damatjs/events",
@@ -15,5 +16,6 @@ export const eventsSystemMigrations: SystemMigrationCatalog = {
     events004,
     events005,
     events006,
+    events007,
   ],
 };

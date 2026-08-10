@@ -25,40 +25,43 @@ export function generateTableScaffold(
     routeDir,
     routeIdDir,
   });
-  const files: Array<[string, string]> = [
-    [
-      join(stepsDir, `create${n.pascal}.ts`),
-      T.stepCreate(n, paths.typesFromStep),
-    ],
-    [
-      join(stepsDir, `update${n.pascal}.ts`),
-      T.stepUpdate(n, paths.typesFromStep),
-    ],
-    [
-      join(stepsDir, `delete${n.pascal}.ts`),
-      T.stepDelete(n, paths.typesFromStep),
-    ],
-    [join(stepsDir, `find${n.pascal}.ts`), T.stepFind(n, paths.typesFromStep)],
-    [
-      join(stepsDir, `findMany${n.pascal}.ts`),
-      T.stepFindMany(n, paths.typesFromStep),
-    ],
-    [
-      join(workflowsDir, `create${n.pascal}.ts`),
-      T.workflowCreate(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
-    ],
-    [
-      join(workflowsDir, `update${n.pascal}.ts`),
-      T.workflowUpdate(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
-    ],
-    [
-      join(workflowsDir, `delete${n.pascal}.ts`),
-      T.workflowDelete(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
-    ],
-    [
-      join(workflowsDir, `find${n.pascal}.ts`),
-      T.workflowFind(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
-    ],
+  const files: Array<[string, string]> = [];
+  files.push([
+    join(stepsDir, `create${n.pascal}.ts`),
+    T.stepCreate(n, paths.typesFromStep),
+  ]);
+  if (n.supportsById) {
+    files.push(
+      [join(stepsDir, `update${n.pascal}.ts`), T.stepUpdate(n, paths.typesFromStep)],
+      [join(stepsDir, `delete${n.pascal}.ts`), T.stepDelete(n, paths.typesFromStep)],
+      [join(stepsDir, `find${n.pascal}.ts`), T.stepFind(n, paths.typesFromStep)],
+    );
+  }
+  files.push([
+    join(stepsDir, `findMany${n.pascal}.ts`),
+    T.stepFindMany(n, paths.typesFromStep),
+  ]);
+  files.push([
+    join(workflowsDir, `create${n.pascal}.ts`),
+    T.workflowCreate(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
+  ]);
+  if (n.supportsById) {
+    files.push(
+      [
+        join(workflowsDir, `update${n.pascal}.ts`),
+        T.workflowUpdate(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
+      ],
+      [
+        join(workflowsDir, `delete${n.pascal}.ts`),
+        T.workflowDelete(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
+      ],
+      [
+        join(workflowsDir, `find${n.pascal}.ts`),
+        T.workflowFind(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
+      ],
+    );
+  }
+  files.push(
     [
       join(workflowsDir, `findMany${n.pascal}.ts`),
       T.workflowFindMany(n, paths.typesFromWorkflow, paths.stepsFromWorkflow),
@@ -77,17 +80,21 @@ export function generateTableScaffold(
     ],
     [join(routeDir, "middleware.ts"), T.routeMiddleware()],
     [join(routeDir, "route.ts"), T.routeCollectionRoute()],
-    [
-      join(routeIdDir, "api.ts"),
-      T.routeIdApi(n, paths.workflowFromRouteId, paths.typesFromRouteId),
-    ],
-    [
-      join(routeIdDir, "validator.ts"),
-      T.routeIdValidator(n, paths.typesFromRouteId),
-    ],
-    [join(routeIdDir, "middleware.ts"), T.routeMiddleware()],
-    [join(routeIdDir, "route.ts"), T.routeIdRoute()],
-  ];
+  );
+  if (n.supportsById) {
+    files.push(
+      [
+        join(routeIdDir, "api.ts"),
+        T.routeIdApi(n, paths.workflowFromRouteId, paths.typesFromRouteId),
+      ],
+      [
+        join(routeIdDir, "validator.ts"),
+        T.routeIdValidator(n, paths.typesFromRouteId),
+      ],
+      [join(routeIdDir, "middleware.ts"), T.routeMiddleware()],
+      [join(routeIdDir, "route.ts"), T.routeIdRoute()],
+    );
+  }
   const write = writeOnce(result);
   for (const [path, content] of files) write(path, content);
 }

@@ -42,7 +42,7 @@ async function retryLocked(
   actor: WorkActor,
 ): Promise<RetryResult> {
   const locked = await executor.query<DurableEventDeliveryRow>(
-    `SELECT * FROM "_damat_event_deliveries" WHERE "id"=$1 FOR UPDATE`,
+    `SELECT * FROM "damat"."_damat_event_deliveries" WHERE "id"=$1 FOR UPDATE`,
     [id],
   );
   const current = locked.rows[0];
@@ -56,7 +56,7 @@ async function retryLocked(
     name: string;
     retention_ms: string | null;
   }>(
-    `SELECT "name","retention_ms" FROM "_damat_event_outbox"
+    `SELECT "name","retention_ms" FROM "damat"."_damat_event_outbox"
      WHERE "id"=$1 FOR UPDATE`,
     [current.event_id],
   );

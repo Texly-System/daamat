@@ -69,6 +69,24 @@ Code definitions have stable version labels and checksums. Reusing a version
 label with a changed graph fails startup instead of rewriting running or
 historical instances.
 
+## Pre-arm an event completion wait
+
+An `event.wait` starts its durable-event history at the creation of its node
+execution. Correlation filters that history but does not move the boundary
+backward, so a matching event published before the wait execution exists is
+not consumed. For start-work/await-completion flows, fork the wait and work
+branches before publishing the completion event, then require both branches at
+an `all` join:
+
+```text
+fork ──> event.wait(completion, correlation) ──┐
+  └──> work ──> event.publish(completion) ─────┴──> join(all)
+```
+
+This makes the event wait durable and correlated without relying on an earlier
+fact. If an earlier-history boundary is needed, that must be an additive API;
+the current graph contract does not provide one.
+
 ---
 
 Prev: [← Durable pipelines](./10c-pipelines.md) · [Guide home](../GUIDE.md) · Next: [Start and signal a run →](./10da-pipeline-runtime-and-signals.md)

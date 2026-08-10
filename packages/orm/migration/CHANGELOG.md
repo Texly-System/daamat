@@ -1,5 +1,23 @@
 # @damatjs/orm-migration
 
+## 1.0.6
+
+### Patch Changes
+
+- Move framework-owned PostgreSQL infrastructure into the dedicated `damat`
+  schema with data-preserving forward migrations and fully qualified runtime SQL.
+- Implement native pgvector columns, extension-aware migrations, exact vector
+  validation and serialization, vector indexes, and nearest-neighbor queries.
+- Updated dependencies
+- Updated dependencies
+  - @damatjs/durability@1.0.6
+  - @damatjs/deps@1.0.6
+  - @damatjs/orm-model@1.0.6
+  - @damatjs/orm-processor@1.0.6
+  - @damatjs/orm-type@1.0.6
+  - @damatjs/logger@1.0.6
+  - @damatjs/types@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

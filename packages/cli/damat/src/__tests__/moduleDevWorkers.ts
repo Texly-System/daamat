@@ -10,7 +10,7 @@ async function workerRows(databaseUrl: string): Promise<WorkerRow[]> {
   const pool = new Pool({ connectionString: databaseUrl });
   try {
     const result = await pool.query<WorkerRow>(
-      `SELECT "id", "stopping_at", "stopped_at" FROM "_damat_workers"`,
+      `SELECT "id", "stopping_at", "stopped_at" FROM "damat"."_damat_workers"`,
     );
     return result.rows;
   } finally {

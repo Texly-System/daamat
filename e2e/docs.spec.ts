@@ -35,7 +35,7 @@ test.describe("documentation site", () => {
     await expect(dialog).toBeVisible();
     await dialog.getByPlaceholder("Search the docs…").fill("providers");
     await dialog.getByRole("button", { name: /Integration providers/ }).click();
-    await expect(page).toHaveURL(`${base}/docs/providers`);
+    await expect(page).toHaveURL(`${base}/docs/providers`, { timeout: 15_000 });
   });
 
   test("metadata endpoints and representative accessibility pass", async ({

@@ -10,6 +10,7 @@ and `@damatjs/orm-cli` are built on — it is not the `damat` command itself.
 
 | Version | Summary                                                                                                                                         | Upgrade notes         |
 | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------- |
+| 1.0.6   | Repeatable command options preserve repeated values and coerce each array element by its declared type                                         | [1.0.6 →](./1.0.6.md) |
 | 1.0.4   | Strict nested help and option parsing, including literal arguments after `--`                                                                    | [1.0.4 →](./1.0.4.md) |
 | 1.0.3   | Verbose handled errors contain one summary followed by one stack                                                                                | [1.0.3 →](./1.0.3.md) |
 | 1.0.2   | Global verbose options are consumed before leaf, default, and parent/child dispatch                                                             | [1.0.2 →](./1.0.2.md) |

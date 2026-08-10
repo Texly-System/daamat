@@ -1,5 +1,18 @@
 # @damatjs/events
 
+## 1.0.6
+
+### Patch Changes
+
+- Move framework-owned PostgreSQL infrastructure into the dedicated `damat`
+  schema with data-preserving forward migrations and fully qualified runtime SQL.
+- Updated dependencies
+- Updated dependencies
+  - @damatjs/durability@1.0.6
+  - @damatjs/deps@1.0.6
+  - @damatjs/redis@1.0.6
+  - @damatjs/logger@1.0.6
+
 ## 1.0.5
 
 ### Patch Changes

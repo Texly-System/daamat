@@ -9,7 +9,7 @@ export async function findJobAttempts(
   executor?: DurabilityExecutor,
 ): Promise<JobAttempt[]> {
   const result = await jobExecutor(executor).query<JobAttemptRow>(
-    `SELECT * FROM "_damat_job_attempts"
+    `SELECT * FROM "damat"."_damat_job_attempts"
      WHERE "run_id" = $1 ORDER BY "attempt_number" ASC`,
     [runId],
   );

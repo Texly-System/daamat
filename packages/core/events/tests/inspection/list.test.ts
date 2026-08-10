@@ -11,13 +11,13 @@ beforeEach(resetInspectionStorage);
 test("lists event-level delivery counts and orthogonal recovered state", async () => {
   const seeded = await seedEvent(["alpha", "beta"]);
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"=CASE "consumer"
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"=CASE "consumer"
        WHEN 'alpha' THEN 'running' ELSE 'retry_wait' END
      WHERE "event_id"=$1`,
     [seeded.event.id],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_activity" ("event_id","type")
+    `INSERT INTO "damat"."_damat_event_activity" ("event_id","type")
      VALUES ($1,'lease_recovered')`,
     [seeded.event.id],
   );

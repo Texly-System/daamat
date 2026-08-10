@@ -16,7 +16,7 @@ export async function heartbeatJobClaim(
   const executor = options.executor ?? options.client ?? getDurabilityClient();
   const result = await executor.query<{ cancellation_requested: boolean }>(
     `WITH run AS (
-       UPDATE "_damat_job_runs" SET
+       UPDATE "damat"."_damat_job_runs" SET
          "heartbeat_at" = NOW(),
          "lease_expires_at" = NOW()+($4*INTERVAL '1 ms'),
          "updated_at" = NOW()
@@ -25,7 +25,7 @@ export async function heartbeatJobClaim(
          AND "lease_expires_at" > NOW()
        RETURNING "cancellation_requested_at" IS NOT NULL
          AS "cancellation_requested")
-     UPDATE "_damat_job_attempts" a SET "heartbeat_at" = NOW()
+     UPDATE "damat"."_damat_job_attempts" a SET "heartbeat_at" = NOW()
      FROM run WHERE a."run_id" = $1 AND a."attempt_number" = $5
      RETURNING run."cancellation_requested"`,
     [

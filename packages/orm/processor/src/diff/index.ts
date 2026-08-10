@@ -7,6 +7,7 @@
 export * as columnsDiff from "./columns";
 export * as diffSchemas from "./diffSchemas";
 export * as enumsDiff from "./enums";
+export * as extensionsDiff from "./extensions";
 export * as foreignKeysDiff from "./foreignKeys";
 export * as indexesDiff from "./indexes";
 export * as priorityDiff from "./priority";

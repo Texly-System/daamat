@@ -20,7 +20,7 @@ export async function updateJobSchedule(
         ? initialScheduleOccurrence(input.schedule)
         : null;
       const result = await executor.query<JobScheduleRow>(
-        `UPDATE "_damat_job_schedules" SET
+        `UPDATE "damat"."_damat_job_schedules" SET
         "enabled"=COALESCE($2::boolean,"enabled"),
         "payload"=COALESCE($3::jsonb,"payload"),
         "metadata"=COALESCE($4::jsonb,"metadata"),

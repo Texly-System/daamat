@@ -34,7 +34,7 @@ test("transaction rollback leaves no acceleration signal", async () => {
     }),
   ).rejects.toThrow("roll back signal");
   const result = await context.pool.query(
-    `SELECT 1 FROM "_damat_acceleration_outbox" WHERE "resource_id"=$1`,
+    `SELECT 1 FROM "damat"."_damat_acceleration_outbox" WHERE "resource_id"=$1`,
     [resourceId],
   );
   expect(result.rowCount).toBe(0);
@@ -60,7 +60,7 @@ test("released relay claims replay and settle idempotently", async () => {
   expect(await markAccelerationSignalPublished(replay)).toBeTrue();
   expect(await markAccelerationSignalPublished(replay)).toBeFalse();
   const result = await context.pool.query(
-    `SELECT "published_at","attempts" FROM "_damat_acceleration_outbox" WHERE "id"=$1`,
+    `SELECT "published_at","attempts" FROM "damat"."_damat_acceleration_outbox" WHERE "id"=$1`,
     [id],
   );
   expect(result.rows[0].published_at).toBeInstanceOf(Date);

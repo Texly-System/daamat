@@ -10,6 +10,8 @@ import { moduleCliCapability } from "@damatjs/cli-module";
 and accept registry refs, paths, directories, Git, npm, and tarballs. Source is
 stable and editable. Node and Damat package storage are explicit early-alpha
 modes requiring `--experimental-package`.
+Installation targets may be overridden repeatedly, for example
+`--target routes=src/http --target jobs=src/workers`.
 
 The installer owns only files it adds. It never edits `damat.config.ts`,
 `tsconfig.json`, `.env*`, barrels, or call sites; commands report that work for
@@ -39,6 +41,9 @@ both `.env.example` and ignored `.env`, installs dependencies, creates the
 module development database, and applies that module's migrations. Its
 `database:setup` command is intentionally module-scoped: a backend remains the
 owner of shared durability, jobs, durable-event, and pipeline catalogs.
+Initialization also creates a `main` Git repository and initial commit by
+default. Pass `--no-git` to skip the Git probe and all repository commands;
+missing Git or setup failures warn while preserving the complete scaffold.
 
 `module dev` owns development preflight and lifecycle. It loads the environment
 and normalized capability plan, rejects an occupied fixed port before creating

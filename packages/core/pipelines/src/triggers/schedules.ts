@@ -12,10 +12,10 @@ export async function processDuePipelineSchedules(
 ): Promise<number> {
   const due = await executor.query<DueScheduleRow>(
     `SELECT s."version_id",s."trigger_id",s."next_at",d."name",v."manifest"
-     FROM "_damat_pipeline_schedules" s
-     JOIN "_damat_pipeline_versions" v ON v."id"=s."version_id"
-     JOIN "_damat_pipeline_definitions" d ON d."active_version_id"=v."id"
-     JOIN "_damat_pipeline_trigger_controls" c ON c."version_id"=s."version_id"
+     FROM "damat"."_damat_pipeline_schedules" s
+     JOIN "damat"."_damat_pipeline_versions" v ON v."id"=s."version_id"
+     JOIN "damat"."_damat_pipeline_definitions" d ON d."active_version_id"=v."id"
+     JOIN "damat"."_damat_pipeline_trigger_controls" c ON c."version_id"=s."version_id"
        AND c."trigger_id"=s."trigger_id"
      WHERE s."enabled" AND c."enabled" AND s."next_at"<=NOW()
      ORDER BY s."next_at" FOR UPDATE OF s SKIP LOCKED LIMIT $1`,
@@ -57,7 +57,7 @@ async function runOccurrence(
     run.id,
   );
   await executor.query(
-    `UPDATE "_damat_pipeline_schedules" SET "last_at"=$3,"next_at"=$4,"updated_at"=NOW()
+    `UPDATE "damat"."_damat_pipeline_schedules" SET "last_at"=$3,"next_at"=$4,"updated_at"=NOW()
      WHERE "version_id"=$1 AND "trigger_id"=$2`,
     [
       row.version_id,

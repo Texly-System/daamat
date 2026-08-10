@@ -7,6 +7,7 @@ import {
   writeConfig,
 } from "./fixture";
 import { systemMigrationKeys } from "./systemMigrationKeys";
+import { eventSystemMigrations } from "../systemMigrationExpectations";
 
 setupMigrateFixture();
 
@@ -18,17 +19,5 @@ test.serial("status reports durable event system migrations", async () => {
   expect((await (await loadStatus()).handler(context().ctx)).exitCode).toBe(0);
   expect(
     systemMigrationKeys(state.statusArgs.options.systemMigrations),
-  ).toEqual([
-    "@damatjs/durability:001",
-    "@damatjs/durability:002",
-    "@damatjs/durability:003",
-    "@damatjs/durability:004",
-    "@damatjs/durability:005",
-    "@damatjs/events:001",
-    "@damatjs/events:002",
-    "@damatjs/events:003",
-    "@damatjs/events:004",
-    "@damatjs/events:005",
-    "@damatjs/events:006",
-  ]);
+  ).toEqual(eventSystemMigrations);
 });

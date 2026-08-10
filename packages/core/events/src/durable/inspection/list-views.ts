@@ -5,7 +5,7 @@ export function eventViewExpressions(
   now: string,
 ): Record<EventOperationalView, string> {
   const delivery = (value: string) =>
-    `EXISTS (SELECT 1 FROM "_damat_event_deliveries" v
+    `EXISTS (SELECT 1 FROM "damat"."_damat_event_deliveries" v
       WHERE v."event_id"=o."id" AND ${value})`;
   return {
     upcoming: `(o."routed_at" IS NULL OR o."available_at">${now} OR ${delivery(

@@ -21,8 +21,12 @@ export interface CrudNames {
   fileBase: string;
   /** PascalCase of the table (mirrors codegen's `toPascalCase`). */
   pascal: string;
-  /** Primary key column name (defaults to `id`). */
+  /** Primary key column name for a single-key table (defaults to `id`). */
   pk: string;
+  /** Primary key columns, including columns from a composite constraint. */
+  pkColumns: string[];
+  /** Whether generated find/update/delete-by-id CRUD is supported. */
+  supportsById: boolean;
   // Generated type names (from `types/<fileBase>.ts`)
   rowType: string;
   newType: string;

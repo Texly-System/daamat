@@ -6,6 +6,10 @@ The package consumes `ModuleSchema` values from `@damatjs/orm-type` and returns
 source strings or deterministic in-memory file maps. It performs no filesystem
 I/O, model discovery, framework integration, or database access.
 
+Native pgvector columns are rendered as `number[]`. `vector(dimensions)` and
+`halfVector(dimensions)` schemas generate finite-number validators with the
+declared exact length; missing or invalid dimensions fail generation.
+
 ## Install
 
 ```bash

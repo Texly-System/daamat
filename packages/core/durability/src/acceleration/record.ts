@@ -1,6 +1,7 @@
 import { getDurabilityClient } from "../client/global";
 import { registerAfterCommit } from "../client/transactional";
 import { requestAccelerationFlush } from "./controller";
+import { damatRelation } from "../migrations/relocation";
 import type { AccelerationSignalInput } from "./types";
 
 export async function recordAccelerationSignal(
@@ -9,7 +10,7 @@ export async function recordAccelerationSignal(
   const id = crypto.randomUUID();
   const executor = input.executor ?? getDurabilityClient();
   await executor.query(
-    `INSERT INTO "_damat_acceleration_outbox"
+    `INSERT INTO ${damatRelation("_damat_acceleration_outbox")}
       ("id","topic","resource_kind","resource_id","scope","payload","available_at")
      VALUES ($1,$2,$3,$4,$5,$6::jsonb,$7)`,
     [

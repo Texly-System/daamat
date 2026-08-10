@@ -10,7 +10,7 @@ export async function claimCandidate(
 ): Promise<ClaimedJobRun> {
   const token = createLeaseToken();
   const updated = await executor.query(
-    `UPDATE "_damat_job_runs" SET "status" = 'running',
+    `UPDATE "damat"."_damat_job_runs" SET "status" = 'running',
        "attempt_count" = "attempt_count" + 1, "lease_owner" = $2,
        "lease_token" = $3, "lease_expires_at" = NOW()+($4*INTERVAL '1 ms'),
        "heartbeat_at" = NOW(), "started_at" = COALESCE("started_at",NOW()),
@@ -19,7 +19,7 @@ export async function claimCandidate(
   );
   const claim = mapClaimedJob(updated.rows[0] as never);
   await executor.query(
-    `INSERT INTO "_damat_job_attempts"
+    `INSERT INTO "damat"."_damat_job_attempts"
        ("run_id","attempt_number","worker_id","lease_token","started_at",
         "available_at","heartbeat_at","wait_ms")
      VALUES ($1,$2,$3,$4,NOW(),$5::timestamptz,NOW(),

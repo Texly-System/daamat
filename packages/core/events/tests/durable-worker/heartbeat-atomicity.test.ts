@@ -22,7 +22,7 @@ test("attempt identity failure rolls back delivery heartbeat extension", async (
   });
   const before = await leaseTimes(item.id);
   await pool.query(
-    `UPDATE "_damat_event_delivery_attempts" SET "lease_token"=$2
+    `UPDATE "damat"."_damat_event_delivery_attempts" SET "lease_token"=$2
      WHERE "delivery_id"=$1 AND "attempt_number"=1`,
     [item.id, crypto.randomUUID()],
   );
@@ -40,7 +40,7 @@ async function leaseTimes(id: string) {
   return (
     await pool.query(
       `SELECT "heartbeat_at","lease_expires_at"
-     FROM "_damat_event_deliveries" WHERE "id"=$1`,
+     FROM "damat"."_damat_event_deliveries" WHERE "id"=$1`,
       [id],
     )
   ).rows[0];

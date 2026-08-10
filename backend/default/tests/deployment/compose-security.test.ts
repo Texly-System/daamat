@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 const root = join(import.meta.dir, "../..", "../..");
+const dockerignore = readFileSync(join(root, ".dockerignore"), "utf8");
 const compose = readFileSync(
   join(root, "backend/default/docker-compose.yml"),
   "utf8",
@@ -37,11 +38,33 @@ test("hardens application containers and binds HTTP locally", () => {
   expect(compose).toContain("${METRICS_TOKEN:?set METRICS_TOKEN}");
 });
 
+test("excludes generated secrets and browser artifacts from image builds", () => {
+  for (const ignored of [
+    "**/.env.*",
+    "**/playwright-report",
+    "**/test-results",
+  ])
+    expect(dockerignore).toContain(ignored);
+});
+
 test("separates bootstrap, migration, runtime, and backup database roles", () => {
   for (const name of ["damat_migrator", "damat_runtime", "damat_backup"])
     expect(roles).toContain(`CREATE ROLE ${name}`);
   expect(roles).toContain("NOSUPERUSER NOCREATEDB NOCREATEROLE");
   expect(roles).toContain("REVOKE CREATE ON SCHEMA public FROM PUBLIC");
+  expect(roles).toContain("CREATE SCHEMA damat AUTHORIZATION damat_migrator");
+  expect(roles).toContain(
+    "GRANT USAGE ON SCHEMA public TO damat_runtime, damat_backup",
+  );
+  expect(roles).toContain(
+    "GRANT USAGE ON SCHEMA damat TO damat_runtime, damat_backup",
+  );
+  expect(roles).toContain(
+    "ALTER DEFAULT PRIVILEGES FOR ROLE damat_migrator IN SCHEMA damat",
+  );
+  expect(roles).toContain(
+    "GRANT USAGE, SELECT, UPDATE ON SEQUENCES TO damat_runtime",
+  );
   expect(compose).not.toContain("postgresql://postgres:");
   expect(service("db")).not.toContain("ports:");
 });

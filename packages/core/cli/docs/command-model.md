@@ -110,5 +110,7 @@ results do not require one.
 ## Options
 
 `CommandOption` supports a long name, optional alias, description, type,
-default, and required marker. Supported coercion types are `string`, `number`,
-and `boolean`; `--no-<name>` negates known boolean options.
+default, required marker, and an optional `repeatable` marker. Repeatable
+options keep one occurrence scalar and accumulate a second and later occurrence
+in order. Supported coercion types are `string`, `number`, and `boolean`;
+`--no-<name>` negates known boolean options.

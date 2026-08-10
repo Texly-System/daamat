@@ -7,7 +7,7 @@ export async function assertCurrentEventDeliveryLease(
   claim: ClaimedEventDelivery,
 ): Promise<void> {
   const result = await executor.query(
-    `SELECT 1 FROM "_damat_event_deliveries"
+    `SELECT 1 FROM "damat"."_damat_event_deliveries"
      WHERE "id"=$1 AND "event_id"=$4 AND "consumer"=$5
        AND "status"='running' AND "lease_owner"=$2 AND "lease_token"=$3
        AND "lease_expires_at">NOW() FOR UPDATE`,

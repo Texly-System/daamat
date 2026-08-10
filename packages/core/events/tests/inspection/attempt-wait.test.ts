@@ -14,7 +14,7 @@ test("attempt waits and retry schedules remain complete across retries", async (
   const delivery = seeded.deliveries[0]!;
   for (const wait of [100, 200]) {
     await pool.query(
-      `UPDATE "_damat_event_deliveries" SET "status"='pending',
+      `UPDATE "damat"."_damat_event_deliveries" SET "status"='pending',
          "available_at"=NOW()-($2*INTERVAL '1 ms') WHERE "id"=$1`,
       [delivery.id, wait],
     );
@@ -27,7 +27,7 @@ test("attempt waits and retry schedules remain complete across retries", async (
     await completeEventDeliveryFailure(claim!, new Error(`failure-${wait}`));
   }
   await pool.query(
-    `INSERT INTO "_damat_event_delivery_attempts"
+    `INSERT INTO "damat"."_damat_event_delivery_attempts"
        ("delivery_id","attempt_number","worker_id","lease_token")
      VALUES ($1,99,'legacy',$2)`,
     [delivery.id, crypto.randomUUID()],

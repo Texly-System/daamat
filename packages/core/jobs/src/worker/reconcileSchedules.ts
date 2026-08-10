@@ -34,7 +34,7 @@ async function reconcile(
   queue?: string,
 ): Promise<ScheduleReconcileResult> {
   const result = await executor.query<JobScheduleRow>(
-    `SELECT * FROM "_damat_job_schedules"
+    `SELECT * FROM "damat"."_damat_job_schedules"
      WHERE "enabled"=TRUE AND "next_occurrence_at" <= NOW()
        AND ($2::text IS NULL OR "queue"=$2)
      ORDER BY "next_occurrence_at","id" FOR UPDATE SKIP LOCKED LIMIT $1`,

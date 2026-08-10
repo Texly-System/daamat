@@ -1,7 +1,7 @@
 {
   "name": "@damatjs/events",
   "description": "Typed ephemeral subscriptions and transactional PostgreSQL durable events for Damat apps",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -48,7 +48,7 @@
   "scripts": {
     "build": "rm -rf tsconfig.tsbuildinfo dist && tsc",
     "watch": "tsc --watch",
-    "test": "bun ../../../scripts/test/package.ts DAMAT_EVENTS_DATABASE_URL --max-concurrency=1",
+    "test": "bun ../../../scripts/test/package.ts DAMAT_EVENTS_DATABASE_URL --max-concurrency=1 --timeout=30000",
     "lint": "oxlint src",
     "prepublishOnly": "test -f dist/index.js || (echo 'Error: dist/index.js not found. Run bun run build first.' && exit 1)"
   }

@@ -32,20 +32,20 @@ test("metadata detail keeps operational errors and schedule history", async () =
     concurrency: 1,
   });
   await pool.query(
-    `UPDATE "_damat_job_runs" SET "status"='dead_lettered',"attempt_count"=1,
+    `UPDATE "damat"."_damat_job_runs" SET "status"='dead_lettered',"attempt_count"=1,
      "schedule_id"=$2,"scheduled_for"=NOW(),"progress"='{"token":"p"}',
      "result"='{"token":"r"}',"last_error"='{"token":"e"}',
      "completed_at"=NOW() WHERE "id"=$1`,
     [run.id, schedule.id],
   );
   await pool.query(
-    `INSERT INTO "_damat_job_attempts"
+    `INSERT INTO "damat"."_damat_job_attempts"
      ("run_id","attempt_number","worker_id","lease_token","result","error")
      VALUES ($1,1,$2,$3,'{"token":"result"}','{"token":"error"}')`,
     [run.id, worker, token],
   );
   await pool.query(
-    `INSERT INTO "_damat_job_schedule_activity"
+    `INSERT INTO "damat"."_damat_job_schedule_activity"
      ("schedule_id","type","metadata","actor")
      VALUES ($1,'updated','{"token":"activity"}',
        '{"id":"actor","type":"user","metadata":{"token":"actor"}}')`,

@@ -27,7 +27,7 @@ export async function listDurableEventDeliveryAttempts(
   executor?: DurabilityExecutor,
 ): Promise<DurableEventDeliveryAttempt[]> {
   const result = await eventExecutor(executor).query<EventDeliveryAttemptRow>(
-    `SELECT * FROM "_damat_event_delivery_attempts"
+    `SELECT * FROM "damat"."_damat_event_delivery_attempts"
      WHERE "delivery_id"=$1 ORDER BY "attempt_number"`,
     [deliveryId],
   );
@@ -39,7 +39,7 @@ export async function listEventDeliveryAttemptsBatch(
   executor: DurabilityExecutor,
 ): Promise<DurableEventDeliveryAttempt[]> {
   const result = await executor.query<EventDeliveryAttemptRow>(
-    `SELECT * FROM "_damat_event_delivery_attempts"
+    `SELECT * FROM "damat"."_damat_event_delivery_attempts"
      WHERE "delivery_id"=ANY($1::uuid[])
      ORDER BY "delivery_id","attempt_number"`,
     [deliveryIds],

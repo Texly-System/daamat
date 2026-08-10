@@ -22,7 +22,7 @@ describe("idempotency retention", () => {
     const scope = `cleanup:${crypto.randomUUID()}`;
     for (const key of ["one", "two"]) {
       await context.pool.query(
-        `INSERT INTO "_damat_idempotency_keys"
+        `INSERT INTO "damat"."_damat_idempotency_keys"
          ("scope","key","status","expires_at")
          VALUES ($1,$2,'completed',NOW()-INTERVAL '1 second')`,
         [scope, key],
@@ -30,12 +30,12 @@ describe("idempotency retention", () => {
     }
     expect(await cleanupExpiredIdempotency({ limit: 1 })).toBe(1);
     const remaining = await context.pool.query(
-      `SELECT 1 FROM "_damat_idempotency_keys" WHERE "scope"=$1`,
+      `SELECT 1 FROM "damat"."_damat_idempotency_keys" WHERE "scope"=$1`,
       [scope],
     );
     expect(remaining.rowCount).toBe(1);
     await context.pool.query(
-      `DELETE FROM "_damat_idempotency_keys" WHERE "scope"=$1`,
+      `DELETE FROM "damat"."_damat_idempotency_keys" WHERE "scope"=$1`,
       [scope],
     );
   });

@@ -3,6 +3,11 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { loadSystemMigrations } from "../cli/utils/load";
+import {
+  eventSystemMigrations,
+  jobEventSystemMigrations,
+  jobSystemMigrations,
+} from "./systemMigrationExpectations";
 
 const roots: string[] = [];
 
@@ -25,17 +30,7 @@ async function load(services: string) {
 test("selects shared then jobs migrations when jobs are enabled", async () => {
   expect(
     (await load("jobs: {}")).map(({ owner, id }) => `${owner}:${id}`),
-  ).toEqual([
-    "@damatjs/durability:001",
-    "@damatjs/durability:002",
-    "@damatjs/durability:003",
-    "@damatjs/durability:004",
-    "@damatjs/durability:005",
-    "@damatjs/jobs:001",
-    "@damatjs/jobs:002",
-    "@damatjs/jobs:003",
-    "@damatjs/jobs:004",
-  ]);
+  ).toEqual(jobSystemMigrations);
 });
 
 test("selects shared then events migrations for durable events", async () => {
@@ -43,41 +38,13 @@ test("selects shared then events migrations for durable events", async () => {
     (await load("events: { durable: {} }")).map(
       ({ owner, id }) => `${owner}:${id}`,
     ),
-  ).toEqual([
-    "@damatjs/durability:001",
-    "@damatjs/durability:002",
-    "@damatjs/durability:003",
-    "@damatjs/durability:004",
-    "@damatjs/durability:005",
-    "@damatjs/events:001",
-    "@damatjs/events:002",
-    "@damatjs/events:003",
-    "@damatjs/events:004",
-    "@damatjs/events:005",
-    "@damatjs/events:006",
-  ]);
+  ).toEqual(eventSystemMigrations);
 });
 
 test("orders shared, jobs, then events catalogs", async () => {
   expect(
     (await load("jobs: {}, events: { durable: {} }")).map(({ owner }) => owner),
-  ).toEqual([
-    "@damatjs/durability",
-    "@damatjs/durability",
-    "@damatjs/durability",
-    "@damatjs/durability",
-    "@damatjs/durability",
-    "@damatjs/jobs",
-    "@damatjs/jobs",
-    "@damatjs/jobs",
-    "@damatjs/jobs",
-    "@damatjs/events",
-    "@damatjs/events",
-    "@damatjs/events",
-    "@damatjs/events",
-    "@damatjs/events",
-    "@damatjs/events",
-  ]);
+  ).toEqual(jobEventSystemMigrations.map((key) => key.split(":")[0]));
 });
 
 test("does not select shared migrations for ordinary events", async () => {

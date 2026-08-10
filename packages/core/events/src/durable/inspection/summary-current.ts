@@ -16,27 +16,27 @@ export async function queryEventCurrentSummary(
     `SELECT
       COALESCE((SELECT jsonb_object_agg(s."status",s."total") FROM
         (SELECT "status",COUNT(*)::int AS "total"
-         FROM "_damat_event_deliveries" GROUP BY "status") s),'{}'::jsonb)
+         FROM "damat"."_damat_event_deliveries" GROUP BY "status") s),'{}'::jsonb)
         AS "status_counts",
       (SELECT MAX(w."wait_ms") FROM (
         SELECT GREATEST(0,EXTRACT(EPOCH FROM ($1-d."available_at"))*1000)
-          AS "wait_ms" FROM "_damat_event_deliveries" d
+          AS "wait_ms" FROM "damat"."_damat_event_deliveries" d
           WHERE d."status" IN ('pending','retry_wait') AND d."available_at"<=$1
         UNION ALL
         SELECT GREATEST(0,EXTRACT(EPOCH FROM ($1-o."available_at"))*1000)
-          FROM "_damat_event_outbox" o
+          FROM "damat"."_damat_event_outbox" o
           WHERE o."routed_at" IS NULL AND o."available_at"<=$1
        ) w) AS "oldest_wait_ms",
       (SELECT MIN(w."available_at") FROM (
-        SELECT "available_at" FROM "_damat_event_deliveries"
+        SELECT "available_at" FROM "damat"."_damat_event_deliveries"
           WHERE "status" IN ('pending','retry_wait')
-        UNION ALL SELECT "available_at" FROM "_damat_event_outbox"
+        UNION ALL SELECT "available_at" FROM "damat"."_damat_event_outbox"
           WHERE "routed_at" IS NULL) w) AS "next_work_at",
       COUNT(*) FILTER (WHERE d."status"='running'
         AND d."lease_expires_at">$1)::text AS "active_leases",
       COUNT(*) FILTER (WHERE d."status"='running'
         AND d."lease_expires_at"<=$1)::text AS "stale_leases"
-     FROM "_damat_event_deliveries" d`,
+     FROM "damat"."_damat_event_deliveries" d`,
     [now],
   );
   const row = result.rows[0]!;

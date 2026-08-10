@@ -17,7 +17,7 @@ test("aborting active execution stops heartbeats and preserves its lease", async
     signal = context.signal;
     await work.promise;
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
     item.run.id,
     name,
   ]);
@@ -41,7 +41,7 @@ test("aborting active execution stops heartbeats and preserves its lease", async
 
 async function heartbeatAt(runId: string): Promise<Date> {
   const result = await pool.query(
-    `SELECT "heartbeat_at" FROM "_damat_job_runs" WHERE "id"=$1`,
+    `SELECT "heartbeat_at" FROM "damat"."_damat_job_runs" WHERE "id"=$1`,
     [runId],
   );
   return result.rows[0]!.heartbeat_at;
@@ -56,7 +56,7 @@ test("a failed execution heartbeat aborts the active handler", async () => {
     signal = context.signal;
     await work.promise;
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
     item.run.id,
     name,
   ]);

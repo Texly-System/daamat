@@ -1,5 +1,6 @@
 import { getDurabilityClient } from "../client/global";
 import type { DurabilityExecutor } from "../client/types";
+import { damatRelation } from "../migrations/relocation";
 
 export interface CleanupIdempotencyOptions {
   before?: Date;
@@ -18,8 +19,8 @@ export async function cleanupExpiredIdempotency(
   }
   const executor = options.executor ?? getDurabilityClient();
   const result = await executor.query(
-    `DELETE FROM "_damat_idempotency_keys" WHERE ("scope","key") IN (
-       SELECT "scope","key" FROM "_damat_idempotency_keys"
+    `DELETE FROM ${damatRelation("_damat_idempotency_keys")} WHERE ("scope","key") IN (
+       SELECT "scope","key" FROM ${damatRelation("_damat_idempotency_keys")}
        WHERE "expires_at" IS NOT NULL AND "expires_at" <= $1
        ORDER BY "expires_at","scope","key" LIMIT $2)`,
     [options.before ?? new Date(), Math.min(limit, 500)],

@@ -1,11 +1,14 @@
 .git
 **/.damat
 **/.env
+**/.env.*
 **/.DS_Store
 **/.next
 **/coverage
 **/dist
 **/node_modules
+**/playwright-report
+**/test-results
 **/tsconfig.tsbuildinfo
 backend/default/logs
 .turbo

@@ -9,10 +9,11 @@ export const createCommand: Command = {
     "Scaffold a new Damat backend app (offline, from embedded templates)",
   aliases: ["new"],
   usage:
-    "damat create <name> [--database-url <url>] [--no-database-setup] [--no-install]",
+    "damat create <name> [--database-url <url>] [--no-database-setup] [--no-git] [--no-install]",
   examples: [
     "damat create my-api",
     "damat create my-api --database-url postgres://user:pass@localhost/my_api",
+    "damat create my-api --no-git   # scaffold without a repository",
     "damat create my-api --no-install   # scaffold only, install later",
     "damat create my-api --pin 0.6.0    # pin @damatjs/* to a specific version",
   ],

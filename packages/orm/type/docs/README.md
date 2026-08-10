@@ -15,7 +15,8 @@ type-safe.
 | `src/connection/main.ts`   | `DbConnection` — the connection abstraction interface.                                                                                       |
 | `src/connection/config.ts` | `DbPoolConfig`, `PoolStats`, `TransactionOptions`, `QueryContext`, etc.                                                                      |
 | `src/model/`               | Schema snapshot types (columns, tables, enums, FKs, constraints, indexes, relations, modules). See [schema-types.md](./schema-types.md).     |
-| `src/model/column.ts`      | `ColumnType` union + `ColumnSchema`.                                                                                                         |
+| `src/model/columnTypes.ts` | `ColumnType` union (including native `vector`/`halfvec`).                                                                                      |
+| `src/model/column.ts`      | `ColumnSchema`, including native vector `dimensions`.                                                                                           |
 | `src/model/table.ts`       | `TableSchema`.                                                                                                                               |
 | `src/model/module.ts`      | `ModuleSchema` (the schema snapshot — not the migration manifest).                                                                           |
 | `src/model/enum.ts`        | `EnumSchema`.                                                                                                                                |
@@ -74,6 +75,8 @@ independent representation used by the query builder and executor.
   aliases. The model DSL and the `pgTypeToTsBase` mapper in `@damatjs/orm-model`
   switch on these exact strings, so adding a type here means adding a case there
   too (the mapper's `switch` is exhaustive over `ColumnType`).
+- Native pgvector types are represented as `"vector"` and `"halfvec"`; their
+  dimensionality belongs in `ColumnSchema.dimensions`, never `length`.
 - **`ColumnSchema.nullable` is required; most other flags are optional.** Builders
   always set `nullable`; downstream code can rely on it being present.
 - **`ForeignKeySchema.columns` is `ForeignKeyType[]` (`{name,type}`), not

@@ -5,11 +5,13 @@ import type {
   MigrationGeneratorOptions,
 } from "../types";
 import { quoteIdentifier, qualifiedTable, resolveSchema } from "./utils";
+import {
+  renderIndexColumn,
+  renderStorageParams,
+  resolvedIndexName,
+} from "./indexFragments";
 
-/**
- * Build CREATE INDEX SQL from a raw IndexSchema (used by both table creation
- * and the change-based add_index path).
- */
+/** Build CREATE INDEX SQL for table creation and add-index changes. */
 export function generateCreateIndex(
   index: IndexSchema,
   tableName: string,
@@ -17,34 +19,20 @@ export function generateCreateIndex(
   options: MigrationGeneratorOptions,
 ): string {
   const fullTable = qualifiedTable(tableName, schema);
-  const nameToUse =
-    index.name ||
-    `${tableName}_${index.columns.map((c) => (typeof c === "string" ? c : c.name)).join("_")}_idx`;
-  const indexName = quoteIdentifier(nameToUse);
-
-  const cols = index.columns
-    .map((c) => {
-      const colName = typeof c === "string" ? c : c.name;
-      const order = typeof c === "string" ? undefined : c.order;
-      const col = quoteIdentifier(colName);
-      return order ? `${col} ${order}` : col;
-    })
-    .join(", ");
-
+  const indexName = quoteIdentifier(resolvedIndexName(tableName, index));
+  const columns = index.columns.map(renderIndexColumn).join(", ");
   const unique = index.unique ? " UNIQUE" : "";
-  const ifNotExists = options.safeMode !== false ? " IF NOT EXISTS" : "";
-  const using =
-    index.type && index.type !== "btree"
-      ? ` USING ${index.type.toUpperCase()}`
-      : "";
+  const concurrent = index.concurrently ? " CONCURRENTLY" : "";
+  const guard = options.safeMode !== false ? " IF NOT EXISTS" : "";
+  const using = index.type && index.type !== "btree"
+    ? ` USING ${index.type.toUpperCase()}`
+    : "";
+  const storage = renderStorageParams(index.with);
   const where = index.where ? ` WHERE ${index.where}` : "";
-
-  return `CREATE${unique} INDEX${ifNotExists} ${indexName} ON ${fullTable}${using} (${cols})${where}`;
+  return `CREATE${unique} INDEX${concurrent}${guard} ${indexName} ON ${fullTable}${using} (${columns})${storage}${where}`;
 }
 
-/**
- * Generate CREATE INDEX SQL from an add_index change.
- */
+/** Generate CREATE INDEX SQL from an add-index change. */
 export function generateAddIndex(
   change: AddIndexChange,
   options: MigrationGeneratorOptions,
@@ -53,16 +41,14 @@ export function generateAddIndex(
   return generateCreateIndex(change.index, change.tableName, schema, options);
 }
 
-/**
- * Generate DROP INDEX SQL.
- * PostgreSQL indexes are schema-qualified independently of the table.
- */
+/** Generate schema-qualified DROP INDEX SQL, preserving CONCURRENTLY. */
 export function generateDropIndex(
   change: DropIndexChange,
   options: MigrationGeneratorOptions,
 ): string {
   const schema = resolveSchema(options, change.schema);
-  const fullIndex = qualifiedTable(change.indexName, schema);
-  const ifExists = options.safeMode !== false ? " IF EXISTS" : "";
-  return `DROP INDEX${ifExists} ${fullIndex}`;
+  const fullIndex = `${quoteIdentifier(schema)}.${quoteIdentifier(change.indexName)}`;
+  const concurrent = change.concurrently ? " CONCURRENTLY" : "";
+  const guard = options.safeMode !== false ? " IF EXISTS" : "";
+  return `DROP INDEX${concurrent}${guard} ${fullIndex}`;
 }

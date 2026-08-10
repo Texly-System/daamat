@@ -13,7 +13,7 @@ test("detail caps control history and reports truncation", async () => {
   const seeded = await seedEvent();
   const scope = encodeEventConsumerScope(seeded.name, "alpha");
   await pool.query(
-    `INSERT INTO "_damat_work_control_activity"
+    `INSERT INTO "damat"."_damat_work_control_activity"
        ("work_kind","scope","action","actor")
      SELECT 'event',$1,CASE WHEN value % 2 = 0 THEN 'paused' ELSE 'resumed' END,
        '{"id":"operator","type":"user"}'::jsonb
@@ -32,7 +32,7 @@ test("detail keeps control history globally ordered across consumers", async () 
   const alpha = encodeEventConsumerScope(seeded.name, "alpha");
   const beta = encodeEventConsumerScope(seeded.name, "beta");
   await pool.query(
-    `INSERT INTO "_damat_work_control_activity"
+    `INSERT INTO "damat"."_damat_work_control_activity"
        ("work_kind","scope","action","actor") VALUES
        ('event',$1,'paused','{"id":"a","type":"user"}'),
        ('event',$2,'paused','{"id":"b","type":"user"}'),

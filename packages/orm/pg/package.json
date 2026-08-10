@@ -1,7 +1,7 @@
 {
   "name": "@damatjs/orm-pg",
   "description": "PostgreSQL ORM core for @damatjs - EntityManager, Repository pattern, and query execution",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -31,6 +31,7 @@
   ],
   "author": "Abel Lamesgen",
   "dependencies": {
+    "@damatjs/deps": "workspace:*",
     "@damatjs/logger": "workspace:*",
     "@damatjs/orm-core": "workspace:*",
     "@damatjs/orm-model": "workspace:*",
@@ -38,7 +39,6 @@
     "@damatjs/types": "workspace:*"
   },
   "devDependencies": {
-    "@damatjs/deps": "workspace:*",
     "@damatjs/orm-processor": "workspace:*",
     "@damatjs/typescript-config": "workspace:*",
     "@types/bun": "1.3.9",

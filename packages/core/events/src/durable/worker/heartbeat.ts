@@ -14,7 +14,7 @@ export async function heartbeatEventDelivery(
   }
   const operation = async (executor: DurabilityExecutor) => {
     const delivery = await executor.query<{ cancellation_requested: boolean }>(
-      `UPDATE "_damat_event_deliveries" SET "heartbeat_at"=NOW(),
+      `UPDATE "damat"."_damat_event_deliveries" SET "heartbeat_at"=NOW(),
        "lease_expires_at"=NOW()+($4*INTERVAL '1 ms'),"updated_at"=NOW()
        WHERE "id"=$1 AND "status"='running' AND "lease_owner"=$2
          AND "lease_token"=$3 AND "lease_expires_at">NOW()
@@ -33,7 +33,7 @@ export async function heartbeatEventDelivery(
     const row = delivery.rows[0];
     if (!row) throw new EventDeliveryLeaseLostError(claim.id);
     const attempt = await executor.query(
-      `UPDATE "_damat_event_delivery_attempts" SET "heartbeat_at"=NOW()
+      `UPDATE "damat"."_damat_event_delivery_attempts" SET "heartbeat_at"=NOW()
        WHERE "delivery_id"=$1 AND "attempt_number"=$2 AND "lease_token"=$3
          AND "finished_at" IS NULL RETURNING 1`,
       [claim.id, claim.attemptCount, claim.leaseToken],

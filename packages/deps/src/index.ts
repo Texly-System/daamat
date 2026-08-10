@@ -9,6 +9,7 @@ export * as hono from "./hono";
 export * as zod from "./zod";
 export * as effect from "./effect";
 export * as pg from "./pg";
+export * as pgvector from "./pgvector";
 export * as ioredis from "./ioredis";
 export * as nanoid from "./nanoid";
 export * as uuid from "./uuid";

@@ -12,13 +12,13 @@ test("hidden visibility omits worker application and deployment metadata", async
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `INSERT INTO "_damat_workers" ("id","capabilities","hostname","process_id",
+    `INSERT INTO "damat"."_damat_workers" ("id","capabilities","hostname","process_id",
        "application","deployment")
      VALUES ('worker-a','["events:test"]','host',1,$1::jsonb,$2::jsonb)`,
     ['{"secret":"application"}', '{"secret":"deployment"}'],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_delivery_attempts"
+    `INSERT INTO "damat"."_damat_event_delivery_attempts"
        ("delivery_id","attempt_number","worker_id","lease_token")
      VALUES ($1,1,'worker-a',$2)`,
     [delivery.id, crypto.randomUUID()],

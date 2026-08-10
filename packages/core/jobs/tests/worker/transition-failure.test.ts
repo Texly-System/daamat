@@ -14,7 +14,7 @@ test("terminal transition failures are contained after lease loss", async () => 
     await expireLease(item.run.id);
     throw new Error("handler failed after lease loss");
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
     item.run.id,
     name,
   ]);

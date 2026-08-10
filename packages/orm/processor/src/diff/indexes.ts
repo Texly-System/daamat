@@ -9,8 +9,11 @@ import { createNameMap, indexesEqual } from "./utils";
 
 function getIndexName(tableName: string, index: IndexSchema): string {
   if (index.name) return index.name;
+  if (index.columns.some((column) => typeof column !== "string" && "expression" in column)) {
+    throw new Error("Expression indexes require an explicit name");
+  }
   const cols = index.columns
-    .map((c) => (typeof c === "string" ? c : c.name))
+    .map((column) => (typeof column === "string" ? column : column.name))
     .join("_");
   return `${tableName}_${cols}_idx`;
 }
@@ -50,6 +53,7 @@ export function diffIndexes(
         type: "drop_index",
         tableName,
         indexName: name,
+        concurrently: oldIdx.concurrently,
         schema,
         priority: PRIORITY.DROP_INDEX,
       } as DropIndexChange);
@@ -70,6 +74,7 @@ export function diffIndexes(
         type: "drop_index",
         tableName,
         indexName: name,
+        concurrently: oldMap.get(name)?.concurrently,
         schema,
         priority: PRIORITY.DROP_INDEX,
       } as DropIndexChange);

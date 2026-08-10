@@ -12,7 +12,7 @@ test("paginates equal-millisecond events with a signed UUID cursor", async () =>
   const first = await seedEvent();
   const second = await seedEvent();
   await pool.query(
-    `UPDATE "_damat_event_outbox"
+    `UPDATE "damat"."_damat_event_outbox"
      SET "created_at"='2026-01-02T03:04:05.123456Z'
      WHERE "id"=ANY($1::uuid[])`,
     [[first.event.id, second.event.id]],

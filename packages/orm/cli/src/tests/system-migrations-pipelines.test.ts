@@ -3,6 +3,7 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import { loadSystemMigrations } from "../cli/utils/load";
+import { pipelineSystemMigrations } from "./systemMigrationExpectations";
 
 test("pipelines select durability and jobs before pipeline storage", async () => {
   const root = fs.mkdtempSync(path.join(os.tmpdir(), "pipeline-catalog-"));
@@ -12,19 +13,9 @@ test("pipelines select durability and jobs before pipeline storage", async () =>
       "export default { services: { pipelines: {} } }",
     );
     const migrations = await loadSystemMigrations("damat.config.ts", root);
-    expect(migrations.map(({ owner, id }) => `${owner}:${id}`)).toEqual([
-      "@damatjs/durability:001",
-      "@damatjs/durability:002",
-      "@damatjs/durability:003",
-      "@damatjs/durability:004",
-      "@damatjs/durability:005",
-      "@damatjs/jobs:001",
-      "@damatjs/jobs:002",
-      "@damatjs/jobs:003",
-      "@damatjs/jobs:004",
-      "@damatjs/pipelines:001",
-      "@damatjs/pipelines:002",
-    ]);
+    expect(migrations.map(({ owner, id }) => `${owner}:${id}`)).toEqual(
+      pipelineSystemMigrations,
+    );
   } finally {
     fs.rmSync(root, { recursive: true, force: true });
   }

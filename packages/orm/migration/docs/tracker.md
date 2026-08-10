@@ -4,14 +4,15 @@ Source: [`src/tracker/index.ts`](../src/tracker/index.ts)
 
 ## Responsibility
 
-Own the `_damat_migration_logs` table — the single source of truth for which migrations have been applied (or reverted) for each module. The `MigrationTracker` class is the only code that reads or writes this table; the executor and status layers go through it.
+Own the `damat._damat_migration_logs` table — the single source of truth for which migrations have been applied (or reverted) for each module. The `MigrationTracker` class is the only code that reads or writes this table; the executor and status layers go through it.
 
 ## `_damat_migration_logs` schema
 
-Created idempotently by `ensureTable()`:
+Created idempotently by `ensureTable()`, which also creates the `damat` schema
+and moves a legacy `public._damat_migration_logs` table transactionally:
 
 ```sql
-CREATE TABLE IF NOT EXISTS "_damat_migration_logs" (
+CREATE TABLE IF NOT EXISTS "damat"."_damat_migration_logs" (
   "id"                TEXT        PRIMARY KEY,
   "module"            TEXT        NOT NULL,
   "name"              TEXT        NOT NULL,              -- migration file name (no .sql)
@@ -21,8 +22,8 @@ CREATE TABLE IF NOT EXISTS "_damat_migration_logs" (
   "status"            TEXT        NOT NULL DEFAULT 'applied',  -- 'applied' | 'reverted'
   UNIQUE ("module", "name")
 );
-CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_module" ON "_damat_migration_logs" ("module");
-CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_status" ON "_damat_migration_logs" ("status");
+CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_module" ON "damat"."_damat_migration_logs" ("module");
+CREATE INDEX IF NOT EXISTS "idx__damat_migration_logs_status" ON "damat"."_damat_migration_logs" ("status");
 ```
 
 ### Why per-module
@@ -61,7 +62,8 @@ Returns rows with `status = 'applied'`, ordered by `applied_at` ascending. With 
 Upsert keyed on `UNIQUE (module, name)`:
 
 ```sql
-INSERT INTO "_damat_migration_logs" (id, module, name, execution_time_ms, status)
+INSERT INTO "damat"."_damat_migration_logs"
+  (id, module, name, execution_time_ms, status)
 VALUES ($1, $2, $3, $4, 'applied')
 ON CONFLICT (module, name) DO UPDATE SET
   applied_at        = NOW(),
@@ -77,7 +79,7 @@ to commit their inline SQL and tracker row atomically.
 ### `recordReverted(module, name): Promise<void>`
 
 ```sql
-UPDATE "_damat_migration_logs"
+UPDATE "damat"."_damat_migration_logs"
 SET reverted_at = NOW(), status = 'reverted'
 WHERE module = $1 AND name = $2;
 ```

@@ -13,14 +13,14 @@ test("manual retry and retention serialize child before parent", async () => {
   const seeded = await seedEvent();
   const delivery = seeded.deliveries[0]!;
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='dead_lettered',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='dead_lettered',
        "completed_at"=NOW(),"available_at"=NOW()-INTERVAL '2 hours',
        "retention_at"=NOW()-INTERVAL '1 hour'
      WHERE "id"=$1`,
     [delivery.id],
   );
   await pool.query(
-    `UPDATE "_damat_event_outbox" SET "available_at"=NOW()-INTERVAL '2 hours',
+    `UPDATE "damat"."_damat_event_outbox" SET "available_at"=NOW()-INTERVAL '2 hours',
        "retention_at"=NOW()-INTERVAL '1 hour'
      WHERE "id"=$1`,
     [seeded.event.id],

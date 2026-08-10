@@ -1,5 +1,6 @@
 import type { QueryResultRow } from "@damatjs/deps/pg";
 import { getDurabilityClient } from "../client/global";
+import { damatRelation } from "../migrations/relocation";
 import type { AccelerationMode } from "../coordinator";
 import type { AccelerationHealth } from "./types";
 
@@ -14,9 +15,9 @@ interface HealthRow extends QueryResultRow {
 
 export async function getAccelerationHealth(): Promise<AccelerationHealth> {
   const result = await getDurabilityClient().query<HealthRow>(
-    `SELECT s.*,(SELECT COUNT(*) FROM "_damat_acceleration_outbox"
+    `SELECT s.*,(SELECT COUNT(*) FROM ${damatRelation("_damat_acceleration_outbox")}
        WHERE "published_at" IS NULL) AS "pending_count"
-     FROM "_damat_acceleration_state" s WHERE "id"=TRUE`,
+     FROM ${damatRelation("_damat_acceleration_state")} s WHERE "id"=TRUE`,
   );
   const row = result.rows[0];
   if (!row) throw new Error("Acceleration state is not migrated");
@@ -42,7 +43,7 @@ export async function updateAccelerationState(input: {
   published?: boolean;
 }): Promise<void> {
   await getDurabilityClient().query(
-    `UPDATE "_damat_acceleration_state" SET "mode"=$1,
+    `UPDATE ${damatRelation("_damat_acceleration_state")} SET "mode"=$1,
        "fallback_interval_ms"=$2,
        "projection_checkpoint"=COALESCE($3,"projection_checkpoint"),
        "last_success_at"=CASE WHEN $5 THEN NOW() ELSE "last_success_at" END,

@@ -2,15 +2,9 @@ import type { Pool, PoolClient, QueryResultRow } from "@damatjs/orm-type";
 import type { ILogger } from "@damatjs/logger";
 import type { ModelDefinition } from "@damatjs/orm-model";
 import { PgModelClient } from "../client";
-import type {
-  FindOptions,
-  CreateOptions,
-  CreateManyOptions,
-  UpdateOptions,
-  DeleteOptions,
-  UpsertOptions,
-  UpsertManyOptions,
-} from "../query";
+import { repositoryCount, repositoryExists } from "./aggregates";
+import { executeNearest, type FindNearestOptions } from "./nearest";
+import type { FindOptions, CreateOptions, CreateManyOptions, UpdateOptions, DeleteOptions, UpsertOptions, UpsertManyOptions } from "../query";
 
 export interface PgRepositoryConfig {
   model: ModelDefinition;
@@ -19,10 +13,7 @@ export interface PgRepositoryConfig {
   isInTransaction?: boolean;
 }
 
-export class PgRepository<
-  T extends QueryResultRow = QueryResultRow,
-  Cols extends string = string,
-> {
+export class PgRepository<T extends QueryResultRow = QueryResultRow, Cols extends string = string> {
   protected connection: Pool | PoolClient;
   protected logger: ILogger;
   protected isInTransaction: boolean;
@@ -32,31 +23,19 @@ export class PgRepository<
     this.connection = config.connection;
     this.logger = config.logger;
     this.isInTransaction = config.isInTransaction ?? false;
-    this.client = new PgModelClient<T, Cols>(
-      config.model,
-      config.connection as Pool,
-      config.connection as PoolClient,
-    );
+    this.client = new PgModelClient<T, Cols>(config.model, config.connection as Pool, config.connection as PoolClient);
   }
 
   async findMany(opt: FindOptions<Cols> = {}): Promise<T[]> {
     return (await this.client.findMany(opt)).rows;
   }
-  async findOne(
-    opt: Omit<FindOptions<Cols>, "limit" | "offset"> = {},
-  ): Promise<T | undefined> {
+  async findOne(opt: Omit<FindOptions<Cols>, "limit" | "offset"> = {}): Promise<T | undefined> {
     return (await this.client.findOne(opt)).rows[0];
   }
-  async findById(
-    id: string,
-    opt: Omit<FindOptions<Cols>, "where"> = {},
-  ): Promise<T | undefined> {
+  async findById(id: string, opt: Omit<FindOptions<Cols>, "where"> = {}): Promise<T | undefined> {
     return this.findOne({ ...opt, where: { id } as any });
   }
-  async findManyByIds(
-    ids: string[],
-    opt: Omit<FindOptions<Cols>, "where"> = {},
-  ): Promise<T[]> {
+  async findManyByIds(ids: string[], opt: Omit<FindOptions<Cols>, "where"> = {}): Promise<T[]> {
     return (
       await this.client.findMany({ ...opt, where: { id: { in: ids } } as any })
     ).rows;
@@ -75,11 +54,7 @@ export class PgRepository<
   async update(opt: UpdateOptions<Cols>): Promise<T[]> {
     return (await this.client.update(opt)).rows;
   }
-  async updateOne(
-    set: Record<string, unknown>,
-    where: Record<string, unknown>,
-    returning?: string[],
-  ): Promise<T | undefined> {
+  async updateOne(set: Record<string, unknown>, where: Record<string, unknown>, returning?: string[]): Promise<T | undefined> {
     return (await this.client.update({ set, where, returning } as any)).rows[0];
   }
 
@@ -103,24 +78,15 @@ export class PgRepository<
   }
 
   async count(where?: Record<string, unknown>): Promise<number> {
-    const { sql } = this.client.accessor.findMany({
-      select: [] as any,
-      where,
-    } as any);
-    const result = await this.connection.query<{ count: string }>(
-      `SELECT COUNT(*) FROM (${sql.sql}) as subquery`,
-      sql.params as any[],
-    );
-    return parseInt(result.rows[0]?.count || "0", 10);
+    return repositoryCount(this.connection, this.client.accessor._model, where);
   }
 
   async exists(where: Record<string, unknown>): Promise<boolean> {
-    const { sql } = this.client.accessor.findOne({ where } as any);
-    const result = await this.connection.query<{ exists: boolean }>(
-      `SELECT EXISTS(${sql.sql}) as exists`,
-      sql.params as any[],
-    );
-    return result.rows[0]?.exists ?? false;
+    return repositoryExists(this.connection, this.client.accessor._model, where);
+  }
+
+  async findNearest(options: FindNearestOptions<Cols>): Promise<Array<{ row: T; distance: number }>> {
+    return executeNearest<T>(this.connection, this.client.accessor._model, options);
   }
 
   getAccessor() {

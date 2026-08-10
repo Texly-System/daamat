@@ -37,7 +37,7 @@ test("a handler returning after cancellation still settles cancelled", async () 
     signal = context.signal;
     await work.promise;
   });
-  await pool.query(`UPDATE "_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
+  await pool.query(`UPDATE "damat"."_damat_job_runs" SET "name"=$2 WHERE "id"=$1`, [
     item.run.id,
     name,
   ]);

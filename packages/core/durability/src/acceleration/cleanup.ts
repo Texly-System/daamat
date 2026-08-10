@@ -1,5 +1,6 @@
 import { getDurabilityClient } from "../client/global";
 import type { DurabilityExecutor } from "../client/types";
+import { damatRelation } from "../migrations/relocation";
 
 export async function cleanupPublishedAccelerationSignals(
   options: {
@@ -15,8 +16,8 @@ export async function cleanupPublishedAccelerationSignals(
   const executor = options.executor ?? getDurabilityClient();
   const before = options.before ?? new Date(Date.now() - 7_776_000_000);
   const result = await executor.query(
-    `DELETE FROM "_damat_acceleration_outbox" WHERE "id" IN
-       (SELECT "id" FROM "_damat_acceleration_outbox"
+    `DELETE FROM ${damatRelation("_damat_acceleration_outbox")} WHERE "id" IN
+       (SELECT "id" FROM ${damatRelation("_damat_acceleration_outbox")}
         WHERE "published_at" IS NOT NULL AND "published_at"<$1
         ORDER BY "published_at","revision" LIMIT $2)`,
     [before, limit],

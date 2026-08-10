@@ -32,7 +32,7 @@ export async function scheduleOutgoing(
     });
     if (!id) continue;
     await executor.query(
-      `INSERT INTO "_damat_pipeline_transitions"
+      `INSERT INTO "damat"."_damat_pipeline_transitions"
         ("run_id","from_execution_id","to_execution_id","edge","reason")
        VALUES ($1,$2,$3,$4::jsonb,$5)
        ON CONFLICT ("run_id","from_execution_id","to_execution_id") DO NOTHING`,
@@ -42,7 +42,8 @@ export async function scheduleOutgoing(
   }
   if (created)
     await executor.query(
-      `UPDATE "_damat_pipeline_runs" SET "status"='running',"updated_at"=NOW() WHERE "id"=$1`,
+      `UPDATE "damat"."_damat_pipeline_runs"
+       SET "status"='running',"updated_at"=NOW() WHERE "id"=$1`,
       [run.id],
     );
   return created;

@@ -7,14 +7,14 @@ export async function updateDeliveryForRetry(
   retentionMs: number | null,
 ): Promise<DurableEventDeliveryRow> {
   await executor.query(
-    `UPDATE "_damat_event_outbox" SET
+    `UPDATE "damat"."_damat_event_outbox" SET
        "retention_at"=CASE WHEN $2::bigint IS NULL THEN NULL
          ELSE GREATEST("retention_at",NOW()+($2*INTERVAL '1 ms')) END
      WHERE "id"=$1`,
     [row.event_id, retentionMs],
   );
   const result = await executor.query<DurableEventDeliveryRow>(
-    `UPDATE "_damat_event_deliveries" SET "status"='pending',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='pending',
        "available_at"=NOW(),"retention_at"=CASE WHEN $2::bigint IS NULL
          THEN NULL ELSE GREATEST("retention_at",
          NOW()+($2*INTERVAL '1 ms')) END,

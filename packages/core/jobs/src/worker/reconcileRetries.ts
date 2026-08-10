@@ -25,7 +25,7 @@ async function promote(
   queue?: string,
 ): Promise<number> {
   const selected = await executor.query<RetryRow>(
-    `SELECT "id" FROM "_damat_job_runs" WHERE "status"='retry_wait'
+    `SELECT "id" FROM "damat"."_damat_job_runs" WHERE "status"='retry_wait'
        AND "available_at" <= NOW() AND ($2::text IS NULL OR "queue"=$2)
      ORDER BY "available_at","id"
      FOR UPDATE SKIP LOCKED LIMIT $1`,
@@ -33,7 +33,7 @@ async function promote(
   );
   for (const row of selected.rows) {
     await executor.query(
-      `UPDATE "_damat_job_runs" SET "status"='queued',"updated_at"=NOW()
+      `UPDATE "damat"."_damat_job_runs" SET "status"='queued',"updated_at"=NOW()
        WHERE "id"=$1 AND "status"='retry_wait'`,
       [row.id],
     );

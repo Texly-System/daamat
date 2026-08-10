@@ -86,6 +86,40 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 const results = await runMigrations(pool, modules);
 ```
 
+## Native pgvector
+
+The umbrella exposes native pgvector modeling and execution through its model
+and PostgreSQL subpaths. `columns.vector(n)` and `columns.halfVector(n)` map to
+`VECTOR(n)` and `HALFVEC(n)` while remaining `number[]` in TypeScript. The
+PostgreSQL adapter registers pgvector for every pool connection, serializes
+modeled values, and decodes results back to `number[]`; repositories also
+provide typed `findNearest` queries and vector index metadata is consumed by
+the migration processor.
+
+```ts
+import { model, columns } from "@damatjs/orm/model";
+import { PgEntityManager } from "@damatjs/orm/pg";
+
+const Asset = model("asset", {
+  id: columns.id({ prefix: "ast" }).primaryKey(),
+  embedding: columns.halfVector(2048),
+});
+
+const nearest = await new PgEntityManager({ pool, models: { asset: Asset } })
+  .repo("asset")
+  .findNearest({
+    column: "embedding",
+    vector: queryEmbedding,
+    distance: "cosine",
+    limit: 20,
+  });
+```
+
+See the [model columns and types guide](../../../docs/guide/05aa-model-columns-and-types.md),
+[index and nearest-neighbor guide](../../../docs/guide/05ab-model-relations-and-indexes.md),
+and [migration guide](../../../docs/guide/06-migrations.md) for the complete
+contract.
+
 ## How it fits
 
 **Depends on** (all re-exported):

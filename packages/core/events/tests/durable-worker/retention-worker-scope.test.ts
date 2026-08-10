@@ -34,7 +34,7 @@ test("worker retention cleans terminal events shared with other workers", async 
     claims.map((claim) => completeEventDeliverySuccess(claim, undefined)),
   );
   await pool.query(
-    `UPDATE "_damat_event_outbox"
+    `UPDATE "damat"."_damat_event_outbox"
      SET "available_at"=NOW()-INTERVAL '2 hours',
          "retention_at"=NOW()-INTERVAL '1 hour'
      WHERE "id"=$1`,
@@ -50,7 +50,7 @@ test("worker retention cleans terminal events shared with other workers", async 
   try {
     await waitUntil(async () => {
       const row = await pool.query(
-        `SELECT 1 FROM "_damat_event_outbox" WHERE "id"=$1`,
+        `SELECT 1 FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
         [published.id],
       );
       return row.rowCount === 0;

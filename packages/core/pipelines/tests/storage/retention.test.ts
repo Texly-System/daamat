@@ -27,11 +27,11 @@ test("retention deletes complete root trees and their pipeline-owned jobs", asyn
   defineJob(jobName, async () => null);
   const job = await enqueueJob(jobName, {});
   await pool.query(
-    `UPDATE "_damat_pipeline_node_executions" SET "job_run_id"=$2 WHERE "id"=$1`,
+    `UPDATE "damat"."_damat_pipeline_node_executions" SET "job_run_id"=$2 WHERE "id"=$1`,
     [node.id, job.id],
   );
   await pool.query(
-    `UPDATE "_damat_pipeline_runs" SET "status"='succeeded',"completed_at"=NOW(),
+    `UPDATE "damat"."_damat_pipeline_runs" SET "status"='succeeded',"completed_at"=NOW(),
      "retention_at"=NOW()-INTERVAL '1 day' WHERE "id"=$1`,
     [root.id],
   );
@@ -41,7 +41,7 @@ test("retention deletes complete root trees and their pipeline-owned jobs", asyn
   expect(await findPipelineRun(root.id)).toBeUndefined();
   expect(
     (
-      await pool.query(`SELECT 1 FROM "_damat_job_runs" WHERE "id"=$1`, [
+      await pool.query(`SELECT 1 FROM "damat"."_damat_job_runs" WHERE "id"=$1`, [
         job.id,
       ])
     ).rowCount,

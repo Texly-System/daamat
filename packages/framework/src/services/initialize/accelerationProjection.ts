@@ -20,7 +20,7 @@ export async function rebuildReadyProjection(
   await clearReadyProjection(redis);
   if (enabled.jobs) {
     const jobs = await executor.query<ReadyRow>(
-      `SELECT "id","queue" AS "scope","available_at" FROM "_damat_job_runs"
+      `SELECT "id","queue" AS "scope","available_at" FROM "damat"."_damat_job_runs"
        WHERE "status" IN ('queued','retry_wait')`,
     );
     for (const row of jobs.rows) {
@@ -41,9 +41,9 @@ async function rebuildPipelineProjection(
 ): Promise<void> {
   const runs = await executor.query<ReadyRow>(
     `SELECT DISTINCT ON (n."run_id") n."run_id" AS "id",d."name" AS "scope",
-       n."available_at" FROM "_damat_pipeline_node_executions" n
-     JOIN "_damat_pipeline_runs" r ON r."id"=n."run_id"
-     JOIN "_damat_pipeline_definitions" d ON d."id"=r."definition_id"
+       n."available_at" FROM "damat"."_damat_pipeline_node_executions" n
+     JOIN "damat"."_damat_pipeline_runs" r ON r."id"=n."run_id"
+     JOIN "damat"."_damat_pipeline_definitions" d ON d."id"=r."definition_id"
      WHERE n."status" IN ('ready','waiting')
      ORDER BY n."run_id",n."available_at"`,
   );
@@ -62,12 +62,12 @@ async function rebuildEventProjection(
 ): Promise<void> {
   const routes = await executor.query<ReadyRow>(
     `SELECT "id",'router' AS "scope","available_at"
-     FROM "_damat_event_outbox" WHERE "routed_at" IS NULL`,
+     FROM "damat"."_damat_event_outbox" WHERE "routed_at" IS NULL`,
   );
   const deliveries = await executor.query<ReadyRow>(
     `SELECT d."id",json_build_array(o."name",d."consumer")::text AS "scope",
-       d."available_at" FROM "_damat_event_deliveries" d
-     JOIN "_damat_event_outbox" o ON o."id"=d."event_id"
+       d."available_at" FROM "damat"."_damat_event_deliveries" d
+     JOIN "damat"."_damat_event_outbox" o ON o."id"=d."event_id"
      WHERE d."status" IN ('pending','retry_wait')`,
   );
   for (const row of routes.rows) {

@@ -6,7 +6,7 @@ beforeEach(resetInspectionStorage);
 test("worker capacity uses active event workers only", async () => {
   const now = new Date("2026-01-02T12:00:00.000Z");
   await pool.query(
-    `INSERT INTO "_damat_workers" ("id","capabilities","hostname","process_id",
+    `INSERT INTO "damat"."_damat_workers" ("id","capabilities","hostname","process_id",
        "last_heartbeat_at","stopping_at","stopped_at","concurrency","in_flight")
      VALUES ('active','["events:a"]','host',1,$1,NULL,NULL,4,1),
        ('stale','["events:a"]','host',2,$2,NULL,NULL,8,2),

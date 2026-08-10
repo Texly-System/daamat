@@ -13,6 +13,7 @@ export * from "./leases";
 export * from "./logs";
 export * from "./migrations/catalog";
 export * from "./migrations/readiness";
+export * from "./migrations/relocation";
 export * from "./migrations/types";
 export * from "./retention";
 export * from "./workers";

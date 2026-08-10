@@ -29,12 +29,12 @@ test("retention rolls back cleanup and completed audit before recording failure"
     }),
   ).rejects.toBe(root);
   const retained = await pool.query(
-    `SELECT 1 FROM "_damat_event_outbox" WHERE "id"=$1`,
+    `SELECT 1 FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
     [event.id],
   );
   expect(retained.rowCount).toBe(1);
   const audit = await pool.query(
-    `SELECT "status","details" FROM "_damat_maintenance_activity"
+    `SELECT "status","details" FROM "damat"."_damat_maintenance_activity"
      WHERE "actor"->>'id'=$1 ORDER BY "id"`,
     [actor.id],
   );
@@ -70,7 +70,7 @@ function failAfterCleanup(root: Error, deletedId?: string): DurabilityClient {
         await callback(executor);
         if (deletedId) {
           const deleted = await executor.query(
-            `SELECT 1 FROM "_damat_event_outbox" WHERE "id"=$1`,
+            `SELECT 1 FROM "damat"."_damat_event_outbox" WHERE "id"=$1`,
             [deletedId],
           );
           if (deleted.rowCount !== 0) {

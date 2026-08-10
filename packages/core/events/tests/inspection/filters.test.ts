@@ -13,19 +13,19 @@ test("supports every event and delivery inspection filter", async () => {
   const delivery = seeded.deliveries[0]!;
   const now = new Date();
   await pool.query(
-    `UPDATE "_damat_event_outbox" SET "causation_id"='cause-a',
+    `UPDATE "damat"."_damat_event_outbox" SET "causation_id"='cause-a',
        "idempotency_key"='key-a' WHERE "id"=$1`,
     [seeded.event.id],
   );
   await pool.query(
-    `UPDATE "_damat_event_deliveries" SET "status"='running',
+    `UPDATE "damat"."_damat_event_deliveries" SET "status"='running',
        "lease_owner"='worker-a',"lease_token"=$2,
        "lease_expires_at"=$3,"started_at"=$4,"completed_at"=$4
      WHERE "id"=$1`,
     [delivery.id, crypto.randomUUID(), new Date(now.getTime() + 60_000), now],
   );
   await pool.query(
-    `INSERT INTO "_damat_event_activity"
+    `INSERT INTO "damat"."_damat_event_activity"
       ("event_id","delivery_id","consumer","type","occurred_at")
      VALUES ($1,$2,'alpha','dead_lettered',$3)`,
     [seeded.event.id, delivery.id, now],

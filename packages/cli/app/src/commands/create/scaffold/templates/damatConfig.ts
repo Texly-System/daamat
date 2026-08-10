@@ -11,7 +11,8 @@ export default defineConfig({
     releaseVersion: process.env.RELEASE_VERSION ?? "development",
     databaseUrl: process.env.DATABASE_URL ?? "",
     redisUrl: process.env.REDIS_URL,
-    nodeEnv: "development",
+    nodeEnv:
+      process.env.NODE_ENV === "production" ? "production" : "development",
     loggerConfig: {
       level: "debug",
       format: "pretty",

@@ -21,6 +21,7 @@ Use this package when you need to:
 - Persist and reload a module's schema as a JSON snapshot (`saveSnapshot` / `loadSnapshot`).
 - Compute the structural difference between two schemas (`diffSchemas.diffSchemas`).
 - Generate PostgreSQL `up` SQL from a diff (`generateMigration.generateFromDiff`) or from a full snapshot (`generateMigration.generateFromSnapshot`).
+- Generate native pgvector DDL (`VECTOR(n)` / `HALFVEC(n)`), additive extension setup, and HNSW/IVFFlat indexes from schema metadata.
 - Build a migration tool or CLI on top of the ORM.
 
 Do **not** use it directly to:
@@ -89,7 +90,7 @@ The root export (`.`) re-exports the type definitions, the `diff`, `sqlGenerator
 | `snapshotExist(dir)`                                                                                                                    | function   | `true` if `schema-snapshot.json` exists in `dir`.                                                      |
 | `diffSchemas.diffSchemas(prev, curr)`                                                                                                   | function   | Compare two `ModuleSchema`s → priority-sorted `SchemaDiff`. Primary diff entry point.                  |
 | `reverseDiff.reverseDiff(diff)`                                                                                                         | function   | Invert a forward diff for `down` migrations (drops are intentionally skipped).                         |
-| `tablesDiff`, `columnsDiff`, `indexesDiff`, `foreignKeysDiff`, `enumsDiff`, `utilsDiff`, `priorityDiff`                                 | namespaces | Per-concern diff helpers and equality checks.                                                          |
+| `tablesDiff`, `columnsDiff`, `indexesDiff`, `foreignKeysDiff`, `enumsDiff`, `extensionsDiff`, `utilsDiff`, `priorityDiff`               | namespaces | Per-concern diff helpers and equality checks.                                                          |
 | `generateMigration.generateFromDiff(diff, opts?)`                                                                                       | function   | Emit ordered `up` SQL from a `SchemaDiff`.                                                             |
 | `generateMigration.generateFromSnapshot(snapshot, opts?)`                                                                               | function   | Emit a full baseline `up` migration from a single `ModuleSchema`.                                      |
 | `changeSqlGenerator.generateChangeSQL(change, opts)`                                                                                    | function   | Dispatch one `SchemaChange` to its SQL generator.                                                      |
@@ -102,6 +103,11 @@ The root export (`.`) re-exports the type definitions, the `diff`, `sqlGenerator
 **Subpath exports:** none — everything is under `.`.
 
 **Key types from `@damatjs/orm-type`:** `ColumnSchema`, `TableSchema`, `ModuleSchema`, `EnumSchema`, `IndexSchema`, `ForeignKeySchema`, `ColumnType`. This package's `SchemaChange` records embed them, but it does **not** re-export them — import these directly from `@damatjs/orm-type`.
+
+Native vectors use `ColumnSchema.type` `vector` or `halfvec` with a positive
+`dimensions` value. They emit scalar `VECTOR(n)`/`HALFVEC(n)` storage; ordinary
+PostgreSQL arrays remain unchanged. Vector type or dimension changes produce a
+warning and manual-review comment instead of an automatic cast.
 
 ## How it fits
 

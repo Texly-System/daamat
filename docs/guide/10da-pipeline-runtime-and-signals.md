@@ -31,6 +31,13 @@ may arrive before that node becomes active; PostgreSQL buffers and consumes them
 once when the wait is reached. Signal calls require actor, reason, and
 idempotency metadata.
 
+Durable event waits use a different boundary. The wait scans matching event
+history from its node-execution activation, so an event published earlier is
+excluded even when its correlation ID matches. Correlation narrows eligible
+events; it does not make earlier facts visible. Use a forked, correlated
+`event.wait` branch beside the work/publish branch and an `all` join when a
+process must start work and await its completion event.
+
 ## Start work in a domain transaction
 
 Starts and signals accept the executor from `ModuleService.transaction`:

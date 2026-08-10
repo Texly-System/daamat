@@ -7,6 +7,10 @@ import {
   writeConfig,
 } from "./fixture";
 import { systemMigrationKeys } from "./systemMigrationKeys";
+import {
+  eventSystemMigrations,
+  jobEventSystemMigrations,
+} from "../systemMigrationExpectations";
 
 setupMigrateFixture();
 
@@ -17,19 +21,7 @@ test.serial(
     state.runResult = [{ success: true }];
     expect((await (await loadUp()).handler(context().ctx)).exitCode).toBe(0);
     expect(systemMigrationKeys(state.runArgs.options.systemMigrations)).toEqual(
-      [
-        "@damatjs/durability:001",
-        "@damatjs/durability:002",
-        "@damatjs/durability:003",
-        "@damatjs/durability:004",
-        "@damatjs/durability:005",
-        "@damatjs/events:001",
-        "@damatjs/events:002",
-        "@damatjs/events:003",
-        "@damatjs/events:004",
-        "@damatjs/events:005",
-        "@damatjs/events:006",
-      ],
+      eventSystemMigrations,
     );
   },
 );
@@ -41,18 +33,7 @@ test.serial("up orders jobs before events when both are enabled", async () => {
   });
   state.runResult = [{ success: true }];
   expect((await (await loadUp()).handler(context().ctx)).exitCode).toBe(0);
-  expect(
-    systemMigrationKeys(state.runArgs.options.systemMigrations).slice(-10),
-  ).toEqual([
-    "@damatjs/jobs:001",
-    "@damatjs/jobs:002",
-    "@damatjs/jobs:003",
-    "@damatjs/jobs:004",
-    "@damatjs/events:001",
-    "@damatjs/events:002",
-    "@damatjs/events:003",
-    "@damatjs/events:004",
-    "@damatjs/events:005",
-    "@damatjs/events:006",
-  ]);
+  expect(systemMigrationKeys(state.runArgs.options.systemMigrations)).toEqual(
+    jobEventSystemMigrations,
+  );
 });

@@ -22,17 +22,17 @@ export async function completeIdlePipelineRuns(
   const result = await executor.query<CompletedRunRow>(
     `WITH candidates AS (
        SELECT r."id",r."parent_run_id",r."definition_id",r."version_id",
-         (SELECT n."output" FROM "_damat_pipeline_node_executions" n
+         (SELECT n."output" FROM "damat"."_damat_pipeline_node_executions" n
            WHERE n."run_id"=r."id" AND n."phase"='forward' AND n."status"='succeeded'
            ORDER BY n."completed_at" DESC,n."id" DESC LIMIT 1) AS "output"
-       FROM "_damat_pipeline_runs" r
+       FROM "damat"."_damat_pipeline_runs" r
        WHERE r."status" IN ('running','waiting')
-         AND NOT EXISTS (SELECT 1 FROM "_damat_pipeline_node_executions" n
+         AND NOT EXISTS (SELECT 1 FROM "damat"."_damat_pipeline_node_executions" n
            WHERE n."run_id"=r."id" AND n."status" IN ('ready','queued','running','waiting'))
        ORDER BY r."updated_at",r."id" FOR UPDATE SKIP LOCKED LIMIT $1
      ) SELECT c."id",c."parent_run_id",c."output",d."name",v."manifest"
-       FROM candidates c JOIN "_damat_pipeline_definitions" d ON d."id"=c."definition_id"
-       JOIN "_damat_pipeline_versions" v ON v."id"=c."version_id"`,
+       FROM candidates c JOIN "damat"."_damat_pipeline_definitions" d ON d."id"=c."definition_id"
+       JOIN "damat"."_damat_pipeline_versions" v ON v."id"=c."version_id"`,
     [limit],
   );
   for (const run of result.rows) {

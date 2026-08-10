@@ -26,6 +26,12 @@ password, and database. It writes the selected URL to `.env`, installs packages,
 creates the database when necessary, and applies the durability, jobs, durable
 events, and pipeline catalogs. Generated `bun run dev` repeats that idempotent
 database setup before the runtime readiness check.
+`damat create` initializes a `main` Git repository and commits the scaffold by
+default; pass `--no-git` to skip all Git probing and setup. Missing Git or a
+failed Git command only emits a recovery warning and leaves the scaffold intact.
+Generated `damat.config.ts` sets `projectConfig.nodeEnv` to `production` only
+when `NODE_ENV` is exactly `production`; an absent or other value uses
+`development`.
 
 - [Internals](./docs/README.md)
 - [CLI framework](../../core/cli/README.md)
